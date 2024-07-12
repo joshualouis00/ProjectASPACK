@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\Component",
+    "\\src\\Component\\TableComponent",
+    "\\src\\GlobalTypes",
+    "\\src\\Pages",
+    "\\src\\Theme"
+  ],
+  "SelectedNode": "\\src\\Pages\\Dashboard.tsx",
+  "PreviewInSolutionExplorer": false
+}

@@ -1,74 +1,164 @@
-// GlideAppTable.tsx
-import React from 'react';
+import React, { ChangeEvent, useState, useEffect } from "react";
 import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  type MRT_ColumnDef,
-} from 'material-react-table';
-import { TUploadTemplate } from '../../GlobalTypes/TUploadTemplate';
-import { getDefaultMRTOptions } from '../../CommonHandler/DefaultMRTOptions';
+  Container,
+  Box,
+  Paper,
+  TableContainer,
+  Table,
+  TablePagination,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+  TextField,
+} from "@mui/material";
 
-const defaultMRTOptions = getDefaultMRTOptions<TUploadTemplate>();
+interface TUploadTemplate {
+  no: string;
+  fileName: string;
+  createdDate: string;
+  status: string;
+  action: string;
+}
 
 export const AppTable = () => {
-  const columns: MRT_ColumnDef<TUploadTemplate>[] = [
-      {
-        accessorKey: "no",
-        header: "#",
-        enableSorting: false,
-      },
-      {
-        accessorKey: 'fileName',
-        header: 'Filename',
-        enableSorting: false,
-      },
-      {
-        accessorKey: 'createdDate',
-        header: 'Create Date',
-        enableSorting: false,
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
-        enableSorting: false,
-      },
-      {
-        accessorKey: 'action',
-        header: 'Action',
-        enableSorting: false,
-      }
-  ]; 
+  // Pagging
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [data, setData] = useState<TUploadTemplate[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [data, setData] = React.useState<TUploadTemplate[]>([]);
-  React.useEffect( () => {
+  useEffect(() => {
     document.title = "Dashboard";
-    setData([{
-      no:"1",
-      fileName: "SampleFile.xlsx",
-      createdDate: "10-Jun-2024",
-      status: "Active",
-      action: "",
-    },
-  ]);
-  },[]);
+    setData([
+      {
+        no: "1",
+        fileName: "SampleFile.xlsx",
+        createdDate: "10/06/2024",
+        status: "Active",
+        action: "",
+      },
+      {
+        no: "2",
+        fileName: "AnotherFile.docx",
+        createdDate: "11/06/2024",
+        status: "Inactive",
+        action: "",
+      },
+      // Tambahkan data lainnya di sini
+    ]);
+  }, []);
 
-  const table = useMaterialReactTable({
-    ...defaultMRTOptions, //spread your default options
-    columns,
-    data,
-    enableGlobalFilter: true, //override default options
-    initialState: {
-      ...defaultMRTOptions.initialState, //spread default initial state
-      showColumnFilters: false, //override default initial state for just this table
-    },
-    //...
-  });
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
 
-  //you will have access to the entire table instance where you need it
-  console.log(table.getState());
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
 
-  return <MaterialReactTable table={table}/>;
+  // Handle search input change
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+    setPage(0);
+    console.log("Search Query:", event.target.value);
+  };
 
+  // Filter data based on search query
+  const filteredData = data.filter((row) =>
+    row.fileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.createdDate.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.status.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  console.log("Filtered Data:", filteredData);
+
+  return (
+    <Container
+      maxWidth="xl"
+      sx={{ pl: "2px !important", pr: "2px !important" }}
+    >
+      <Box mt={10} alignContent={"center"} alignItems={"left"}>
+        <Paper>
+          <Box display="flex" justifyContent="flex-end" p={2}>
+            <TextField
+              label="Search"
+              variant="outlined"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </Box>
+          <TableContainer component={Paper}>
+            <Table
+              stickyHeader
+              sx={{ minWidth: 650 }}
+              aria-label="caption table"
+            >
+              <caption>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <TablePagination
+                    rowsPerPageOptions={[10, 25, 100]}
+                    component="div"
+                    count={filteredData.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </Box>
+              </caption>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left" sx={{ width: "0.4%" }}>
+                    #
+                  </TableCell>
+                  <TableCell align="left" sx={{ width: "3%" }}>
+                    Filename
+                  </TableCell>
+                  <TableCell align="left" sx={{ width: "1.5%" }}>
+                    Created Date
+                  </TableCell>
+                  <TableCell align="left" sx={{ width: "0.5%" }}>
+                    Status
+                  </TableCell>
+                  <TableCell align="left" sx={{ width: "1.5%" }}>
+                    Action
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredData
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => (
+                    <TableRow key={row.no}>
+                      <TableCell component="th" scope="row">
+                        {row.no}
+                      </TableCell>
+                      <TableCell align="left">{row.fileName}</TableCell>
+                      <TableCell align="left">{row.createdDate}</TableCell>
+                      <TableCell align="left">{row.status}</TableCell>
+                      <TableCell align="left">
+                        <Button variant="outlined" value="">
+                          Preview
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Box>
+    </Container>
+  );
 };
 
 export default AppTable;

@@ -8,11 +8,10 @@ import {
   Avatar,
   CssBaseline,
   Grid,
-  Link,
-  Radio,
-//   Stack,
+  Radio
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
@@ -22,12 +21,20 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  
+  const { open, setOpen } = UseToggleSidebar();
+  const toggleDrawer = () => {
+    console.log("email : ", email);
+    console.log("password : ",password);
+    setOpen(true);
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Handle login logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+    // Simpan logika autentikasi di sini jika perlu
+    // Contoh sederhana untuk navigasi ke Dashboard setelah login berhasil
+    navigate('/Dashboard');
+    window.location.reload();
   };
 
   return (
@@ -117,6 +124,7 @@ const Login: React.FC = () => {
               type="submit"
               fullWidth
               variant="contained"
+              onClick={toggleDrawer}
               sx={{ mt: 1, mb: 2 }}
             >
               Sign In

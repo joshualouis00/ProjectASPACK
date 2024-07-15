@@ -1,15 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
   Typography,
-  Grid,
   IconButton,
   Collapse,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Button,
   Step,
   StepButton,
@@ -35,12 +30,14 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import { PokemonClient } from "pokenode-ts";
+import FilterPeriod from "../Component/TableComponent/FilterPeriod";
 
 // Definisi rows
 function createData(
   id: number,
   filename: string,
-  createdDate: string,
+  createdDate: Date,
   version: string,
   status: string
 ) {
@@ -48,47 +45,71 @@ function createData(
 }
 
 const approveSteps = ["Waiting Approval", "Approved"];
+const date = new Date();
 
-const steps = [
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-  "Aspack ",
-];
+const stepsCount = 10; // Jumlah langkah yang diinginkan
+const steps = Array.from({ length: stepsCount }, (_, index) => `Aspack ${index + 1}`);
 
 //Data Waiting for Approval
-const rows = [
-  createData(1, "asbasbdba.xls", "01/02/2001", "V0", ""),
-  createData(2, "asbasbdba.xls", "01/02/2002", "V1", ""),
-  createData(3, "asbasbdba.xls", "01/02/2003", "V2", ""),
-  createData(4, "asbasbdba.xls", "01/02/2004", "V3", ""),
-  createData(5, "asbasbdba.xls", "01/02/2005", "V4", ""),
+const rowsWaiting = [
+  // rows
+  createData(1, "asbasbdba.xls", date, "V0", ""),
+  createData(2, "asbasbdba.xls", date, "V1", ""),
+  createData(3, "asbasbdba.xls", date, "V2", ""),
+  createData(4, "asbasbdba.xls", date, "V3", ""),
+  createData(5, "asbasbdba.xls", date, "V4", ""),
 ];
 
 //Data Hold On
 const rowsHold = [
-  createData(1, "aaaaaaaaaaaaa.xls", "01/02/2001", "", "To be Revised"),
-  createData(2, "bbbbbbbbbbbbb.xls", "01/02/2002", "", "To be Revised"),
+  createData(1, "aaaaaaaaaaaaa.xls", date, "", "To be Revised"),
+  createData(2, "bbbbbbbbbbbbb.xls", date, "", "To be Revised"),
 ];
 
 //Data Approved
 const rowsApproved = [
-  createData(1, "cccccccccccc.xls", "01/02/2001", "V1", "Approved"),
-  createData(2, "dddddddddddd.xls", "01/02/2002", "V2", "Approved"),
+  createData(1, "cccccccccccc.xls", date, "V1", "Approved"),
+  createData(2, "dddddddddddd.xls", date, "V2", "Approved"),
 ];
 
 const UploadedAspackPage = () => {
+  // Test Pokemon API
+  const [rows, setRows] = useState(rowsWaiting);
+  const fetchPokemonData = async () => {
+    const api = new PokemonClient();
+    
+    try {
+      const pokemonList = await api.listPokemons(0, 50);
+
+      const pokemonDataPromises = pokemonList.results.map(async (pokemon) => {
+        const pokemonData = await api.getPokemonByName(pokemon.name);
+        return createData(
+          pokemonData.id,
+          pokemonData.name,
+          date,
+          pokemonData.types.map(type => type.type.name).join(', '),
+          pokemonData.weight.toString()
+        );
+      })
+      const allPokemonData = await Promise.all(pokemonDataPromises);
+
+      setRows(allPokemonData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    // Panggil fungsi fetchPokemonData saat komponen dimuat
+    fetchPokemonData();
+  }, []);
+
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
   const [openFilter, setOpenFilter] = useState(false);
   const [filteredRows, setFilteredRows] = useState(rows);
+
 
   const [openStatus, setOpenStatus] = useState(false);
 
@@ -108,7 +129,7 @@ const UploadedAspackPage = () => {
     setTabValue(newValue);
   };
 
-  interface TabPanelProps {
+  interface TabPanelProps { 
     children?: React.ReactNode;
     value: number;
     index: number;
@@ -182,11 +203,6 @@ const UploadedAspackPage = () => {
     handleComplete();
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
-
   const handleToggleStatus = () => {
     setOpenStatus(!openStatus);
   };
@@ -197,15 +213,15 @@ const UploadedAspackPage = () => {
 
   const handleFilter = () => {
     // Logika untuk memfilter data berdasarkan selectedMonth, selectedYear, selectedCompany
-    //const filteredData = rows.filter((row) => {
-    // Misalnya, memfilter berdasarkan tahun dan perusahaan
-    // const yearMatch = selectedYear
-    //   ? row.createdDate.includes(selectedYear)
-    //   : true;
+  const filteredData = rows.filter((row) => {
+    const monthMatch = selectedMonth ? row.createdDate.getMonth() + 1 === parseInt(selectedMonth) : true;
+    const yearMatch = selectedYear ? row.createdDate.getFullYear() === parseInt(selectedYear) : true;
     //const companyMatch = selectedCompany ? row.company === selectedCompany : true;
-    // return yearMatch;
-    // });
-    // setFilteredRows(filteredData);
+
+    return monthMatch && yearMatch;
+  });
+
+  setFilteredRows(filteredData);
   };
 
   const handleCheckAll = () => {
@@ -248,75 +264,17 @@ const UploadedAspackPage = () => {
       maxWidth="xl"
       sx={{ pl: "2px !important", pr: "2px !important" }}
     >
-      <Box ml={"10px"} mb={2} mt={2}>
-        <Typography
-          variant="h6"
-          onClick={handleToggleFilter}
-          style={{ cursor: "pointer" }}
-        >
-          Filter Periode{" "}
-          <IconButton>
-            {openFilter ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-          </IconButton>
-        </Typography>
-        <Collapse in={openFilter}>
-          <Grid container spacing={2} mt={2}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Bulan</InputLabel>
-                <Select
-                  value={selectedMonth}
-                  autoComplete="bulan"
-                  autoFocus
-                  fullWidth
-                  onChange={(e) => setSelectedMonth(e.target.value as string)}
-                >
-                  <MenuItem value="jan">Januari</MenuItem>
-                  <MenuItem value="feb">Februari</MenuItem>
-                  {/* Tambahkan lebih banyak bulan */}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Tahun</InputLabel>
-                <Select
-                  value={selectedYear}
-                  autoComplete="tahun"
-                  autoFocus
-                  fullWidth
-                  onChange={(e) => setSelectedYear(e.target.value as string)}
-                >
-                  <MenuItem value="2022">2022</MenuItem>
-                  <MenuItem value="2023">2023</MenuItem>
-                  {/* Tambahkan lebih banyak tahun */}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Affiliate Company</InputLabel>
-                <Select
-                  value={selectedCompany}
-                  autoComplete="company"
-                  autoFocus
-                  fullWidth
-                  onChange={(e) => setSelectedCompany(e.target.value as string)}
-                >
-                  <MenuItem value="company1">Company 1</MenuItem>
-                  <MenuItem value="company2">Company 2</MenuItem>
-                  {/* Tambahkan lebih banyak perusahaan */}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" onClick={handleFilter}>
-                Filter
-              </Button>
-            </Grid>
-          </Grid>
-        </Collapse>
-      </Box>
+      <FilterPeriod
+        openFilter={openFilter}
+        handleToggleFilter={handleToggleFilter}
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        selectedCompany={selectedCompany}
+        setSelectedCompany={setSelectedCompany}
+        handleFilter={handleFilter}
+      />
       <Box ml={"5px"} mb={2} mt={2}>
         <Typography
           variant="h6"
@@ -336,7 +294,7 @@ const UploadedAspackPage = () => {
               {steps.map((label, index) => (
                 <Step key={label} completed={completed[index]}>
                   <StepButton color="inherit" onClick={handleStep(index)}>
-                    {label} {index + 1}{" "}
+                    {label} {" "}
                     {index === activeStep && approvalStatus
                       ? approvalStatus
                       : ""}
@@ -423,7 +381,7 @@ const UploadedAspackPage = () => {
                           {row.id}
                         </TableCell>
                         <TableCell align="left">{row.filename}</TableCell>
-                        <TableCell align="left">{row.createdDate}</TableCell>
+                        <TableCell align="left">{row.createdDate.toDateString()}</TableCell>
                         <TableCell align="left">{row.version}</TableCell>
                         <TableCell align="left">
                           <Button variant="outlined">Preview</Button>
@@ -456,7 +414,11 @@ const UploadedAspackPage = () => {
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
             <TableContainer component={Paper}>
-              <Table stickyHeader sx={{ minWidth: 650 }} aria-label="caption table">
+              <Table
+                stickyHeader
+                sx={{ minWidth: 650 }}
+                aria-label="caption table"
+              >
                 {/* Tabel untuk tab "Hold On" */}
                 <caption>
                   <Box
@@ -496,33 +458,37 @@ const UploadedAspackPage = () => {
                 </TableHead>
                 <TableBody>
                   {rowsHold
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        {row.id}
-                      </TableCell>
-                      <TableCell align="left" sx={{ width: "0.4%" }}>
-                        {row.filename}
-                      </TableCell>
-                      <TableCell align="left" sx={{ width: "0.4%" }}>
-                        {row.createdDate}
-                      </TableCell>
-                      <TableCell align="left" sx={{ width: "0.4%" }}>
-                        <Button variant="outlined">Preview</Button>
-                      </TableCell>
-                      <TableCell align="left" sx={{ width: "0.4%" }}>
-                        {row.status}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell component="th" scope="row">
+                          {row.id}
+                        </TableCell>
+                        <TableCell align="left" sx={{ width: "0.4%" }}>
+                          {row.filename}
+                        </TableCell>
+                        <TableCell align="left" sx={{ width: "0.4%" }}>
+                          {row.createdDate.toDateString()}
+                        </TableCell>
+                        <TableCell align="left" sx={{ width: "0.4%" }}>
+                          <Button variant="outlined">Preview</Button>
+                        </TableCell>
+                        <TableCell align="left" sx={{ width: "0.4%" }}>
+                          {row.status}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>
           </TabPanel>
           <TabPanel value={tabValue} index={2}>
             <TableContainer component={Paper}>
-              <Table stickyHeader sx={{ minWidth: 650 }} aria-label="caption table">
+              <Table
+                stickyHeader
+                sx={{ minWidth: 650 }}
+                aria-label="caption table"
+              >
                 {/* Tabel untuk tab "Approved" */}
                 <caption>
                   <Box
@@ -568,26 +534,26 @@ const UploadedAspackPage = () => {
                 </TableHead>
                 <TableBody>
                   {rowsApproved
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        {row.id}
-                      </TableCell>
-                      <TableCell align="left">{row.filename}</TableCell>
-                      <TableCell align="left">{row.createdDate}</TableCell>
-                      <TableCell align="left">{row.version}</TableCell>
-                      <TableCell align="left">
-                        <Button variant="outlined">Preview</Button>
-                      </TableCell>
-                      <TableCell align="left">{row.status}</TableCell>
-                      <TableCell align="left">
-                        <>
-                          <Checkbox></Checkbox>
-                        </>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell component="th" scope="row">
+                          {row.id}
+                        </TableCell>
+                        <TableCell align="left">{row.filename}</TableCell>
+                        <TableCell align="left">{row.createdDate.toDateString()}</TableCell>
+                        <TableCell align="left">{row.version}</TableCell>
+                        <TableCell align="left">
+                          <Button variant="outlined">Preview</Button>
+                        </TableCell>
+                        <TableCell align="left">{row.status}</TableCell>
+                        <TableCell align="left">
+                          <>
+                            <Checkbox></Checkbox>
+                          </>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>

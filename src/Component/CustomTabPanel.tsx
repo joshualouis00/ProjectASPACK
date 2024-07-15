@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import AppTable from "./TableComponent/MaterialTableUploadTemplate";
 import { useDropzone } from "react-dropzone";
 
@@ -10,13 +10,13 @@ export interface ITabContent {
 }
 
 const TabContent = (props: ITabContent) => {
-//Drag n Drop dengan react-dropzone
-const onDrop = React.useCallback((acceptedFiles: any) => {
-  // Handle the files here
-  console.log(acceptedFiles);
-}, []);
+  //Drag n Drop dengan react-dropzone
+  const onDrop = React.useCallback((acceptedFiles: any) => {
+    // Handle the files here
+    console.log(acceptedFiles);
+  }, []);
 
-const { getRootProps, getInputProps } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
     <Container
@@ -36,21 +36,29 @@ const { getRootProps, getInputProps } = useDropzone({ onDrop });
           "a new file will automatically deactivate the previous file. the file accessible by affco will be the latest uploaded file."
         }
       </Typography>
-      <Box {...getRootProps()} sx={{
-        border: '0.5px dashed #ccc',
-        borderRadius: '4px',
-        padding: '20px',
-        height: '300px',
-        textAlign: 'center',
-        cursor: "pointer",
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <Box
+        {...getRootProps()}
+        sx={{
+          border: "0.5px dashed #ccc",
+          borderRadius: "4px",
+          padding: "20px",
+          height: "300px",
+          textAlign: "center",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <input {...getInputProps()} />
         <Typography color="textSecondary">
           Drag 'n' drop some files here, or click to select files
         </Typography>
+      </Box>
+      <Box display="flex" justifyContent="flex-end" p={2}>
+        <Button variant="contained" sx={{ marginRight: "0.5%" }}>
+          Download button
+        </Button>
       </Box>
       <Box sx={{ width: "100%" }}>
         <AppTable />

@@ -17,24 +17,26 @@ import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
-const Login: React.FC = () => {
+const Login: React.FC<{ setUser: (user: { role: string, email: string }) => void }> = ({ setUser }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Simpan logika autentikasi di sini jika perlu
+    // Misalkan kita mendapatkan data pengguna dari server
+    const userData = { role: "User Affco", email }; // Contoh data pengguna
+    setUser(userData);
+    navigate('/Dashboard');
+    window.location.reload();
+  };
   
   const { open, setOpen } = UseToggleSidebar();
   const toggleDrawer = () => {
     console.log("email : ", email);
     console.log("password : ",password);
     setOpen(true);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Simpan logika autentikasi di sini jika perlu
-    // Contoh sederhana untuk navigasi ke Dashboard setelah login berhasil
-    navigate('/Dashboard');
-    window.location.reload();
   };
 
   return (

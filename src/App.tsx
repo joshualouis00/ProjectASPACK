@@ -34,6 +34,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import MasterTemplate from "./Pages/MasterTemplate";
 import PageWrapper from "./Component/PageWrapper";
 import Login from "./Pages/Login";
+import { useState } from "react";
 
 function Copyright(props: any) {
   return (
@@ -125,6 +126,7 @@ const defaultTheme = createTheme();
 function App() {
   const { open, setOpen } = UseToggleSidebar();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [user, setUser] = useState<{ role: string, email: string } | null>(null);
   const openMenu = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -332,7 +334,10 @@ function App() {
               }}
             >
               <Routes>
-                <Route path="/" element={<Login />} />
+              <Route
+                  path="/"
+                  element={<Login setUser={setUser} />}
+                />
                 <Route
                   path="/Dashboard"
                   element={
@@ -347,7 +352,7 @@ function App() {
                   path="/Approval"
                   element={
                     <PageWrapper
-                      content={<Approvals />}
+                      content={<Approvals setUser={setUser}/>}
                       title="Aspack Approval"
                       headerTitle="Uploaded Aspack"
                     />

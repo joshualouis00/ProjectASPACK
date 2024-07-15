@@ -72,7 +72,15 @@ const rowsApproved = [
   createData(2, "dddddddddddd.xls", date, "V2", "Approved"),
 ];
 
-const UploadedAspackPage = () => {
+const UploadedAspackPage: React.FC<{ setUser: (user: { role: string, email: string }) => void }> = ({ setUser }) => {
+  const [email, setEmail] = useState("");
+  const userData = { role: "User Affco", email }; // Contoh data pengguna
+
+  useEffect(() => {
+    setUser(userData);
+  }, [setEmail, email]);
+
+
   // Test Pokemon API
   const [rows, setRows] = useState(rowsWaiting);
   const fetchPokemonData = async () => {
@@ -179,9 +187,9 @@ const UploadedAspackPage = () => {
     setActiveStep(step);
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  // const handleBack = () => {
+  //   setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  // };
 
   const handleComplete = () => {
     const newCompleted = completed;
@@ -258,7 +266,7 @@ const UploadedAspackPage = () => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-
+  console.log("cek email : ",email);
   return (
     <Container
       maxWidth="xl"
@@ -275,7 +283,9 @@ const UploadedAspackPage = () => {
         setSelectedCompany={setSelectedCompany}
         handleFilter={handleFilter}
       />
-      <Box ml={"5px"} mb={2} mt={2}>
+
+      {email !== "User Affco" && (
+      <Box ml={"5px"} mb={2} mt={2}> 
         <Typography
           variant="h6"
           onClick={handleToggleStatus}
@@ -305,6 +315,7 @@ const UploadedAspackPage = () => {
           </Box>
         </Collapse>
       </Box>
+      )}
       <Box ml={"10px"} mt={1} alignContent={"center"} alignItems={"left"}>
         <Paper>
           <Tabs
@@ -602,6 +613,7 @@ const UploadedAspackPage = () => {
       </Dialog>
     </Container>
   );
+  
 };
 
 export default UploadedAspackPage;

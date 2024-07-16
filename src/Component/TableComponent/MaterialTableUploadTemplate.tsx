@@ -82,7 +82,7 @@ export const AppTable = () => {
       maxWidth="xl"
       sx={{ pl: "2px !important", pr: "2px !important" }}
     >
-      <Box mt={10} alignContent={"center"} alignItems={"left"}>
+      <Box mt={5} alignContent={"center"} alignItems={"left"}>
         <Paper>
           <Box display="flex" justifyContent="flex-end" p={2}>
             <TextField

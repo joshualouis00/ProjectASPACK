@@ -55,11 +55,6 @@ const TabContent = (props: ITabContent) => {
           Drag 'n' drop some files here, or click to select files
         </Typography>
       </Box>
-      <Box display="flex" justifyContent="flex-end" p={2}>
-        <Button variant="contained" sx={{ marginRight: "0.5%" }}>
-          Download button
-        </Button>
-      </Box>
       <Box sx={{ width: "100%" }}>
         <AppTable />
       </Box>

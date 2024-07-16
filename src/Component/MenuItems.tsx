@@ -1,121 +1,206 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Collapse,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import BarChartIcon from "@mui/icons-material/BarChart";
 import LayersIcon from "@mui/icons-material/Layers";
 import { useNavigate } from "react-router-dom";
 import {
   ConnectWithoutContact,
+  ExpandLess,
+  ExpandMore,
 } from "@mui/icons-material";
+import DatasetIcon from "@mui/icons-material/Dataset";
 export interface MenuItemsProps {
   DrawerStatus: boolean;
 }
 
 const MenuItems = (props: MenuItemsProps) => {
-  const [openMaster, setOpenMaster] = React.useState(false);
+  const [openMaster, setOpenMaster] = useState(false);
+  const [openApproval, setOpenApproval] = useState(false);
+  const [openLibrary, setOpenLibrary] = useState(false);
+  const [openUserWorkflow, setUserWorkflow] = useState(false);
   const navigate = useNavigate();
 
   const handleOpenMaster = () => {
     setOpenMaster(!openMaster);
   };
 
+  const handleOpenApproval = () => {
+    setOpenApproval(!openApproval);
+  };
+
+  const handleOpenLibrary = () => {
+    setOpenLibrary(!openLibrary);
+  };
+
+  const handleUserWorkflow = () => {
+    setUserWorkflow(!openUserWorkflow);
+  };
+
   React.useEffect(() => {
     if (!props.DrawerStatus) {
       setOpenMaster(false);
+      setOpenApproval(false);
+      setOpenApproval(false);
     }
   }, [props.DrawerStatus]);
+
+
   return (
     <List component="nav" sx={{ color: "white" }}>
-      <ListItemButton
-        onClick={() => {
-          navigate("/Dashboard");
-        }}
-      >
+      {/* Aspack Template */}
+      <ListItemButton onClick={handleOpenMaster}>
         <ListItemIcon>
-          <DashboardIcon color="inherit" />
+          <DatasetIcon color="inherit" />
         </ListItemIcon>
         <ListItemText primary="Aspack Template" />
+        {openMaster ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      {/* <ListItemButton onClick={handleOpenMaster}>
-          <ListItemIcon>
-            <DatasetIcon color="inherit" />
-          </ListItemIcon>
-          <ListItemText primary="Master" />
-          {openMaster ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton> */}
-      {/* <Collapse in={openMaster} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding className="subMenus">
-            <ListItemButton sx={{ pl: 6 }} onClick={() => {
-              navigate("/MasterRole");
-            }}>
-              <ListItemText primary="Master Role" />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 6 }} onClick={() => {
-              navigate("/MasterUser");
-            }}>
-              <ListItemText primary="Master User" />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 6 }} onClick={() => {
-              navigate("/MasterQap");
-            }}>
-              <ListItemText primary="Master Qap" />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 6 }} onClick={() => {
-              navigate("/MasterUserDist");
-            }}>
-              <ListItemText primary="Master User Distributor" />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 6 }}
-              onClick={() => {
-                navigate("/MasterGeneral");
-              }}>
-              <ListItemText primary="Master General" />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 6 }} onClick={() => {
-              navigate("/MasterActivity");
-            }}>
-              <ListItemText primary="Master Activity" />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 6 }}
-              onClick={() => {
-                navigate("/MasterDistributor");
-              }}>
-              <ListItemText primary="Master Distributor" />
-            </ListItemButton>
-          </List>
-        </Collapse> */}
-      <ListItemButton
-        onClick={() => {
-          navigate("/Approval");
-        }}
-      >
+      <Collapse in={openMaster} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding className="subMenus">
+          <ListItemButton
+            onClick={() => {
+              navigate("/Dashboard");
+            }}
+            sx={{ bgcolor: '#223c49', color: 'white' }}
+          >
+            <ListItemIcon>
+              <FolderOpenOutlinedIcon color="inherit" />
+            </ListItemIcon>
+            <ListItemText primary="Master Template" />
+          </ListItemButton>
+        </List>
+      </Collapse>
+
+      {/* Aspack Approval */}
+      <ListItemButton onClick={handleOpenApproval}>
         <ListItemIcon>
-          <ConnectWithoutContact color="inherit" />
+          <DatasetIcon color="inherit" />
         </ListItemIcon>
         <ListItemText primary="Aspack Approval" />
+        {openApproval ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      <ListItemButton>
+      <Collapse in={openApproval} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding className="subMenus">
+          <ListItemButton
+            onClick={() => {
+              navigate("/Approval");
+            }}
+            sx={{ bgcolor: '#223c49', color: 'white' }}
+          >
+            <ListItemIcon>
+              <FolderOpenOutlinedIcon color="inherit" />
+            </ListItemIcon>
+            <ListItemText primary="Aspack Approval" />
+          </ListItemButton>
+        </List>
+      </Collapse>
+
+      {/* Aspack Approval */}
+      <ListItemButton onClick={handleOpenLibrary}>
         <ListItemIcon>
-          <BarChartIcon color="inherit" />
+          <DatasetIcon color="inherit" />
         </ListItemIcon>
-        <ListItemText primary="Consolidate Library" />
+        <ListItemText primary="Consolidation Library" />
+        {openLibrary ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      <ListItemButton>
+      <Collapse in={openLibrary} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding className="subMenus">
+
+          {/* Archived News */}
+          <ListItemButton
+            onClick={() => {
+              navigate("/Archived");
+            }}
+            sx={{ bgcolor: '#223c49', color: 'white' }}
+          >
+            <ListItemIcon>
+              <FolderOpenOutlinedIcon color="inherit" />
+            </ListItemIcon>
+            <ListItemText primary="Archived News" />
+          </ListItemButton>
+
+          {/* Recent News */}
+          <ListItemButton
+            onClick={() => {
+              navigate("/Recent");
+            }}
+            sx={{ bgcolor: '#223c49', color: 'white' }}
+          >
+            <ListItemIcon>
+              <FolderOpenOutlinedIcon color="inherit" />
+            </ListItemIcon>
+            <ListItemText primary="Recent News" />
+          </ListItemButton>
+
+          {/* Kategori News */}
+          <ListItemButton
+            onClick={() => {
+              navigate("/Kategori");
+            }}
+            sx={{ bgcolor: '#223c49', color: 'white' }}
+          >
+            <ListItemIcon>
+              <FolderOpenOutlinedIcon color="inherit" />
+            </ListItemIcon>
+            <ListItemText primary="Kategori News" />
+          </ListItemButton>
+        </List>
+      </Collapse>
+
+
+      {/* Master User & Workflow */}
+      <ListItemButton onClick={handleUserWorkflow}>
         <ListItemIcon>
-          <LayersIcon color="inherit" />
+          <DatasetIcon color="inherit" />
         </ListItemIcon>
         <ListItemText primary="Master User & Workflow" />
+        {openUserWorkflow ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
-      <ListItemButton>
+      <Collapse in={openUserWorkflow} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding className="subMenus">
+
+          {/* Master User & Workflow */}
+          <ListItemButton
+            onClick={() => {
+              navigate("/mstUserAffco");
+            }}
+            sx={{ bgcolor: '#223c49', color: 'white' }}
+          >
+            <ListItemIcon>
+              <FolderOpenOutlinedIcon color="inherit" />
+            </ListItemIcon>
+            <ListItemText primary="Master User & Workflow" />
+          </ListItemButton>
+
+          {/* Master Workflow */}
+          <ListItemButton
+            onClick={() => {
+              navigate("/mstWorkflow");
+            }}
+            sx={{ bgcolor: '#223c49', color: 'white' }}
+          >
+            <ListItemIcon>
+              <FolderOpenOutlinedIcon color="inherit" />
+            </ListItemIcon>
+            <ListItemText primary="Master Workflow" />
+          </ListItemButton>
+        </List>
+      </Collapse>
+
+      <ListItemButton onClick={() => {
+              navigate("/histUpload");
+            }}>
         <ListItemIcon>
           <LayersIcon color="inherit" />
         </ListItemIcon>
-        <ListItemText primary="History Upload  AFFCO" />
+        <ListItemText primary="History Upload AFFCO" />
       </ListItemButton>
     </List>
   );

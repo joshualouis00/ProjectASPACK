@@ -266,7 +266,7 @@ const UploadedAspackPage: React.FC<{ setUser: (user: { role: string, email: stri
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  console.log("cek email : ",email);
+  
   return (
     <Container
       maxWidth="xl"

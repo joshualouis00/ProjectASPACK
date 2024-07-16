@@ -14,22 +14,45 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const theme = createTheme();
 
 const Login: React.FC<{ setUser: (user: { role: string, email: string }) => void }> = ({ setUser }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // Simpan logika autentikasi di sini jika perlu
-    // Misalkan kita mendapatkan data pengguna dari server
-    const userData = { role: "User Affco", email }; // Contoh data pengguna
-    setUser(userData);
+    try {
+      const resp = await axios.post('https://recruitment-api.pyt1.stg.jmr.pl/login',{
+        email,
+        password,
+      });
+
+      const { token } = resp.data;
+      if (token) {
+        localStorage.setItem('token', token);
+        setError('');
+        console.log("Token: ", token);
+      } else {
+        setError('Token not found in response');
+      }
+
+      setError('');
+      console.log("Response : " + resp);
+      // Misalkan kita mendapatkan data pengguna dari server
+    // const userData = { role: "User Affco", email }; // Contoh data pengguna
+    // setUser(userData);
     navigate('/Dashboard');
     window.location.reload();
+
+    } catch (error) {
+      setError('Invalid username or password');
+    }
   };
   
   const { open, setOpen } = UseToggleSidebar();

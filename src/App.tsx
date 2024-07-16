@@ -54,7 +54,7 @@ function Copyright(props: any) {
   );
 }
 
-const drawerWidth: number = 200;
+const drawerWidth: number = 250;
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;

@@ -146,7 +146,7 @@ export const AppTable = () => {
                       <TableCell align="left">{row.createdDate}</TableCell>
                       <TableCell align="left">{row.status}</TableCell>
                       <TableCell align="left">
-                        <Button variant="outlined" value="">
+                        <Button variant="contained" value="" sx={{ backgroundColor: "#808080", color: "white"}}>
                           Preview
                         </Button>
                       </TableCell>
@@ -154,6 +154,7 @@ export const AppTable = () => {
                   ))}
               </TableBody>
             </Table>
+            <Button variant="contained" color="info" sx={{ color: "white", m: "10px"}}>Submit</Button>
           </TableContainer>
         </Paper>
       </Box>

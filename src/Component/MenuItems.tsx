@@ -182,7 +182,7 @@ const MenuItems = (props: MenuItemsProps) => {
           {/* Master Workflow */}
           <ListItemButton
             onClick={() => {
-              navigate("/mstWorkflow");
+              navigate("/MasterWorkflow");
             }}
             sx={{ bgcolor: '#223c49', color: 'white' }}
           >

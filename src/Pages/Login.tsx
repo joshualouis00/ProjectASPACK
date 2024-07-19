@@ -8,154 +8,195 @@ import {
   Avatar,
   CssBaseline,
   Grid,
-  Radio
+  Radio,
+  Snackbar,
+  Alert,
+  Paper,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const theme = createTheme();
 
-const Login: React.FC<{ setUser: (user: { role: string, email: string }) => void }> = ({ setUser }) => {
+const Login: React.FC<{
+  setUser: (user: { role: string; email: string }) => void;
+}> = ({ setUser }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Simpan logika autentikasi di sini jika perlu
+
+    if (!email || !password) {
+      setError("Email and password are required");
+      setOpenSnackbar(true);
+      return;
+    }
+
     try {
-      const resp = await axios.post('https://recruitment-api.pyt1.stg.jmr.pl/login',{
+      const resp = await axios.post("https://localhost:44338/api/Auth/Login", {
         email,
         password,
       });
 
-      const { token } = resp.data;
+      const { token, user } = resp.data;
+      console.log("Token", token);
       if (token) {
-        localStorage.setItem('token', token);
-        setError('');
-        console.log("Token: ", token);
+        localStorage.setItem("token", token);
+        setError("");
+        setUser(user); // Assuming user data contains role and email
+        navigate("/Dashboard");
+        window.location.reload();
       } else {
-        setError('Token not found in response');
+        setError("Token not found in response");
+        setOpenSnackbar(true);
       }
-
-      setError('');
-      console.log("Response : " + resp);
-      // Misalkan kita mendapatkan data pengguna dari server
-    // const userData = { role: "User Affco", email }; // Contoh data pengguna
-    // setUser(userData);
-    navigate('/Dashboard');
-    window.location.reload();
-
     } catch (error) {
-      setError('Invalid username or password');
+      setError("Invalid username or password");
+      setOpenSnackbar(true);
     }
   };
-  
+
   const { open, setOpen } = UseToggleSidebar();
   const toggleDrawer = () => {
-    console.log("email : ", email);
-    console.log("password : ",password);
     setOpen(true);
   };
 
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
+  };
+
+  //Style
+  const paperStyle = {
+    padding: "10px",
+    height: "65vh",
+    width: 350,
+    margin: "20px auto",
+  };
+  const btnstyle = { margin: "8px 0" };
+
   return (
     <ThemeProvider theme={theme}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
+        <Paper elevation={15} style={paperStyle}>
           <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 0.5 }}
+            sx={{
+              marginTop: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Grid
-              container
-              direction="row"
-              alignItems="center"
+            <Avatar
+              src={require("../assets/logoAOP.png")}
+              variant="square"
+              sx={{ height: "100px", width: "300px", ml: "5px"}}
+            ></Avatar>
+            <Typography component="h2" variant="h5" sx={{mt:"10px"}}>
+              Login
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              noValidate
+              sx={{ mt: 0.5 }}
             >
-              <Grid item>
-                <Typography component="h2" variant="body2" sx={{mr:"10px", fontSize: "16px", fontWeight: "bold"}}>
-                  Portal
-                </Typography>
+              <TextField
+                margin="normal"
+                //required
+                fullWidth
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
+                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <TextField
+                margin="normal"
+                //required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Grid container direction="row" alignItems="center">
+                <Grid item>
+                  <Typography
+                    component="h2"
+                    variant="body2"
+                    sx={{ mr: "10px", fontSize: "16px", fontWeight: "bold" }}
+                  >
+                    Portal
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Radio
+                    value="fact"
+                    color="primary"
+                    size="small"
+                    sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
+                    inputProps={{ "aria-label": "FACT" }}
+                  />
+                </Grid>
+                <Grid item>
+                  <Typography variant="body1" sx={{ fontSize: 14 }}>
+                    FACT
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Radio
+                    value="aspack"
+                    color="primary"
+                    size="small"
+                    sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
+                    inputProps={{ "aria-label": "ASPACK" }}
+                  />
+                </Grid>
+                <Grid item>
+                  <Typography variant="body1" sx={{ fontSize: 14 }}>
+                    ASPACK
+                  </Typography>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Radio
-                  value="fact"
-                  color="primary"
-                  size="small" // Set the size to small
-                  sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} // Adjust the icon size
-                  inputProps={{ "aria-label": "FACT" }}
-                />
-              </Grid>
-              <Grid item>
-                <Typography variant="body1" sx={{fontSize: 14}}>FACT</Typography>
-              </Grid>
-              <Grid item>
-                <Radio
-                  value="aspack"
-                  color="primary"
-                  size="small" // Set the size to small
-                  sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} // Adjust the icon size
-                  inputProps={{ "aria-label": "ASPACK" }}
-                />
-              </Grid>
-              <Grid item>
-                <Typography variant="body1" sx={{fontSize: 14}}>ASPACK</Typography>
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={toggleDrawer}
-              sx={{ mt: 1, mb: 2 }}
-            >
-              Sign In
-            </Button>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                onClick={toggleDrawer}
+                sx={{ mt: 1, mb: 2 }}
+                style={btnstyle}
+              >
+                Sign In
+              </Button>
+            </Box>
           </Box>
-        </Box>
+        </Paper>
       </Container>
     </ThemeProvider>
   );

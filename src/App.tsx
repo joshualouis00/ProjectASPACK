@@ -37,6 +37,7 @@ import Login from "./Pages/Login";
 import { useState } from "react";
 import MstUserAffco from "./Pages/MstUserAffco";
 import AccordionWrapper from "./Component/AccordionWrapper";
+import MstWorkflow from "./Pages/MasterWorkflow";
 
 function Copyright(props: any) {
   return (
@@ -357,6 +358,16 @@ function App() {
                       content={<Approvals setUser={setUser}/>}
                       title="Aspack Approval"
                       headerTitle="Uploaded Aspack"
+                    />
+                  }
+                />
+                <Route
+                  path="/MasterWorkflow"
+                  element={
+                    <PageWrapper
+                      content={<MstWorkflow />}
+                      title="Master Workflow"
+                      headerTitle="Master Workflow"
                     />
                   }
                 />

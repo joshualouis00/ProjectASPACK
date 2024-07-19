@@ -14,7 +14,7 @@ return(
                     alt="Astra Otoparts"
                     height="470"
                     image={DashboardImage}
-                />
+                />               
         </Card>
     </Box>
 );

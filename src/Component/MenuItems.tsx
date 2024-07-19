@@ -169,14 +169,14 @@ const MenuItems = (props: MenuItemsProps) => {
           {/* Master User & Workflow */}
           <ListItemButton
             onClick={() => {
-              navigate("/mstUserAffco");
+              navigate("/MstUserAffco");
             }}
             sx={{ bgcolor: '#223c49', color: 'white' }}
           >
             <ListItemIcon>
               <FolderOpenOutlinedIcon color="inherit" />
             </ListItemIcon>
-            <ListItemText primary="Master User & Workflow" />
+            <ListItemText primary="Master User & Affco" />
           </ListItemButton>
 
           {/* Master Workflow */}

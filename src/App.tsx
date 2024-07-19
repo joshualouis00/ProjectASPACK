@@ -35,6 +35,8 @@ import MasterTemplate from "./Pages/MasterTemplate";
 import PageWrapper from "./Component/PageWrapper";
 import Login from "./Pages/Login";
 import { useState } from "react";
+import MstUserAffco from "./Pages/MstUserAffco";
+import AccordionWrapper from "./Component/AccordionWrapper";
 
 function Copyright(props: any) {
   return (
@@ -357,6 +359,14 @@ function App() {
                       headerTitle="Uploaded Aspack"
                     />
                   }
+                />
+                <Route 
+                path="/MstUserAffco"
+                element={
+                  <AccordionWrapper 
+                  content={<MstUserAffco />}                  
+                  headerTitle="Master User & Affco" />                  
+                }
                 />
               </Routes>
             </Container>

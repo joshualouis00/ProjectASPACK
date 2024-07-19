@@ -7,11 +7,9 @@ import {
   ListItemText,
 } from "@mui/material";
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
-import BarChartIcon from "@mui/icons-material/BarChart";
 import LayersIcon from "@mui/icons-material/Layers";
 import { useNavigate } from "react-router-dom";
 import {
-  ConnectWithoutContact,
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";

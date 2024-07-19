@@ -9,14 +9,12 @@ import {
   CssBaseline,
   Grid,
   Radio,
-  Snackbar,
   Alert,
   Paper,
 } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const theme = createTheme();
@@ -27,7 +25,6 @@ const Login: React.FC<{
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +32,6 @@ const Login: React.FC<{
 
     if (!email || !password) {
       setError("Email and password are required");
-      setOpenSnackbar(true);
       return;
     }
 
@@ -51,15 +47,13 @@ const Login: React.FC<{
         localStorage.setItem("token", token);
         setError("");
         setUser(user); // Assuming user data contains role and email
-        navigate("/Dashboard");
+        navigate("/Welcome");
         window.location.reload();
       } else {
         setError("Token not found in response");
-        setOpenSnackbar(true);
       }
     } catch (error) {
       setError("Invalid username or password");
-      setOpenSnackbar(true);
     }
   };
 
@@ -68,9 +62,6 @@ const Login: React.FC<{
     setOpen(true);
   };
 
-  const handleSnackbarClose = () => {
-    setOpenSnackbar(false);
-  };
 
   //Style
   const paperStyle = {
@@ -83,19 +74,6 @@ const Login: React.FC<{
 
   return (
     <ThemeProvider theme={theme}>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          {error}
-        </Alert>
-      </Snackbar>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Paper elevation={15} style={paperStyle}>
@@ -110,9 +88,9 @@ const Login: React.FC<{
             <Avatar
               src={require("../assets/logoAOP.png")}
               variant="square"
-              sx={{ height: "100px", width: "300px", ml: "5px"}}
+              sx={{ height: "100px", width: "300px", ml: "5px" }}
             ></Avatar>
-            <Typography component="h2" variant="h5" sx={{mt:"10px"}}>
+            <Typography component="h2" variant="h5" sx={{ mt: "10px" }}>
               Login
             </Typography>
             <Box
@@ -189,11 +167,16 @@ const Login: React.FC<{
                 fullWidth
                 variant="contained"
                 onClick={toggleDrawer}
-                sx={{ mt: 1, mb: 2 }}
+                sx={{ mt: 1, mb: 1 }}
                 style={btnstyle}
               >
                 Sign In
               </Button>
+              {error && (
+                <Alert severity="error" sx={{ width: "100%", mb: 1 }}>
+                  {error}
+                </Alert>
+              )}
             </Box>
           </Box>
         </Paper>

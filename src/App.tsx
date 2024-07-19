@@ -11,7 +11,6 @@ import IconButton from "@mui/material/IconButton";
 //import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
 import {
-  Link as Links,
   // Drawer,
   Button,
   Menu,
@@ -38,24 +37,7 @@ import { useState } from "react";
 import MstUserAffco from "./Pages/MstUserAffco";
 import AccordionWrapper from "./Component/AccordionWrapper";
 import MstWorkflow from "./Pages/MasterWorkflow";
-
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Links color="inherit" href="https://mui.com/">
-        Your Website
-      </Links>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import WelcomePage from "./Pages/Welcome";
 
 const drawerWidth: number = 250;
 
@@ -245,7 +227,7 @@ function App() {
                   }}
                   variant="dense"
                 >
-                  <Link to={"/Dashboard"}>
+                  <Link to={"/Welcome"}>
                     <Avatar
                       src={require("./assets/Logo AOP.png")}
                       variant="square"
@@ -279,7 +261,6 @@ function App() {
                     <Grid item xs={3}>
                       <Avatar
                         alt="Profile Picture"
-                        // src={require("./assets/Logo AOP.png")}
                         sx={{ width: 40, height: 40 }}
                       >
                         {"C"}
@@ -368,6 +349,16 @@ function App() {
                       content={<MstWorkflow />}
                       title="Master Workflow"
                       headerTitle="Master Workflow"
+                    />
+                  }
+                />
+                <Route
+                  path="/Welcome"
+                  element={
+                    <PageWrapper
+                      content={<WelcomePage />}
+                      title=""
+                      headerTitle=""
                     />
                   }
                 />

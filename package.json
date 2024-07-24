@@ -51,8 +51,10 @@
     ]
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@mui/lab": "^5.0.0-alpha.171",
     "@mui/x-date-pickers": "^7.9.0",
+    "@tanstack/react-query": "^5.51.11",
     "@types/styled-components": "^5.1.34",
     "axios": "^1.7.2",
     "axios-cache-interceptor": "^1.5.3",

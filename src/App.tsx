@@ -8,10 +8,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-//import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
 import {
-  // Drawer,
   Button,
   Menu,
   MenuItem,
@@ -21,7 +19,6 @@ import Approvals from "./Pages/Approvals";
 import CustomTheme from "./Theme/CustomTheme";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-//import NotificationsIcon from "@mui/icons-material/Notifications";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Avatar, Grid } from "@mui/material";
@@ -29,7 +26,6 @@ import { Link } from "react-router-dom";
 import MenuItems from "./Component/MenuItems";
 import UseToggleSidebar from "./CommonHandler/UseToggleSidebar";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-//import Dashboard from "./Pages/Dashboard";
 import MasterTemplate from "./Pages/MasterTemplate";
 import PageWrapper from "./Component/PageWrapper";
 import Login from "./Pages/Login";
@@ -38,6 +34,7 @@ import MstUserAffco from "./Pages/MstUserAffco";
 import AccordionWrapper from "./Component/AccordionWrapper";
 import MstWorkflow from "./Pages/MasterWorkflow";
 import WelcomePage from "./Pages/Welcome";
+import {useUser} from "./GlobalUsers/UserContext";
 
 const drawerWidth: number = 250;
 
@@ -111,7 +108,7 @@ const defaultTheme = createTheme();
 function App() {
   const { open, setOpen } = UseToggleSidebar();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [user, setUser] = useState<{ role: string, email: string } | null>(null);
+  const { user } = useUser();
   const openMenu = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -263,7 +260,7 @@ function App() {
                         alt="Profile Picture"
                         sx={{ width: 40, height: 40 }}
                       >
-                        {"C"}
+                        {user?.vusername?.charAt(0) || "C"}
                       </Avatar>
                     </Grid>
                     <Grid
@@ -280,7 +277,7 @@ function App() {
                       </Grid>
                       <Grid item xs={12}>
                         <Typography sx={{ fontSize: "18px" }}>
-                          {"Console Team"}
+                          {user?.vrole || "Console Team"}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -320,7 +317,7 @@ function App() {
               <Routes>
               <Route
                   path="/"
-                  element={<Login setUser={setUser} />}
+                  element={<Login />}
                 />
                 <Route
                   path="/Dashboard"
@@ -336,7 +333,7 @@ function App() {
                   path="/Approval"
                   element={
                     <PageWrapper
-                      content={<Approvals setUser={setUser}/>}
+                      content={<Approvals />}
                       title="Aspack Approval"
                       headerTitle="Uploaded Aspack"
                     />

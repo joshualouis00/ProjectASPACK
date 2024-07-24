@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import AppTable from "./TableComponent/MaterialTableUploadTemplate";
 import { useDropzone } from "react-dropzone";
 

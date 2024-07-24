@@ -1,19 +1,10 @@
-import {
-  Box,
-  // Card,
-  // CardActions,
-  // CardContent,
-  // CardHeader,
-  // Container,
-  // Divider,
-  Typography,
-  Tabs,
-} from "@mui/material";
+import { Box, Typography, Tabs } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import TabContent from "../Component/CustomTabPanel";
 import React from "react";
 import Tab from "@mui/material/Tab";
 import CustomTheme from "../Theme/CustomTheme";
+import { initialData } from "./MasterWorkflow";
+import TabContent from "../Component/CustomTabPanel";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -52,6 +43,7 @@ function a11yProps(index: number) {
 const MasterTemplate = () => {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
+  const data = initialData();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -60,6 +52,7 @@ const MasterTemplate = () => {
   const handleChangeIndex = (index: number) => {
     setValue(index);
   };
+
   return (
     <Box>
       <Tabs
@@ -74,14 +67,19 @@ const MasterTemplate = () => {
         variant="scrollable"
         aria-label="full width tabs example"
       >
-        {[...Array(15)].map((x, i) => (
-          <Tab label={"Aspack " + (i + 1)} {...a11yProps(i)} />
+        {data.map((item, index) => (
+          <Tab label={item.name} {...a11yProps(index)} key={item.no} />
         ))}
       </Tabs>
 
-      {[...Array(15)].map((x, i) => (
-        <TabPanel value={value} index={i} dir={theme.direction}>
-         <TabContent label={"Aspack " + (i + 1)} />
+      {data.map((item, index) => (
+        <TabPanel
+          value={value}
+          index={index}
+          dir={theme.direction}
+          key={item.no}
+        >
+          <TabContent label={item.name} key={item.no} />
         </TabPanel>
       ))}
     </Box>

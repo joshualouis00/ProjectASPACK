@@ -72,13 +72,11 @@ const rowsApproved = [
   createData(2, "dddddddddddd.xls", date, "V2", "Approved"),
 ];
 
-const UploadedAspackPage: React.FC<{ setUser: (user: { role: string, email: string }) => void }> = ({ setUser }) => {
-  const [email, setEmail] = useState("");
-  const userData = { role: "User Affco", email }; // Contoh data pengguna
+const UploadedAspackPage: React.FC = () => {
 
-  useEffect(() => {
-    setUser(userData);
-  }, [setEmail, email]);
+  // useEffect(() => {
+  //   setUser(userData);
+  // }, [setEmail, email]);
 
 
   // Test Pokemon API
@@ -284,7 +282,7 @@ const UploadedAspackPage: React.FC<{ setUser: (user: { role: string, email: stri
         handleFilter={handleFilter}
       />
 
-      {email !== "User Affco" && (
+      {/* {email !== "User Affco" && ( */}
       <Box ml={"5px"} mb={2} mt={2}> 
         <Typography
           variant="h6"
@@ -315,7 +313,6 @@ const UploadedAspackPage: React.FC<{ setUser: (user: { role: string, email: stri
           </Box>
         </Collapse>
       </Box>
-      )}
       <Box ml={"10px"} mt={1} alignContent={"center"} alignItems={"left"}>
         <Paper>
           <Tabs

@@ -16,16 +16,17 @@ import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import {useUser} from "../GlobalUsers/UserContext";
 
 const theme = createTheme();
 
-const Login: React.FC<{
-  setUser: (user: { role: string; email: string }) => void;
-}> = ({ setUser }) => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,7 +40,10 @@ const Login: React.FC<{
       const resp = await axios.post("https://localhost:44338/api/Auth/Login", {
         email,
         password,
+        role
       });
+
+      console.log("Role " + role);
 
       const { token, user } = resp.data;
       console.log("Token", token);
@@ -47,8 +51,8 @@ const Login: React.FC<{
         localStorage.setItem("token", token);
         setError("");
         setUser(user); // Assuming user data contains role and email
-        navigate("/Welcome");
-        window.location.reload();
+        // navigate("/Welcome");
+        // window.location.reload();
       } else {
         setError("Token not found in response");
       }
@@ -88,9 +92,9 @@ const Login: React.FC<{
             <Avatar
               src={require("../assets/logoAOP.png")}
               variant="square"
-              sx={{ height: "100px", width: "300px", ml: "5px" }}
+              sx={{ height: "45px", width: "200px", ml: "5px" }}
             ></Avatar>
-            <Typography component="h2" variant="h5" sx={{ mt: "10px" }}>
+            <Typography component="h5" variant="h5" sx={{mt: "1px"}}>
               Login
             </Typography>
             <Box
@@ -123,12 +127,26 @@ const Login: React.FC<{
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              {/* Test Role */}
+              {/* <TextField
+                margin="normal"
+                //required
+                fullWidth
+                hidden
+                name="role"
+                label="role"
+                type="role"
+                id="role"
+                autoComplete="current-role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              /> */}
               <Grid container direction="row" alignItems="center">
                 <Grid item>
                   <Typography
                     component="h2"
                     variant="body2"
-                    sx={{ mr: "10px", fontSize: "16px", fontWeight: "bold" }}
+                    sx={{ mr: "10px", fontSize: "14px", fontWeight: "bold" }}
                   >
                     Portal
                   </Typography>
@@ -138,12 +156,12 @@ const Login: React.FC<{
                     value="fact"
                     color="primary"
                     size="small"
-                    sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
+                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
                     inputProps={{ "aria-label": "FACT" }}
                   />
                 </Grid>
                 <Grid item>
-                  <Typography variant="body1" sx={{ fontSize: 14 }}>
+                  <Typography variant="body1" sx={{ fontSize: 12 }}>
                     FACT
                   </Typography>
                 </Grid>
@@ -152,12 +170,12 @@ const Login: React.FC<{
                     value="aspack"
                     color="primary"
                     size="small"
-                    sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
+                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
                     inputProps={{ "aria-label": "ASPACK" }}
                   />
                 </Grid>
                 <Grid item>
-                  <Typography variant="body1" sx={{ fontSize: 14 }}>
+                  <Typography variant="body1" sx={{ fontSize: 12 }}>
                     ASPACK
                   </Typography>
                 </Grid>
@@ -173,7 +191,7 @@ const Login: React.FC<{
                 Sign In
               </Button>
               {error && (
-                <Alert severity="error" sx={{ width: "100%", mb: 1 }}>
+                <Alert severity="error" sx={{ width: "100%", mt: 5 }}>
                   {error}
                 </Alert>
               )}

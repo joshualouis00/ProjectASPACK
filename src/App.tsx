@@ -29,12 +29,10 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import MasterTemplate from "./Pages/MasterTemplate";
 import PageWrapper from "./Component/PageWrapper";
 import Login from "./Pages/Login";
-import { useState } from "react";
 import MstUserAffco from "./Pages/MstUserAffco";
 import AccordionWrapper from "./Component/AccordionWrapper";
 import MstWorkflow from "./Pages/MasterWorkflow";
 import WelcomePage from "./Pages/Welcome";
-import {useUser} from "./GlobalUsers/UserContext";
 
 const drawerWidth: number = 250;
 
@@ -108,8 +106,8 @@ const defaultTheme = createTheme();
 function App() {
   const { open, setOpen } = UseToggleSidebar();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const { user } = useUser();
   const openMenu = Boolean(anchorEl);
+  const username = localStorage.getItem("username");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -191,7 +189,7 @@ function App() {
                         fontSize: "15px",
                       }}
                     >
-                      {"Console Team"}
+                      {username}
                     </Typography>
                   </Button>
                   <Menu
@@ -260,7 +258,7 @@ function App() {
                         alt="Profile Picture"
                         sx={{ width: 40, height: 40 }}
                       >
-                        {user?.vusername?.charAt(0) || "C"}
+                        {"C"}
                       </Avatar>
                     </Grid>
                     <Grid
@@ -277,7 +275,7 @@ function App() {
                       </Grid>
                       <Grid item xs={12}>
                         <Typography sx={{ fontSize: "18px" }}>
-                          {user?.vrole || "Console Team"}
+                           {username}
                         </Typography>
                       </Grid>
                     </Grid>

@@ -9,7 +9,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
-import { Category } from "@mui/icons-material";
 
 interface Data {
   no: number;
@@ -66,13 +65,13 @@ const DataWorkflow: React.FC = () => {
     {
       accessorKey: "no",
       header: "Step No",
-      minSize: 170,
+      size: 20,
       sortingFn: (a, b) => a.original.no - b.original.no,
     },
     {
       accessorKey: "name",
       header: "Step Description",
-      minSize: 100,
+      size: 200,
       sortingFn: (a, b) => {
         const nameA = a.original.name.toLowerCase();
         const nameB = b.original.name.toLowerCase();
@@ -82,7 +81,7 @@ const DataWorkflow: React.FC = () => {
     {
       accessorKey: "category",
       header: "Category",
-      minSize: 170,
+      size: 170,
       sortingFn: (a, b) => {
         const CategoryA = a.original.category.toLowerCase();
         const CategoryB = b.original.category.toLowerCase();
@@ -92,10 +91,9 @@ const DataWorkflow: React.FC = () => {
     {
       accessorKey: "action",
       header: "Action",
-      minSize: 170,
       enableSorting: false,
       Cell: ({ row }) => (
-        <Button variant="contained" sx={{ backgroundColor: "#808080" }}>
+        <Button variant="contained" sx={{ backgroundColor: "#808080" }} size="small">
           Update
         </Button>
       ),
@@ -104,14 +102,6 @@ const DataWorkflow: React.FC = () => {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleClickOpen}
-        sx={{ mb: "5px", ml: "10px" }}
-      >
-        Add Step
-      </Button>
       <MaterialReactTable
         columns={columns}
         data={rows}
@@ -119,6 +109,26 @@ const DataWorkflow: React.FC = () => {
           pagination: { pageIndex: 0, pageSize: 10 },
         }}
         enableSorting
+        renderTopToolbarCustomActions={({ table }) => {
+          const handleContact = () => {
+            setOpen(true);
+          };
+
+          return (
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <Button
+                onClick={handleContact}
+                variant="contained"
+                color="primary"
+                sx={{ m: "5px", fontSize: "12px" }}
+                size="small"
+              >
+                Add Step
+              </Button>
+            </div>
+          );
+        }}
+
       />
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add Step</DialogTitle>

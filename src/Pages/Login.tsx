@@ -16,42 +16,49 @@ import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {useUser} from "../GlobalUsers/UserContext";
+import { jwtDecode, JwtPayload } from "jwt-decode";
+import { hash } from "bcrypt-ts";
 
 const theme = createTheme();
 
+interface CustomJwtPayload extends JwtPayload {
+  VNAMEUSR: string;
+}
+
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [role, setRole] = useState<string>("");
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
-  const { setUser } = useUser();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!email || !password) {
-      setError("Email and password are required");
+    if (!username || !password) {
+      setError("Username and password are required");
       return;
     }
 
     try {
-      const resp = await axios.post("https://localhost:44338/api/Auth/Login", {
-        email,
-        password,
-        role
+      // Hash the password before sending it to the server
+      const hashedPassword = await hash(password, 8);
+
+      const resp = await axios.post("http://10.194.235.103:9020/api/Auth/Login", {
+        username,
+        password: hashedPassword,
       });
 
-      console.log("Role " + role);
-
       const { token, user } = resp.data;
-      console.log("Token", token);
+      const decode = jwtDecode<CustomJwtPayload>(token);
+      const userName = decode.VNAMEUSR; // Properti kustom dari token decoded
+      console.log("Data : ", resp.data);
+      console.log("Decode : ", decode);
+
       if (token) {
         localStorage.setItem("token", token);
-        setError("");
-        setUser(user); // Assuming user data contains role and email
-        // navigate("/Welcome");
+        localStorage.setItem("username", userName);
+        localStorage.setItem("password", password);
+        // navigate("/welcome");
         // window.location.reload();
       } else {
         setError("Token not found in response");
@@ -66,13 +73,12 @@ const Login: React.FC = () => {
     setOpen(true);
   };
 
-
   //Style
   const paperStyle = {
     padding: "10px",
-    height: "65vh",
+    height: "58vh",
     width: 350,
-    margin: "20px auto",
+    margin: "50px auto",
   };
   const btnstyle = { margin: "8px 0" };
 
@@ -94,7 +100,7 @@ const Login: React.FC = () => {
               variant="square"
               sx={{ height: "45px", width: "200px", ml: "5px" }}
             ></Avatar>
-            <Typography component="h5" variant="h5" sx={{mt: "1px"}}>
+            <Typography component="h5" variant="h5" sx={{ mt: "1px" }}>
               Login
             </Typography>
             <Box
@@ -104,20 +110,19 @@ const Login: React.FC = () => {
               sx={{ mt: 0.5 }}
             >
               <TextField
-                margin="normal"
-                //required
+                margin="dense"
                 fullWidth
                 id="username"
                 label="Username"
                 name="username"
                 autoComplete="username"
                 autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                size="medium"
               />
               <TextField
-                margin="normal"
-                //required
+                margin="dense"
                 fullWidth
                 name="password"
                 label="Password"
@@ -127,20 +132,6 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {/* Test Role */}
-              {/* <TextField
-                margin="normal"
-                //required
-                fullWidth
-                hidden
-                name="role"
-                label="role"
-                type="role"
-                id="role"
-                autoComplete="current-role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              /> */}
               <Grid container direction="row" alignItems="center">
                 <Grid item>
                   <Typography
@@ -187,6 +178,7 @@ const Login: React.FC = () => {
                 onClick={toggleDrawer}
                 sx={{ mt: 1, mb: 1 }}
                 style={btnstyle}
+                size="medium"
               >
                 Sign In
               </Button>

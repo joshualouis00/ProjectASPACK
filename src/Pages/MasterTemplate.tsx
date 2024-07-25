@@ -25,7 +25,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 2 }}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -56,22 +56,34 @@ const MasterTemplate = () => {
   return (
     <Box>
       <Tabs
-        value={value}
-        onChange={handleChange}
-        TabIndicatorProps={{
-          style: {
-            backgroundColor: CustomTheme.palette.accent.primary,
-          },
-        }}
-        textColor="inherit"
-        variant="scrollable"
-        aria-label="full width tabs example"
-      >
-        {data.map((item, index) => (
-          <Tab label={item.name} {...a11yProps(index)} key={item.no} />
-        ))}
-      </Tabs>
-
+      value={value}
+      onChange={handleChange}
+      TabIndicatorProps={{
+        style: {
+          backgroundColor: CustomTheme.palette.accent.primary,
+        },
+      }}
+      textColor="inherit"
+      variant="scrollable"
+      aria-label="full width tabs example"
+      sx={{
+        '& .MuiTabs-flexContainer': {
+          gap: '10px', // Adjust the spacing between tabs if needed\
+        },
+      }}
+    >
+      {data.map((item, index) => (
+        <Tab
+          label={item.name}
+          {...a11yProps(index)}
+          key={item.no}
+          sx={{
+            minWidth: '50px', // Adjust the minimum width of the tabs
+            fontSize: '10px', // Adjust the font size of the tab labels
+          }}
+        />
+      ))}
+    </Tabs>
       {data.map((item, index) => (
         <TabPanel
           value={value}

@@ -32,17 +32,6 @@ export const AppTable = () => (
     data={data}
     enableRowSelection
     renderTopToolbarCustomActions={({ table }) => {
-      const handleDeactivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert('deactivating ' + row.original.firstName);
-        });
-      };
-
-      const handleActivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert('activating ' + row.original.firstName);
-        });
-      };
 
       const handleContact = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
@@ -53,28 +42,12 @@ export const AppTable = () => (
       return (
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <Button
-            color="error"
-            disabled={table.getSelectedRowModel().flatRows.length === 0}
-            onClick={handleDeactivate}
-            variant="contained"
-          >
-            Deactivate
-          </Button>
-          <Button
-            color="success"
-            disabled={table.getSelectedRowModel().flatRows.length === 0}
-            onClick={handleActivate}
-            variant="contained"
-          >
-            Activate
-          </Button>
-          <Button
             color="info"
             disabled={table.getSelectedRowModel().flatRows.length === 0}
             onClick={handleContact}
             variant="contained"
           >
-            Contact
+            Submit
           </Button>
         </div>
       );

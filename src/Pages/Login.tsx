@@ -17,49 +17,55 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import { hash } from "bcrypt-ts";
+import { genSaltSync, hashSync } from "bcrypt-ts";
 
 const theme = createTheme();
 
 interface CustomJwtPayload extends JwtPayload {
-  VNAMEUSR: string;
+  UserID: string;
+  UserName: string;
+  Email: string;
+  Role: string;
 }
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState<string>("");
+  const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+  const combine = password + userId;
+  const encodeString = btoa(combine);
+  const salt = genSaltSync(8);
+  const hashedPassword = salt + encodeString;
 
+  
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!username || !password) {
+    if (!userId || !password) {
       setError("Username and password are required");
       return;
     }
 
     try {
-      // Hash the password before sending it to the server
-      const hashedPassword = await hash(password, 8);
-
-      const resp = await axios.post("http://10.194.235.103:9020/api/Auth/Login", {
-        username,
-        password: hashedPassword,
+      const resp = await axios.post("http://192.168.1.207:9020/api/Auth/Login", {
+        Email: userId,
+        Password: hashedPassword,
       });
 
-      const { token, user } = resp.data;
+      const { token } = resp.data;
       const decode = jwtDecode<CustomJwtPayload>(token);
-      const userName = decode.VNAMEUSR; // Properti kustom dari token decoded
-      console.log("Data : ", resp.data);
-      console.log("Decode : ", decode);
 
       if (token) {
+        console.log("Decode : " + JSON.stringify(decode, null, 2));
+        console.log("Data : " + JSON.stringify(resp.data, null, 2));
         localStorage.setItem("token", token);
-        localStorage.setItem("username", userName);
-        localStorage.setItem("password", password);
-        // navigate("/welcome");
-        // window.location.reload();
+        localStorage.setItem("UserID", decode.UserID);
+        localStorage.setItem("UserName", decode.UserName);
+        localStorage.setItem("Email", decode.Email);
+        localStorage.setItem("Role", decode.Role);
+        navigate("/welcome");
+        window.location.reload();
       } else {
         setError("Token not found in response");
       }
@@ -117,8 +123,8 @@ const Login: React.FC = () => {
                 name="username"
                 autoComplete="username"
                 autoFocus
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={userId}
+                onChange={(e) => setUserID(e.target.value)}
                 size="medium"
               />
               <TextField

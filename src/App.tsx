@@ -107,7 +107,7 @@ function App() {
   const { open, setOpen } = UseToggleSidebar();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
-  const username = localStorage.getItem("username");
+  const username = localStorage.getItem("UserName");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

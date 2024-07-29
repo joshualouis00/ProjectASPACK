@@ -11,13 +11,17 @@ import {
   Radio,
   Alert,
   Paper,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  RadioGroup,
 } from "@mui/material";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import { genSaltSync, hashSync } from "bcrypt-ts";
+import { genSaltSync } from "bcrypt-ts";
 
 const theme = createTheme();
 
@@ -38,20 +42,21 @@ const Login: React.FC = () => {
   const salt = genSaltSync(8);
   const hashedPassword = salt + encodeString;
 
-  
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (!userId || !password) {
       setError("Username and password are required");
       return;
     }
 
     try {
-      const resp = await axios.post("http://192.168.1.207:9020/api/Auth/Login", {
-        Email: userId,
-        Password: hashedPassword,
-      });
+      const resp = await axios.post(
+        "http://192.168.1.207:9020/api/Auth/Login",
+        {
+          Email: userId,
+          Password: hashedPassword,
+        }
+      );
 
       const { token } = resp.data;
       const decode = jwtDecode<CustomJwtPayload>(token);
@@ -149,6 +154,40 @@ const Login: React.FC = () => {
                   </Typography>
                 </Grid>
                 <Grid item>
+                  <FormControl>
+                    <RadioGroup
+                      row
+                      aria-labelledby="portal-label"
+                      name="portal-login"
+                    >
+                      <FormControlLabel
+                        value="capex"
+                        control={<Radio size="small"
+                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                          inputProps={{ "aria-label": "FACT" }}/>}
+                        label="CAPEX"
+                      />
+                      <FormControlLabel
+                        value="aspack"
+                        control={<Radio size="medium"
+                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                          inputProps={{ "aria-label": "FACT" }}/>}
+                        label="ASPACK"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
+
+                {/* <Grid item>
+                  <Typography
+                    component="h2"
+                    variant="body2"
+                    sx={{ mr: "10px", fontSize: "14px", fontWeight: "bold" }}
+                  >
+                    Portal
+                  </Typography>
+                </Grid>
+                <Grid item>
                   <Radio
                     value="fact"
                     color="primary"
@@ -159,7 +198,7 @@ const Login: React.FC = () => {
                 </Grid>
                 <Grid item>
                   <Typography variant="body1" sx={{ fontSize: 12 }}>
-                    FACT
+                    CAPEX
                   </Typography>
                 </Grid>
                 <Grid item>
@@ -175,7 +214,7 @@ const Login: React.FC = () => {
                   <Typography variant="body1" sx={{ fontSize: 12 }}>
                     ASPACK
                   </Typography>
-                </Grid>
+                </Grid> */}
               </Grid>
               <Button
                 type="submit"

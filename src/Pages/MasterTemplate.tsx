@@ -49,10 +49,6 @@ const MasterTemplate = () => {
     setValue(newValue);
   };
 
-  const handleChangeIndex = (index: number) => {
-    setValue(index);
-  };
-
   return (
     <Box>
       <Tabs

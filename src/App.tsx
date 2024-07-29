@@ -33,6 +33,8 @@ import MstUserAffco from "./Pages/MstUserAffco";
 import AccordionWrapper from "./Component/AccordionWrapper";
 import MstWorkflow from "./Pages/MasterWorkflow";
 import WelcomePage from "./Pages/Welcome";
+import OpenPeriod from "./Pages/oPeriode";
+import EmailUpdateTemplate from "./Pages/MstTempEmail";
 
 const drawerWidth: number = 250;
 
@@ -120,11 +122,16 @@ function App() {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
-    window.location.reload();
+    localStorage.removeItem("token");
+    localStorage.removeItem("UserName");
+    localStorage.removeItem("UserID");
+    localStorage.removeItem("Email");
+    localStorage.removeItem("Role");
+    window.location.href = "/";
   };
 
-  const isLoginRoute = window.location.pathname === "/";
+  const isToken = localStorage.getItem("token") === "";
+  const isLoginRoute = (window.location.pathname === "/" || isToken);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -365,6 +372,32 @@ function App() {
                   headerTitle="Master User & Affco" />                  
                 }
                 />
+                <Route
+                path="/oPeriode"
+                element={
+                  <OpenPeriod /> 
+                }
+                />
+                {/* Manage Email Template */}
+                <Route
+                path="/emailUpdateTemp"
+                element={
+                  <EmailUpdateTemplate /> 
+                }
+                />
+                <Route
+                path="/emailApproval"
+                // element={
+                //   <UpdateApproval /> 
+                // }
+                />
+                <Route
+                path="/emailApprovalResp"
+                // element={
+                //   <ApprovalResponse /> 
+                // }
+                />
+
               </Routes>
             </Container>
           </Box>

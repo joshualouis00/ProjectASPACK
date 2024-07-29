@@ -22,10 +22,10 @@ const WelcomePage: React.FC = () => {
   return (
     <>
       <Container
-        maxWidth="xl"
+        maxWidth="lg"
         sx={{ pl: "2px !important", pr: "2px !important" }}
       >
-        <Typography sx={{mb:"10px"}} variant="h5" >
+        <Typography sx={{mb:"10px", fontSize: "18px"}} >
           Welcome, Console Team! We are glad to have you here. Let's make
           something amazing together.
         </Typography>

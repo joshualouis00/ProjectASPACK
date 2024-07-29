@@ -35,6 +35,7 @@ import MstWorkflow from "./Pages/MasterWorkflow";
 import WelcomePage from "./Pages/Welcome";
 import OpenPeriod from "./Pages/oPeriode";
 import EmailUpdateTemplate from "./Pages/MstTempEmail";
+import AcordionWrapper from "./Component/AccordionWrapper";
 
 const drawerWidth: number = 250;
 
@@ -325,43 +326,36 @@ function App() {
                   element={<Login />}
                 />
                 <Route
-                  path="/Dashboard"
+                  path="/MstTemplate"
                   element={
-                    <PageWrapper
-                      content={<MasterTemplate />}
-                      title="Master Template Aspack"
-                      headerTitle="Master Data"
+                    <AcordionWrapper
+                    content={<MasterTemplate />}
+                    headerTitle="Master Template Aspack"
                     />
                   }
                 />
                 <Route
                   path="/Approval"
                   element={
-                    <PageWrapper
-                      content={<Approvals />}
-                      title="Aspack Approval"
-                      headerTitle="Uploaded Aspack"
+                    <AcordionWrapper
+                    content={<Approvals />}
+                    headerTitle="Uploaded Aspack"
                     />
                   }
                 />
                 <Route
                   path="/MasterWorkflow"
                   element={
-                    <PageWrapper
-                      content={<MstWorkflow />}
-                      title="Master Workflow"
-                      headerTitle="Master Workflow"
+                    <AcordionWrapper
+                    content={<MstWorkflow />}
+                    headerTitle="Master Workflow"
                     />
                   }
                 />
                 <Route
                   path="/Welcome"
                   element={
-                    <PageWrapper
-                      content={<WelcomePage />}
-                      title=""
-                      headerTitle=""
-                    />
+                    <WelcomePage />
                   }
                 />
                 <Route 

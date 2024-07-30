@@ -149,7 +149,7 @@ function App() {
                   variant="dense"
                 >
                   {!open && (
-                    <Link to={"/Dashboard"}>
+                    <Link to={"/Welcome"}>
                       <Avatar
                         src={require("./assets/Logo AOP.png")}
                         variant="square"

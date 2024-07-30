@@ -26,7 +26,6 @@ const MenuItems = (props: MenuItemsProps) => {
   const navigate = useNavigate();
 
   const role = localStorage.getItem("Role");
-  console.log("Role nya : ", role);
 
   const handleEmail = () => {
     setEmail(!openEmail);

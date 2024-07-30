@@ -1,10 +1,10 @@
 import { Box, Typography, Tabs } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Tab from "@mui/material/Tab";
 import CustomTheme from "../Theme/CustomTheme";
-import { initialData } from "./MasterWorkflow";
 import TabContent from "../Component/CustomTabPanel";
+import axios from "axios";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -43,7 +43,20 @@ function a11yProps(index: number) {
 const MasterTemplate = () => {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
-  const data = initialData();
+  const [data, setData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resp = await axios.get('http://192.168.1.207:9020/api/WorkflowStep/getStep');
+        setData(resp.data.data);
+      } catch (error) {
+        console.error('Errornya : ', error);
+      }
+    };
+
+    fetchData();
+  })
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -70,9 +83,9 @@ const MasterTemplate = () => {
     >
       {data.map((item, index) => (
         <Tab
-          label={item.name}
+          label={item.vstepdesc} //description dari workflow step
           {...a11yProps(index)}
-          key={item.no}
+          key={item.vstepid} //running number yang dari workflow step
           sx={{
             minWidth: '50px', // Adjust the minimum width of the tabs
             fontSize: '10px', // Adjust the font size of the tab labels
@@ -85,9 +98,9 @@ const MasterTemplate = () => {
           value={value}
           index={index}
           dir={theme.direction}
-          key={item.no}
+          key={item.vstepid}
         >
-          <TabContent label={item.name} key={item.no} />
+          <TabContent label={item.vstepdesc} key={item.vstepid} />
         </TabPanel>
       ))}
     </Box>

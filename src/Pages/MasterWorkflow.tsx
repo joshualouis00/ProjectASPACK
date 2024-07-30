@@ -9,37 +9,38 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
+import axios from 'axios';
 
 interface Data {
-  no: number;
-  name: string;
-  category: string;
+  vstepid: string;
+  vstepdesc: string;
+  vaffcoctgry: string;
+  vfiletype: string;
+  bactive: boolean | null;
 }
 
-function createData(no: number, name: string, category: string): Data {
-  return { no, name, category };
-}
-
-export const initialData = () => [
-  createData(1, "Example Step 1", "ASSO JV"),
-  createData(2, "Example Step 2", "ASSO JV"),
-  createData(3, "Example Step 3", "SUBS"),
-  createData(4, "Example Step 4", "All"),
-  createData(5, "Example Step 5", "SUBS"),
-  createData(6, "Example Step 6", "ASSO JV"),
-  createData(7, "Example Step 7", "ASSO JV"),
-  createData(8, "Example Step 8", "SUBS"),
-  createData(9, "Example Step 9", "All"),
-  createData(10, "Example Step 10", "SUBS"),
-  createData(11, "ASPACK 11", "SUBS"),
-];
-
-const DataWorkflow: React.FC = () => {
-  const [rows, setRows] = React.useState<Data[]>(initialData());
+export const DataWorkflow: React.FC = () => {
+  const [rows, setRows] = React.useState<Data[]>([]);
   const [open, setOpen] = React.useState(false);
   const [stepDescription, setStepDescription] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [fileType, setFileType] = React.useState("");
+  const user = localStorage.getItem("UserID");
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resp = await axios.get('http://192.168.1.207:9020/api/WorkflowStep/getStep');
+        console.log("Data : ", JSON.stringify(resp.data, null, 2));
+        setRows(resp.data.data);
+      } catch (error) {
+        console.error('Errornya : ', error);
+      }
+    };
+
+    fetchData();
+
+  }, []);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -56,42 +57,63 @@ const DataWorkflow: React.FC = () => {
     setFileType("");
   };
 
-  const handleAddStep = () => {
-    setRows([...rows, createData(rows.length + 1, stepDescription, category)]);
-    handleClose();
+  const handleAddStep = async () => {
+    const newStep = {
+      vstepid: "STEP" + (rows.length + 1).toString(),
+      vstepdesc: stepDescription,
+      vaffcocategory: category,
+      vfiletype: fileType,
+      bactive: true
+    }
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.post('http://192.168.1.207:9020/api/WorkflowStep/addStep', newStep, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': '*/*'
+        }
+      });
+      
+      console.log("Nambah : ", JSON.stringify(newStep, null, 2));
+      if (response.status === 200) {
+        handleClose();
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Errornya : ', error);
+    }
   };
 
   const columns: MRT_ColumnDef<Data>[] = [
     {
-      accessorKey: "no",
+      accessorKey: "vstepid",
       header: "Step No",
-      size: 20,
-      sortingFn: (a, b) => a.original.no - b.original.no,
+      size: 20
     },
     {
-      accessorKey: "name",
+      accessorKey: "vstepdesc",
       header: "Step Description",
       size: 200,
       sortingFn: (a, b) => {
-        const nameA = a.original.name.toLowerCase();
-        const nameB = b.original.name.toLowerCase();
+        const nameA = a.original.vstepdesc.toLowerCase();
+        const nameB = b.original.vstepdesc.toLowerCase();
         return nameA.localeCompare(nameB);
       },
     },
     {
-      accessorKey: "category",
+      accessorKey: "vaffcoctgry",
       header: "Category",
       size: 170,
       sortingFn: (a, b) => {
-        const CategoryA = a.original.category.toLowerCase();
-        const CategoryB = b.original.category.toLowerCase();
+        const CategoryA = a.original.vaffcoctgry.toLowerCase();
+        const CategoryB = b.original.vaffcoctgry.toLowerCase();
         return CategoryA.localeCompare(CategoryB);
       },
     },
     {
-      accessorKey: "action",
       header: "Action",
-      enableSorting: false,
       Cell: ({ row }) => (
         <Button variant="contained" sx={{ backgroundColor: "#808080" }} size="small">
           Update

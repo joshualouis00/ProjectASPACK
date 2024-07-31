@@ -8,154 +8,233 @@ import {
   Avatar,
   CssBaseline,
   Grid,
-  Radio
+  Radio,
+  Alert,
+  Paper,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  RadioGroup,
 } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode, JwtPayload } from "jwt-decode";
+import { genSaltSync } from "bcrypt-ts";
 
 const theme = createTheme();
 
-const Login: React.FC<{ setUser: (user: { role: string, email: string }) => void }> = ({ setUser }) => {
-  const [email, setEmail] = useState<string>("");
+interface CustomJwtPayload extends JwtPayload {
+  UserID: string;
+  UserName: string;
+  Email: string;
+  Role: string;
+}
+
+const Login: React.FC = () => {
+  const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+  const combine = password + userId;
+  const encodeString = btoa(combine);
+  const salt = genSaltSync(8);
+  const hashedPassword = salt + encodeString;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Simpan logika autentikasi di sini jika perlu
+    if (!userId || !password) {
+      setError("Username and password are required");
+      return;
+    }
+
     try {
-      const resp = await axios.post('https://recruitment-api.pyt1.stg.jmr.pl/login',{
-        email,
-        password,
-      });
+      const resp = await axios.post(
+        "http://192.168.1.207:9020/api/Auth/Login",
+        {
+          Email: userId,
+          Password: hashedPassword,
+        }
+      );
 
       const { token } = resp.data;
+      const decode = jwtDecode<CustomJwtPayload>(token);
+
       if (token) {
-        localStorage.setItem('token', token);
-        setError('');
-        console.log("Token: ", token);
+        console.log("Decode : " + JSON.stringify(decode, null, 2));
+        console.log("Data : " + JSON.stringify(resp.data, null, 2));
+        localStorage.setItem("token", token);
+        localStorage.setItem("UserID", decode.UserID);
+        localStorage.setItem("UserName", decode.UserName);
+        localStorage.setItem("Email", decode.Email);
+        localStorage.setItem("Role", decode.Role);
+        navigate("/welcome");
+        window.location.reload();
       } else {
-        setError('Token not found in response');
+        setError("Token not found in response");
       }
-
-      setError('');
-      console.log("Response : " + resp);
-      // Misalkan kita mendapatkan data pengguna dari server
-    // const userData = { role: "User Affco", email }; // Contoh data pengguna
-    // setUser(userData);
-    navigate('/Dashboard');
-    window.location.reload();
-
     } catch (error) {
-      setError('Invalid username or password');
+      setError("Invalid username or password");
     }
   };
-  
+
   const { open, setOpen } = UseToggleSidebar();
   const toggleDrawer = () => {
-    console.log("email : ", email);
-    console.log("password : ",password);
     setOpen(true);
   };
+
+  //Style
+  const paperStyle = {
+    padding: "10px",
+    height: "58vh",
+    width: 350,
+    margin: "50px auto",
+  };
+  const btnstyle = { margin: "8px 0" };
 
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
+        <Paper elevation={15} style={paperStyle}>
           <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 0.5 }}
+            sx={{
+              marginTop: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Grid
-              container
-              direction="row"
-              alignItems="center"
+            <Avatar
+              src={require("../assets/logoAOP.png")}
+              variant="square"
+              sx={{ height: "45px", width: "200px", ml: "5px" }}
+            ></Avatar>
+            <Typography component="h5" variant="h5" sx={{ mt: "1px" }}>
+              Login
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              noValidate
+              sx={{ mt: 0.5 }}
             >
-              <Grid item>
-                <Typography component="h2" variant="body2" sx={{mr:"10px", fontSize: "16px", fontWeight: "bold"}}>
-                  Portal
-                </Typography>
+              <TextField
+                margin="dense"
+                fullWidth
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
+                autoFocus
+                value={userId}
+                onChange={(e) => setUserID(e.target.value)}
+                size="medium"
+              />
+              <TextField
+                margin="dense"
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Grid container direction="row" alignItems="center">
+                <Grid item>
+                  <Typography
+                    component="h2"
+                    variant="body2"
+                    sx={{ mr: "10px", fontSize: "14px", fontWeight: "bold" }}
+                  >
+                    Portal
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <FormControl>
+                    <RadioGroup
+                      row
+                      aria-labelledby="portal-label"
+                      name="portal-login"
+                    >
+                      <FormControlLabel
+                        value="capex"
+                        control={<Radio size="small"
+                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                          inputProps={{ "aria-label": "FACT" }}/>}
+                        label="CAPEX"
+                      />
+                      <FormControlLabel
+                        value="aspack"
+                        control={<Radio size="medium"
+                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                          inputProps={{ "aria-label": "FACT" }}/>}
+                        label="ASPACK"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid>
+
+                {/* <Grid item>
+                  <Typography
+                    component="h2"
+                    variant="body2"
+                    sx={{ mr: "10px", fontSize: "14px", fontWeight: "bold" }}
+                  >
+                    Portal
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Radio
+                    value="fact"
+                    color="primary"
+                    size="small"
+                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                    inputProps={{ "aria-label": "FACT" }}
+                  />
+                </Grid>
+                <Grid item>
+                  <Typography variant="body1" sx={{ fontSize: 12 }}>
+                    CAPEX
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Radio
+                    value="aspack"
+                    color="primary"
+                    size="small"
+                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                    inputProps={{ "aria-label": "ASPACK" }}
+                  />
+                </Grid>
+                <Grid item>
+                  <Typography variant="body1" sx={{ fontSize: 12 }}>
+                    ASPACK
+                  </Typography>
+                </Grid> */}
               </Grid>
-              <Grid item>
-                <Radio
-                  value="fact"
-                  color="primary"
-                  size="small" // Set the size to small
-                  sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} // Adjust the icon size
-                  inputProps={{ "aria-label": "FACT" }}
-                />
-              </Grid>
-              <Grid item>
-                <Typography variant="body1" sx={{fontSize: 14}}>FACT</Typography>
-              </Grid>
-              <Grid item>
-                <Radio
-                  value="aspack"
-                  color="primary"
-                  size="small" // Set the size to small
-                  sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} // Adjust the icon size
-                  inputProps={{ "aria-label": "ASPACK" }}
-                />
-              </Grid>
-              <Grid item>
-                <Typography variant="body1" sx={{fontSize: 14}}>ASPACK</Typography>
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={toggleDrawer}
-              sx={{ mt: 1, mb: 2 }}
-            >
-              Sign In
-            </Button>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                onClick={toggleDrawer}
+                sx={{ mt: 1, mb: 1 }}
+                style={btnstyle}
+                size="medium"
+              >
+                Sign In
+              </Button>
+              {error && (
+                <Alert severity="error" sx={{ width: "100%", mt: 5 }}>
+                  {error}
+                </Alert>
+              )}
+            </Box>
           </Box>
-        </Box>
+        </Paper>
       </Container>
     </ThemeProvider>
   );

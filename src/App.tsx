@@ -8,11 +8,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-//import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
 import {
-  Link as Links,
-  // Drawer,
   Button,
   Menu,
   MenuItem,
@@ -22,7 +19,6 @@ import Approvals from "./Pages/Approvals";
 import CustomTheme from "./Theme/CustomTheme";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-//import NotificationsIcon from "@mui/icons-material/Notifications";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Avatar, Grid } from "@mui/material";
@@ -30,36 +26,20 @@ import { Link } from "react-router-dom";
 import MenuItems from "./Component/MenuItems";
 import UseToggleSidebar from "./CommonHandler/UseToggleSidebar";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-//import Dashboard from "./Pages/Dashboard";
 import MasterTemplate from "./Pages/MasterTemplate";
 import PageWrapper from "./Component/PageWrapper";
 import Login from "./Pages/Login";
-import { useState } from "react";
 import MstUserAffco from "./Pages/MstUserAffco";
 import ConsArchived from "./Pages/ConsArchived";
 import ConsRecent from "./Pages/ConsRecent";
 import ConsKategori from "./Pages/ConsKategori";
 import AccordionWrapper from "./Component/AccordionWrapper";
-import PageContent from "./Component/PageContent";
-import AspackAprroval from "./Pages/ConsApprovals";
-
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Links color="inherit" href="https://mui.com/">
-        Your Website
-      </Links>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import MstWorkflow from "./Pages/MasterWorkflow";
+import WelcomePage from "./Pages/Welcome";
+import OpenPeriod from "./Pages/oPeriode";
+import EmailUpdateTemplate from "./Pages/MstTempEmail";
+import AcordionWrapper from "./Component/AccordionWrapper";
+import HistoryUploadAffco from "./Pages/HistUploadAffco";
 
 const drawerWidth: number = 250;
 
@@ -133,10 +113,8 @@ const defaultTheme = createTheme();
 function App() {
   const { open, setOpen } = UseToggleSidebar();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [user, setUser] = useState<{ role: string; email: string } | null>(
-    null
-  );
   const openMenu = Boolean(anchorEl);
+  const username = localStorage.getItem("UserName");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -149,11 +127,16 @@ function App() {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
-    window.location.reload();
+    localStorage.removeItem("token");
+    localStorage.removeItem("UserName");
+    localStorage.removeItem("UserID");
+    localStorage.removeItem("Email");
+    localStorage.removeItem("Role");
+    window.location.href = "/";
   };
 
-  const isLoginRoute = window.location.pathname === "/";
+  const isToken = localStorage.getItem("token") === "";
+  const isLoginRoute = (window.location.pathname === "/" || isToken);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -170,7 +153,7 @@ function App() {
                   variant="dense"
                 >
                   {!open && (
-                    <Link to={"/Dashboard"}>
+                    <Link to={"/Welcome"}>
                       <Avatar
                         src={require("./assets/Logo AOP.png")}
                         variant="square"
@@ -218,7 +201,7 @@ function App() {
                         fontSize: "15px",
                       }}
                     >
-                      {"Console Team"}
+                      {username}
                     </Typography>
                   </Button>
                   <Menu
@@ -251,7 +234,7 @@ function App() {
                   }}
                   variant="dense"
                 >
-                  <Link to={"/Dashboard"}>
+                  <Link to={"/Welcome"}>
                     <Avatar
                       src={require("./assets/Logo AOP.png")}
                       variant="square"
@@ -285,7 +268,6 @@ function App() {
                     <Grid item xs={3}>
                       <Avatar
                         alt="Profile Picture"
-                        // src={require("./assets/Logo AOP.png")}
                         sx={{ width: 40, height: 40 }}
                       >
                         {"C"}
@@ -305,7 +287,7 @@ function App() {
                       </Grid>
                       <Grid item xs={12}>
                         <Typography sx={{ fontSize: "18px" }}>
-                          {"Console Team"}
+                           {username}
                         </Typography>
                       </Grid>
                     </Grid>
@@ -343,67 +325,85 @@ function App() {
               }}
             >
               <Routes>
-                <Route path="/" element={<Login setUser={setUser} />} />
+              <Route
+                  path="/"
+                  element={<Login />}
+                />
                 <Route
-                  path="/Dashboard"
+                  path="/MstTemplate"
                   element={
-                    <PageWrapper
-                      content={<MasterTemplate />}
-                      title="Master Template Aspack"
-                      headerTitle="Master Data"
+                    <AcordionWrapper
+                    content={<MasterTemplate />}
+                    headerTitle="Master Template Aspack"
                     />
                   }
                 />
                 <Route
                   path="/Approval"
                   element={
-                    <PageWrapper
-                      content={<Approvals setUser={setUser} />}
-                      title="Aspack Approval"
-                      headerTitle="Uploaded Aspack"
+                    <AcordionWrapper
+                    content={<Approvals />}
+                    headerTitle="Uploaded Aspack"
                     />
                   }
                 />
                 <Route
-                  path="/MstUserAffco"
+                  path="/MasterWorkflow"
                   element={
-                    <AccordionWrapper
-                      content={<MstUserAffco />}
-                      headerTitle="Master User & Affco"
+                    <AcordionWrapper
+                    content={<MstWorkflow />}
+                    headerTitle="Master Workflow"
                     />
                   }
                 />
                 <Route
-                  path="/Archived"
+                  path="/Welcome"
                   element={
-                    <AccordionWrapper
-                      content={<ConsArchived />}
-                      headerTitle="Consolidate Archived News"
-                    />
+                    <WelcomePage />
                   }
                 />
-                <Route
-                  path="/Recent"
-                  element={
-                    <AccordionWrapper
-                      content={<ConsRecent />}
-                      headerTitle="Consolidate Recent News"
-                    />
-                  }
+                <Route 
+                path="/MstUserAffco"
+                element={
+                  <AccordionWrapper 
+                  content={<MstUserAffco />}                  
+                  headerTitle="Master User & Affco" />                  
+                }
+                />
+                <Route 
+                path="/hisUploadAffco"
+                element={
+                  <AccordionWrapper 
+                  content={<HistoryUploadAffco />}                  
+                  headerTitle="History Upload AFFCO" />                  
+                }
                 />
                 <Route
-                  path="/Kategori"
-                  element={
-                    <AccordionWrapper
-                      content={<ConsKategori />}
-                      headerTitle="Consolidate Kategori News"
-                    />
-                  }
+                path="/oPeriode"
+                element={
+                  <OpenPeriod /> 
+                }
+                />
+                {/* Manage Email Template */}
+                <Route
+                path="/emailUpdateTemp"
+                element={
+                  <EmailUpdateTemplate /> 
+                }
                 />
                 <Route
-                  path="/ConsApproval"
-                  element={<PageContent content={<AspackAprroval />} headerTitle="Aspack Approval"/>}
+                path="/emailApproval"
+                // element={
+                //   <UpdateApproval /> 
+                // }
                 />
+                <Route
+                path="/emailApprovalResp"
+                // element={
+                //   <ApprovalResponse /> 
+                // }
+                />
+
               </Routes>
             </Container>
           </Box>

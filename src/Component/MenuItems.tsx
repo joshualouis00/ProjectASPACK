@@ -90,7 +90,7 @@ const MenuItems = (props: MenuItemsProps) => {
         <List component="div" disablePadding className="subMenus">
           <ListItemButton
             onClick={() => {
-              navigate("/Approval");
+              navigate("/ConsApproval");
             }}
             sx={{ bgcolor: '#223c49', color: 'white' }}
           >

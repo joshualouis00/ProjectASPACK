@@ -36,7 +36,12 @@ import PageWrapper from "./Component/PageWrapper";
 import Login from "./Pages/Login";
 import { useState } from "react";
 import MstUserAffco from "./Pages/MstUserAffco";
+import ConsArchived from "./Pages/ConsArchived";
+import ConsRecent from "./Pages/ConsRecent";
+import ConsKategori from "./Pages/ConsKategori";
 import AccordionWrapper from "./Component/AccordionWrapper";
+import PageContent from "./Component/PageContent";
+import AspackAprroval from "./Pages/ConsApprovals";
 
 function Copyright(props: any) {
   return (
@@ -128,7 +133,9 @@ const defaultTheme = createTheme();
 function App() {
   const { open, setOpen } = UseToggleSidebar();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [user, setUser] = useState<{ role: string, email: string } | null>(null);
+  const [user, setUser] = useState<{ role: string; email: string } | null>(
+    null
+  );
   const openMenu = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -336,10 +343,7 @@ function App() {
               }}
             >
               <Routes>
-              <Route
-                  path="/"
-                  element={<Login setUser={setUser} />}
-                />
+                <Route path="/" element={<Login setUser={setUser} />} />
                 <Route
                   path="/Dashboard"
                   element={
@@ -354,19 +358,51 @@ function App() {
                   path="/Approval"
                   element={
                     <PageWrapper
-                      content={<Approvals setUser={setUser}/>}
+                      content={<Approvals setUser={setUser} />}
                       title="Aspack Approval"
                       headerTitle="Uploaded Aspack"
                     />
                   }
                 />
-                <Route 
-                path="/MstUserAffco"
-                element={
-                  <AccordionWrapper 
-                  content={<MstUserAffco />}                  
-                  headerTitle="Master User & Affco" />                  
-                }
+                <Route
+                  path="/MstUserAffco"
+                  element={
+                    <AccordionWrapper
+                      content={<MstUserAffco />}
+                      headerTitle="Master User & Affco"
+                    />
+                  }
+                />
+                <Route
+                  path="/Archived"
+                  element={
+                    <AccordionWrapper
+                      content={<ConsArchived />}
+                      headerTitle="Consolidate Archived News"
+                    />
+                  }
+                />
+                <Route
+                  path="/Recent"
+                  element={
+                    <AccordionWrapper
+                      content={<ConsRecent />}
+                      headerTitle="Consolidate Recent News"
+                    />
+                  }
+                />
+                <Route
+                  path="/Kategori"
+                  element={
+                    <AccordionWrapper
+                      content={<ConsKategori />}
+                      headerTitle="Consolidate Kategori News"
+                    />
+                  }
+                />
+                <Route
+                  path="/ConsApproval"
+                  element={<PageContent content={<AspackAprroval />} headerTitle="Aspack Approval"/>}
                 />
               </Routes>
             </Container>

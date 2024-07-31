@@ -200,7 +200,7 @@ const MenuItems = (props: MenuItemsProps) => {
 
           <ListItemButton
             onClick={() => {
-              navigate("/histUpload");
+              navigate("/hisUploadAffco");
             }}
           >
             <ListItemIcon>
@@ -261,7 +261,7 @@ const MenuItems = (props: MenuItemsProps) => {
                 <ListItemIcon>
                   <FolderOpenOutlinedIcon color="inherit" />
                 </ListItemIcon>
-                <ListItemText primary="Approval Response Template" />
+                <ListItemText primary="Affco Submit Template" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -290,28 +290,6 @@ const MenuItems = (props: MenuItemsProps) => {
                   <FolderOpenOutlinedIcon color="inherit" />
                 </ListItemIcon>
                 <ListItemText primary="Aspack Upload Form" />
-              </ListItemButton>
-              <ListItemButton
-                onClick={() => {
-                  navigate("/affcoHistory");
-                }}
-                sx={{ bgcolor: "#223c49", color: "white" }}
-              >
-                <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" />
-                </ListItemIcon>
-                <ListItemText primary="Aspack History" />
-              </ListItemButton>
-              <ListItemButton
-                onClick={() => {
-                  navigate("/affcoTemplate");
-                }}
-                sx={{ bgcolor: "#223c49", color: "white" }}
-              >
-                <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" />
-                </ListItemIcon>
-                <ListItemText primary="Aspack Template" />
               </ListItemButton>
             </List>
           </Collapse>

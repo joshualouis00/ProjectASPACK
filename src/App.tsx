@@ -36,6 +36,7 @@ import WelcomePage from "./Pages/Welcome";
 import OpenPeriod from "./Pages/oPeriode";
 import EmailUpdateTemplate from "./Pages/MstTempEmail";
 import AcordionWrapper from "./Component/AccordionWrapper";
+import HistoryUploadAffco from "./Pages/HistUploadAffco";
 
 const drawerWidth: number = 250;
 
@@ -364,6 +365,14 @@ function App() {
                   <AccordionWrapper 
                   content={<MstUserAffco />}                  
                   headerTitle="Master User & Affco" />                  
+                }
+                />
+                <Route 
+                path="/hisUploadAffco"
+                element={
+                  <AccordionWrapper 
+                  content={<HistoryUploadAffco />}                  
+                  headerTitle="History Upload AFFCO" />                  
                 }
                 />
                 <Route

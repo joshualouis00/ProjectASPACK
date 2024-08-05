@@ -14,7 +14,7 @@ const data = [...Array(5)].map(() => ({
 const columns: MRT_ColumnDef<(typeof data)[0]>[] = [
     {
       accessorKey: 'firstName',
-      header: 'First Name',
+      header: 'File Name',
     },
     {
       accessorKey: 'createDate',

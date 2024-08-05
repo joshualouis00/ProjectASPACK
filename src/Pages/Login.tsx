@@ -13,7 +13,6 @@ import {
   Paper,
   FormControl,
   FormControlLabel,
-  FormLabel,
   RadioGroup,
 } from "@mui/material";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
@@ -177,44 +176,6 @@ const Login: React.FC = () => {
                     </RadioGroup>
                   </FormControl>
                 </Grid>
-
-                {/* <Grid item>
-                  <Typography
-                    component="h2"
-                    variant="body2"
-                    sx={{ mr: "10px", fontSize: "14px", fontWeight: "bold" }}
-                  >
-                    Portal
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Radio
-                    value="fact"
-                    color="primary"
-                    size="small"
-                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                    inputProps={{ "aria-label": "FACT" }}
-                  />
-                </Grid>
-                <Grid item>
-                  <Typography variant="body1" sx={{ fontSize: 12 }}>
-                    CAPEX
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Radio
-                    value="aspack"
-                    color="primary"
-                    size="small"
-                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                    inputProps={{ "aria-label": "ASPACK" }}
-                  />
-                </Grid>
-                <Grid item>
-                  <Typography variant="body1" sx={{ fontSize: 12 }}>
-                    ASPACK
-                  </Typography>
-                </Grid> */}
               </Grid>
               <Button
                 type="submit"

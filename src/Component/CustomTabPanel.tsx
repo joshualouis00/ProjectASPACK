@@ -26,11 +26,6 @@ const TabContent = (props: ITabContent) => {
       <Typography variant="h4" color="initial" sx={{fontSize: "14px"}}>
         {"Upload Template " + props.label}
       </Typography>
-      <Typography sx={{ color: "red", fontSize: "12px" }}>
-        {
-          "*Template aspack harus di upload dan mekanisme status aktif adalah file template terakhir yang di upload"
-        }
-      </Typography>
       <Typography sx={{ fontSize: "12px" }}>
         {
           "a new file will automatically deactivate the previous file. the file accessible by affco will be the latest uploaded file."

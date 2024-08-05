@@ -7,7 +7,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, FormControl, MenuItem, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControl, MenuItem, TextField } from "@mui/material";
 
 interface StepData {
   vstepid: string;
@@ -43,7 +43,7 @@ const HistoryUploadAffco: React.FC = () => {
           "http://192.168.1.207:9020/api/WorkflowStep/getStep"
         );
         const stepData = resp.data.data;
-
+        
         console.log("Data: ", JSON.stringify(resp.data.data, null, 2));
 
         //Generate dynamic columns for steps:

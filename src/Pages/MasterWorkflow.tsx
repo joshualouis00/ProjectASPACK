@@ -25,7 +25,6 @@ export const DataWorkflow: React.FC = () => {
   const [stepDescription, setStepDescription] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [fileType, setFileType] = React.useState("");
-  const user = localStorage.getItem("UserID");
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -41,11 +40,7 @@ export const DataWorkflow: React.FC = () => {
     fetchData();
 
   }, []);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
+  
   const handleClose = () => {
     setOpen(false);
     resetDialogFields();

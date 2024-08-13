@@ -93,7 +93,7 @@ const FilterPeriod: React.FC<FilterPeriodProps> = ({
           </Grid>
         </Grid>
       </Collapse>
-    </Box>
+    </Box> 
   );
 };
 

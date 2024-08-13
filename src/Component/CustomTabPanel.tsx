@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
@@ -9,26 +9,46 @@ export interface ITabContent {
   label: string;
 }
 
-const TabContent = (props: ITabContent) => {
-  //Drag n Drop dengan react-dropzone
-  const onDrop = React.useCallback((acceptedFiles: any) => {
-    // Handle the files here
-    console.log(acceptedFiles);
+interface FileData {
+  fileName: string;
+  createDate: string;
+  status: string;
+  fileURL: string;
+}
+
+const TabContent: React.FC<ITabContent> = (props: ITabContent) => {
+  const [files, setFiles] = useState<FileData[]>([]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const newFiles = acceptedFiles.map((file) => ({
+      fileName: file.name,
+      createDate: new Date().toDateString(),
+      status: "Active",
+      fileURL: URL.createObjectURL(file),
+    }));
+
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
+  useEffect(() => {
+    return () => {
+      files.forEach((file) => URL.revokeObjectURL(file.fileURL));
+    };
+  }, [files]);
+
   return (
     <Container
       maxWidth="xl"
-      sx={{ pl: "2px !important", pr: "2px !important" }}
+      sx={{ paddingLeft: "2px !important", paddingRight: "2px !important" }}
     >
-      <Typography variant="h4" color="initial" sx={{fontSize: "14px"}}>
+      <Typography variant="h4" component="div" sx={{ fontSize: "14px", mb: 1 }}>
         {"Upload Template " + props.label}
       </Typography>
-      <Typography sx={{ fontSize: "12px" }}>
+      <Typography component="div" sx={{ fontSize: "12px", mb: 2 }}>
         {
-          "a new file will automatically deactivate the previous file. the file accessible by affco will be the latest uploaded file."
+          "A new file will automatically deactivate the previous file. The file accessible by affco will be the latest uploaded file."
         }
       </Typography>
       <Box
@@ -43,18 +63,20 @@ const TabContent = (props: ITabContent) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          mb: 2,
         }}
       >
         <input {...getInputProps()} />
-        <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
+        <Typography color="textSecondary" component="div" sx={{ fontSize: "10px" }}>
           Drag 'n' drop some files here, or click to select files
         </Typography>
       </Box>
       <Box sx={{ width: "100%" }}>
-        <AppTable />
+        <AppTable files={files} setFiles={setFiles} />
       </Box>
     </Container>
   );
+  
 };
 
 export default TabContent;

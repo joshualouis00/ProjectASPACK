@@ -35,6 +35,7 @@ const Login: React.FC = () => {
   const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+
   const navigate = useNavigate();
   const combine = password + userId;
   const encodeString = btoa(combine);

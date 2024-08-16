@@ -68,7 +68,7 @@ const MenuItems = (props: MenuItemsProps) => {
   return (
     <List component="nav" sx={{ color: "white" }}>
       {/* Aspack Template */}
-      {role === "CONS" && (
+      {role === "C" && (
         <>
           <ListItemButton onClick={handleOpenMaster}>
             <ListItemIcon>
@@ -269,7 +269,7 @@ const MenuItems = (props: MenuItemsProps) => {
       )}
 
       {/* User Affco Aspack */}
-      {role === "AFFCO" && (
+      {role === "A" && (
         <>
           <ListItemButton onClick={handleOpenAspackAffco}>
             <ListItemIcon>

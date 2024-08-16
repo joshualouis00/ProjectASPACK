@@ -9,14 +9,14 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
-import axios from 'axios';
+import axios from "axios";
 
 interface Data {
-  vstepid: string;
-  vstepdesc: string;
-  vaffcoctgry: string;
-  vfiletype: string;
-  bactive: boolean | null;
+  vStepId: string;
+  vStepDesc: string;
+  vAffcoCtgry: string;
+  vAttType: string;
+  bActive: boolean | null;
 }
 
 export const DataWorkflow: React.FC = () => {
@@ -25,92 +25,146 @@ export const DataWorkflow: React.FC = () => {
   const [stepDescription, setStepDescription] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [fileType, setFileType] = React.useState("");
+  const [bactive, setBactive] = React.useState<boolean>(true);
+  const [change, setChange] = React.useState<boolean>(false);
+
+  //Buat si Edit
+  const [editMode, setEditMode] = React.useState(false);
+  const [selectedStep, setselectedStep] = React.useState<Data | null>(null);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const resp = await axios.get('http://192.168.1.207:9020/api/WorkflowStep/getStep');
+        const resp = await axios.get(
+          "http://192.168.1.207:9020/api/WorkflowStep/getStep"
+        );
         console.log("Data : ", JSON.stringify(resp.data, null, 2));
         setRows(resp.data.data);
       } catch (error) {
-        console.error('Errornya : ', error);
+        console.error("Errornya : ", error);
       }
     };
 
     fetchData();
+  }, [change]);
 
-  }, []);
-  
   const handleClose = () => {
     setOpen(false);
     resetDialogFields();
+    setselectedStep(null);
+    setEditMode(false);
+    setChange(false);
+  };
+
+  const handleOpenEditDialog = (step: Data) => {
+    setselectedStep(step);
+    setStepDescription(step.vStepDesc);
+    setCategory(step.vAffcoCtgry);
+    setFileType(step.vAttType);
+    setBactive(step.bActive || false);
+    setEditMode(true);
+    setOpen(true);
   };
 
   const resetDialogFields = () => {
     setStepDescription("");
     setCategory("");
     setFileType("");
+    setBactive(true);
   };
 
-  const handleAddStep = async () => {
-    const newStep = {
-      vstepid: "STEP" + (rows.length + 1).toString(),
+  //Add Step
+  const handleSaveStep = async () => {
+    const token = localStorage.getItem("token");
+    const stepData = {
+      vstepid:
+        editMode && selectedStep
+          ? selectedStep.vStepId
+          : "STEP" + (rows.length + 1).toString(),
       vstepdesc: stepDescription,
       vaffcocategory: category,
       vfiletype: fileType,
-      bactive: true
-    }
-
-    const token = localStorage.getItem("token");
+      bactive: bactive,
+    };
 
     try {
-      const response = await axios.post('http://192.168.1.207:9020/api/WorkflowStep/addStep', newStep, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': '*/*'
+      const response = await axios.post(
+        `http://192.168.1.207:9020/api/WorkflowStep/${
+          editMode ? "editStep" : "addStep"
+        }`,
+        stepData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "*/*",
+          },
         }
-      });
-      
-      console.log("Nambah : ", JSON.stringify(newStep, null, 2));
+      );
+
+      console.log(
+        `${editMode ? "Edit" : "Tambah"} : `,
+        JSON.stringify(stepData, null, 2)
+      );
       if (response.status === 200) {
         handleClose();
-        window.location.reload();
+        setChange(true);
       }
     } catch (error) {
-      console.error('Errornya : ', error);
+      console.error("Errornya : ", error);
     }
   };
 
   const columns: MRT_ColumnDef<Data>[] = [
     {
-      accessorKey: "vstepid",
+      accessorKey: "vStepId",
       header: "Step No",
-      size: 20
+      size: 20,
     },
     {
-      accessorKey: "vstepdesc",
+      accessorKey: "vStepDesc",
       header: "Step Description",
       size: 200,
       sortingFn: (a, b) => {
-        const nameA = a.original.vstepdesc.toLowerCase();
-        const nameB = b.original.vstepdesc.toLowerCase();
+        const nameA = a.original.vStepDesc.toLowerCase();
+        const nameB = b.original.vStepDesc.toLowerCase();
         return nameA.localeCompare(nameB);
       },
     },
     {
-      accessorKey: "vaffcoctgry",
+      accessorKey: "vAffcoCtgry",
       header: "Category",
       size: 170,
       sortingFn: (a, b) => {
-        const CategoryA = a.original.vaffcoctgry.toLowerCase();
-        const CategoryB = b.original.vaffcoctgry.toLowerCase();
+        const CategoryA = a.original.vAffcoCtgry.toLowerCase();
+        const CategoryB = b.original.vAffcoCtgry.toLowerCase();
         return CategoryA.localeCompare(CategoryB);
       },
     },
     {
+      accessorKey: "vAttType",
+      header: "File Type",
+      size: 100,
+      sortingFn: (a, b) => {
+        const typeA = a.original.vAttType.toLowerCase();
+        const typeB = b.original.vAttType.toLowerCase();
+        return typeA.localeCompare(typeB);
+      },
+    },
+    {
+      accessorKey: "bActive",
+      header: "Active",
+      size: 100,
+      Cell: ({ cell }) => (cell.getValue<boolean>() ? "Active" : "Inactive"), // Ubah bactive menjadi "Active" atau "Inactive"
+    },
+    {
       header: "Action",
       Cell: ({ row }) => (
-        <Button variant="contained" sx={{ backgroundColor: "#808080" }} size="small">
+        <Button
+          variant="contained"
+          sx={{ backgroundColor: "#808080" }}
+          size="small"
+          onClick={() => handleOpenEditDialog(row.original)}
+        >
           Update
         </Button>
       ),
@@ -145,13 +199,14 @@ export const DataWorkflow: React.FC = () => {
             </div>
           );
         }}
-
       />
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Step</DialogTitle>
+        <DialogTitle>{editMode ? "Edit Step" : "Add Step"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Masukkan detail step baru di bawah ini.
+            {editMode
+              ? "Edit detail step di bawah ini."
+              : "Masukkan detail step baru di bawah ini."}
           </DialogContentText>
           <TextField
             autoFocus
@@ -192,13 +247,30 @@ export const DataWorkflow: React.FC = () => {
             required
           >
             <MenuItem value="Excel">Excel</MenuItem>
-            <MenuItem value="Email">PDF</MenuItem>
-            <MenuItem value="Text">Both</MenuItem>
+            <MenuItem value="PDF">PDF</MenuItem>
+            <MenuItem value="Both">Both</MenuItem>
+          </TextField>
+          {/* Tambahkan pilihan untuk bactive */}
+          <TextField
+            select
+            margin="dense"
+            id="bactive"
+            label="Active Status"
+            fullWidth
+            variant="standard"
+            value={bactive ? "Active" : "Inactive"}
+            onChange={(e) => setBactive(e.target.value === "Active")}
+            required
+          >
+            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Inactive">Inactive</MenuItem>
           </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleAddStep}>Add Step</Button>
+          <Button onClick={handleSaveStep}>
+            {editMode ? "Save Changes" : "Add Step"}
+          </Button>
         </DialogActions>
       </Dialog>
     </Paper>

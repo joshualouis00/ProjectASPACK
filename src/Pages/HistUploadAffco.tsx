@@ -10,8 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { Box, Button, FormControl, MenuItem, TextField } from "@mui/material";
 
 interface StepData {
-  vstepid: string;
-  vstepdesc: string;
+  vStepId: string;
+  vStepDesc: string;
 }
 
 interface TableData {
@@ -49,7 +49,7 @@ const HistoryUploadAffco: React.FC = () => {
         //Generate dynamic columns for steps:
         const stepCol = stepData.map((step: StepData, index: number) => ({
           accessorKey: `step${index + 1}`,
-          header: step.vstepdesc,
+          header: step.vStepDesc,
           size: 150,
         }));
 

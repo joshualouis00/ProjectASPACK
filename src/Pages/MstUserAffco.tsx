@@ -522,7 +522,6 @@ function a11yProps(index: number) {
 
 const token = localStorage.getItem("token");
 
-console.log(" tokennya : ", token);
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,

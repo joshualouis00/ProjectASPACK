@@ -74,12 +74,6 @@ const rowsApproved = [
 
 const UploadedAspackPage: React.FC = () => {
 
-  // useEffect(() => {
-  //   setUser(userData);
-  // }, [setEmail, email]);
-
-
-  // Test Pokemon API
   const [rows, setRows] = useState(rowsWaiting);
   const fetchPokemonData = async () => {
     const api = new PokemonClient();

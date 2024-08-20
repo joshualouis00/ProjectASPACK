@@ -29,6 +29,8 @@ interface CustomJwtPayload extends JwtPayload {
   UserName: string;
   Email: string;
   Role: string;
+  CoCode: string;
+  exp: number;
 }
 
 const Login: React.FC = () => {
@@ -69,6 +71,8 @@ const Login: React.FC = () => {
         localStorage.setItem("UserName", decode.UserName);
         localStorage.setItem("Email", decode.Email);
         localStorage.setItem("Role", decode.Role);
+        localStorage.setItem("CoCode", decode.CoCode);
+
         navigate("/welcome");
         window.location.reload();
       } else {
@@ -162,16 +166,24 @@ const Login: React.FC = () => {
                     >
                       <FormControlLabel
                         value="capex"
-                        control={<Radio size="small"
-                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                          inputProps={{ "aria-label": "FACT" }}/>}
+                        control={
+                          <Radio
+                            size="small"
+                            sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                            inputProps={{ "aria-label": "FACT" }}
+                          />
+                        }
                         label="CAPEX"
                       />
                       <FormControlLabel
                         value="aspack"
-                        control={<Radio size="medium"
-                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                          inputProps={{ "aria-label": "FACT" }}/>}
+                        control={
+                          <Radio
+                            size="medium"
+                            sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                            inputProps={{ "aria-label": "FACT" }}
+                          />
+                        }
                         label="ASPACK"
                       />
                     </RadioGroup>

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import CustomTheme from "../Theme/CustomTheme";
 import TabContent from "../Component/CustomTabPanel";
 import axios from "axios";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -15,7 +16,7 @@ interface FileData {
   fileName: string;
   createDate: string;
   status: string;
-  file: File; // Menyimpan file asli
+  file: File;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -50,6 +51,7 @@ const MasterTemplate = () => {
   const [value, setValue] = React.useState(0);
   const [data, setData] = useState<any[]>([]);
   const [files, setFiles] = useState<{ [key: string]: FileData[] }>({});
+  const navigate = useHandleUnauthorized();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,18 +60,19 @@ const MasterTemplate = () => {
           "http://192.168.1.207:9020/api/WorkflowStep/getStep"
         );
         setData(resp.data.data);
-      } catch (error) {
-        console.error("Errornya : ", error);
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          navigate();
+        } else {
+          console.error("Error fetching templates:", error);
+        }
       }
     };
 
     fetchData();
-  }, []);
+  }, [navigate]);
 
-  const handleChange = (
-    event: React.SyntheticEvent,
-    newValue: number
-  ) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -93,15 +96,16 @@ const MasterTemplate = () => {
 
       if (response.status === 200) {
         const backendData = response.data.data;
+        console.log("Get Template : " + JSON.stringify(backendData, null, 2));
         const updatedFiles: { [key: string]: FileData[] } = {};
 
         backendData.forEach((item: any) => {
-          if (item.vAttchId !== '') {
+          if (item.vAttchId !== "") {
             const filesForStep = item.attachment.map((element: any) => ({
-              fileName: element?.vFileName || '',
+              fileName: element?.vFileName || "",
               createDate: new Date().toDateString(),
               status: element?.vStatus === "1" ? "Active" : "Inactive",
-              file: new File([], element?.vFileName || '')
+              file: new File([], element?.vFileName || ""),
             }));
 
             updatedFiles[item.vStepId] = filesForStep;
@@ -110,8 +114,12 @@ const MasterTemplate = () => {
 
         setFiles(updatedFiles);
       }
-    } catch (error) {
-      console.error("Error fetching templates:", error);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate();
+      } else {
+        console.error("Error fetching templates:", error);
+      }
     }
   };
 
@@ -122,7 +130,7 @@ const MasterTemplate = () => {
   const activeSteps = data.filter((item) => item.bActive);
 
   return (
-    <ThemeProvider theme={CustomTheme}> {/* Wrap with ThemeProvider */}
+    <ThemeProvider theme={CustomTheme}>
       <Box>
         <Tabs
           value={value}
@@ -166,7 +174,9 @@ const MasterTemplate = () => {
               vStepId={item.vStepId}
               vFileType={item.vAttType}
               files={files[item.vStepId] || []}
-              setFiles={(newFiles: FileData[]) => handleFileChange(item.vStepId, newFiles)}
+              setFiles={(newFiles: FileData[]) =>
+                handleFileChange(item.vStepId, newFiles)
+              }
             />
           </TabPanel>
         ))}

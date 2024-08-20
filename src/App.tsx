@@ -110,6 +110,8 @@ const ProtectedRoute = ({ element }) => {
   return isToken ? element : <Navigate to="/" replace />;
 };
 
+
+
 function App() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { open, setOpen } = UseToggleSidebar();
@@ -131,6 +133,8 @@ function App() {
     localStorage.removeItem("UserID");
     localStorage.removeItem("Email");
     localStorage.removeItem("Role");
+    localStorage.removeItem("CoCode");
+    localStorage.removeItem("exp");
     window.location.href = "/";
   };
 

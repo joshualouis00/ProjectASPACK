@@ -3,6 +3,7 @@ import { Container, Typography, Box, Button } from "@mui/material";
 import AppTable from "./TableComponent/MaterialTableUploadTemplate";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 interface ITabContent {
   label: string;
@@ -22,6 +23,7 @@ interface FileData {
 const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, setFiles }) => {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [fileList, setFileList] = useState<FileData[]>(files);
+  const navigate = useHandleUnauthorized();
 
   useEffect(() => {
     setFileList(files);
@@ -47,8 +49,9 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
       }));
 
       setFileList((prevList) => [...prevList, ...newFiles]);
+      setFiles([...files, ...newFiles]); // Update the files in the parent component
     },
-    [vFileType]
+    [vFileType, files, setFiles]
   );
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
@@ -83,10 +86,15 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
         setTimeout(() => setUploadStatus(null), 5000);
         await getTemplates(); // Update file list after successful upload
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upload error:", error);
-      setUploadStatus("Upload failed");
-      setTimeout(() => setUploadStatus(null), 5000);
+      if (error.response && error.response.status === 401) {
+        setUploadStatus("Upload failed");
+        setTimeout(() => setUploadStatus(null), 5000);
+        navigate();
+      } else {
+        console.error("Error Add templates:", error);
+      }
     }
   };
 
@@ -122,11 +130,15 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
           console.error("Expected array but got:", backendData);
         }
       }
-    } catch (error) {
-      console.error("Error fetching templates:", error);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate();
+      } else {
+      console.error("Error Get templates:", error);
+      }
     }
   };
-
+  
   return (
     <Container
       maxWidth="xl"

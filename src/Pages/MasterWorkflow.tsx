@@ -10,6 +10,7 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
 import axios from "axios";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 interface Data {
   vStepId: string;
@@ -32,6 +33,8 @@ export const DataWorkflow: React.FC = () => {
   const [editMode, setEditMode] = React.useState(false);
   const [selectedStep, setselectedStep] = React.useState<Data | null>(null);
 
+  const navigate = useHandleUnauthorized();
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,8 +43,12 @@ export const DataWorkflow: React.FC = () => {
         );
         console.log("Data : ", JSON.stringify(resp.data, null, 2));
         setRows(resp.data.data);
-      } catch (error) {
-        console.error("Errornya : ", error);
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          navigate();
+        } else {
+          console.error("Error Get Step:", error);
+        }
       }
     };
 
@@ -109,8 +116,12 @@ export const DataWorkflow: React.FC = () => {
         handleClose();
         setChange(true);
       }
-    } catch (error) {
-      console.error("Errornya : ", error);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate();
+      } else {
+        console.error("Error Workflow Step:", error);
+      }
     }
   };
 

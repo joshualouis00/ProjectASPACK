@@ -33,13 +33,21 @@ export const DataWorkflow: React.FC = () => {
   const [editMode, setEditMode] = React.useState(false);
   const [selectedStep, setselectedStep] = React.useState<Data | null>(null);
 
+  const token = localStorage.getItem("token");
+
   const navigate = useHandleUnauthorized();
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         const resp = await axios.get(
-          "http://192.168.1.207:9020/api/WorkflowStep/getStep"
+          "http://192.168.1.207:9020/api/WorkflowStep/getStep",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "*/*",
+            },
+          }
         );
         console.log("Data : ", JSON.stringify(resp.data, null, 2));
         setRows(resp.data.data);

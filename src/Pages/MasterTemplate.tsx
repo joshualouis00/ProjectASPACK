@@ -57,7 +57,12 @@ const MasterTemplate = () => {
     const fetchData = async () => {
       try {
         const resp = await axios.get(
-          "http://192.168.1.207:9020/api/WorkflowStep/getStep"
+          "http://192.168.1.207:9020/api/WorkflowStep/getStep",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         setData(resp.data.data);
       } catch (error: any) {
@@ -70,7 +75,7 @@ const MasterTemplate = () => {
     };
 
     fetchData();
-  }, [navigate]);
+  }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

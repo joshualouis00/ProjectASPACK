@@ -8,6 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, FormControl, MenuItem, TextField } from "@mui/material";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 interface StepData {
   vStepId: string;
@@ -32,6 +33,7 @@ const HistoryUploadAffco: React.FC = () => {
   const [viewHistoryOpen, setViewHistoryOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
+  const handleError401 = useHandleUnauthorized();
 
   const token = localStorage.getItem("token");
   console.log("Tokennya : ", token);
@@ -40,7 +42,12 @@ const HistoryUploadAffco: React.FC = () => {
     const fetchData = async () => {
       try {
         const resp = await axios.get(
-          "http://192.168.1.207:9020/api/WorkflowStep/getStep"
+          "http://192.168.1.207:9020/api/WorkflowStep/getStep",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         const stepData = resp.data.data;
         
@@ -94,8 +101,12 @@ const HistoryUploadAffco: React.FC = () => {
           }));
 
         setRows(dummyRows);
-      } catch (error) {
-        console.error("Errornya: ", error);
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          handleError401();
+        } else {
+          console.error("Error Get Step :", error);
+        }
       }
     };
 

@@ -1,7 +1,4 @@
-import { useNavigate } from "react-router-dom";
-
 const useHandleUnauthorized = () => {
-  const navigate = useNavigate();
 
   const handleUnauthorized = () => {
     localStorage.removeItem("token");
@@ -12,7 +9,8 @@ const useHandleUnauthorized = () => {
     localStorage.removeItem("CoCode");
     localStorage.removeItem("exp");
 
-    navigate("/login");
+    window.location.href = "/";
+    window.location.reload();
   };
 
   return handleUnauthorized;

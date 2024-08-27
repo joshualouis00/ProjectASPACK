@@ -17,6 +17,7 @@ interface FileData {
   fileName: string;
   createDate: string;
   status: string;
+  vAttchId: string;
   file: File;
 }
 
@@ -46,6 +47,7 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
         createDate: new Date().toDateString(),
         status: "Draft",
         file: file,
+        vAttchId: "",
       }));
 
       setFileList((prevList) => [...prevList, ...newFiles]);
@@ -118,7 +120,7 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
             .flatMap((item: any) =>
               item.attachment.map((element: any) => ({
                 fileName: element?.vFileName || "",
-                createDate: new Date().toDateString(),
+                createDate: element?.dCrea,
                 status: element?.vStatus === "1" ? "Active" : "Inactive",
                 file: new File([], element?.vFileName || ""),
               }))
@@ -170,14 +172,15 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
           Drag 'n' drop some files here, or click to select files
         </Typography>
       </Box>
-      <AppTable files={fileList} />
       <Button
         onClick={handleUpload}
         variant="contained"
-        color="primary"
+        color="info"
+        sx={{mb: 1}}
       >
         Submit
       </Button>
+      <AppTable files={fileList} />
       {uploadStatus && (
         <Typography
           variant="body1"

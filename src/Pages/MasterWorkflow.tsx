@@ -138,6 +138,18 @@ export const DataWorkflow: React.FC = () => {
       accessorKey: "vStepId",
       header: "Step No",
       size: 20,
+      Cell: ({ cell }) => (
+        <span
+          style={{
+            display: "block",
+            width: "65px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {cell.getValue<string>()}
+        </span>
+      ),
     },
     {
       accessorKey: "vStepDesc",
@@ -148,6 +160,18 @@ export const DataWorkflow: React.FC = () => {
         const nameB = b.original.vStepDesc.toLowerCase();
         return nameA.localeCompare(nameB);
       },
+      Cell: ({ cell }) => (
+        <span
+          style={{
+            display: "block",
+            width: "150px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {cell.getValue<string>()}
+        </span>
+      ),
     },
     {
       accessorKey: "vAffcoCtgry",
@@ -158,6 +182,18 @@ export const DataWorkflow: React.FC = () => {
         const CategoryB = b.original.vAffcoCtgry.toLowerCase();
         return CategoryA.localeCompare(CategoryB);
       },
+      Cell: ({ cell }) => (
+        <span
+          style={{
+            display: "block",
+            width: "100px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {cell.getValue<string>()}
+        </span>
+      ),
     },
     {
       accessorKey: "vAttType",
@@ -168,12 +204,35 @@ export const DataWorkflow: React.FC = () => {
         const typeB = b.original.vAttType.toLowerCase();
         return typeA.localeCompare(typeB);
       },
+      Cell: ({ cell }) => (
+        <span
+          style={{
+            display: "block",
+            width: "100px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {cell.getValue<string>()}
+        </span>
+      ),
     },
     {
       accessorKey: "bActive",
       header: "Active",
       size: 100,
-      Cell: ({ cell }) => (cell.getValue<boolean>() ? "Active" : "Inactive"), // Ubah bactive menjadi "Active" atau "Inactive"
+      Cell: ({ cell }) => (
+        <span
+        style={{
+          display: "block",
+          width: "105px",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+        >
+          {cell.getValue<boolean>() ? "Active" : "Inactive"} 
+        </span>
+      ),
     },
     {
       header: "Action",

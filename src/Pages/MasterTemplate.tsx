@@ -16,6 +16,7 @@ interface FileData {
   fileName: string;
   createDate: string;
   status: string;
+  vAttchId: string;
   file: File;
 }
 
@@ -108,9 +109,10 @@ const MasterTemplate = () => {
           if (item.vAttchId !== "") {
             const filesForStep = item.attachment.map((element: any) => ({
               fileName: element?.vFileName || "",
-              createDate: new Date().toDateString(),
+              createDate: element?.dCrea,
               status: element?.vStatus === "1" ? "Active" : "Inactive",
               file: new File([], element?.vFileName || ""),
+              vAttchId: item.vAttchId,
             }));
 
             updatedFiles[item.vStepId] = filesForStep;

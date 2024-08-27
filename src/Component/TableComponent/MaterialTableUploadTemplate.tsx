@@ -1,10 +1,14 @@
 import React from "react";
 import { type MRT_ColumnDef, MaterialReactTable } from "material-react-table";
+import useHandleUnauthorized from "../handleUnauthorized";
+import { Button, Box, Alert } from "@mui/material";
+import { format, parse } from "date-fns";
 
 interface FileData {
   fileName: string;
   createDate: string;
   status: string;
+  vAttchId: string;
 }
 
 interface AppTableProps {
@@ -12,29 +16,127 @@ interface AppTableProps {
 }
 
 const AppTable: React.FC<AppTableProps> = ({ files }) => {
+  const navigate = useHandleUnauthorized();
+  const [showAlert, setShowAlert] = React.useState(false);
+
+  const getLatestVersion = (vAttchId: string) => {
+    const filesForAttchId = files.filter((file) => file.vAttchId === vAttchId);
+    return filesForAttchId.length; // Misalnya, versi adalah panjang array
+  };
+
+  const downloadFile = async (fileName: string, vAttchId: string) => {
+    const encodedFileName = btoa(fileName); // Encode filename
+    const iVersion = getLatestVersion(vAttchId).toString();
+    const url = `http://192.168.1.207:9020/api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${iVersion}`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate();
+      } else {
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 5000);
+        console.error("Error fetching templates:", error);
+      }
+    }
+  };
+
   const columns: MRT_ColumnDef<FileData>[] = [
     {
       accessorKey: "fileName",
       header: "File Name",
-      Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Removed hyperlink
+      Cell: ({ cell }) => (
+        <span
+          style={{
+            display: "block",
+            width: "300px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {cell.getValue<string>()}
+        </span>
+      ),
     },
     {
       accessorKey: "createDate",
       header: "Create Date",
-      Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>,
+      Cell: ({ cell }) => {
+        const dateStr = cell.getValue<string>(); // Ambil string tanggal dari data
+        let formattedDate = " "; // Default jika tanggal tidak valid
+
+        try {
+          const date = parse(dateStr, "dd-MM-yyyy", new Date()); // Parsing tanggal dari format "dd-MM-yyyy"
+          if (!isNaN(date.getTime())) {
+            // Periksa apakah tanggal valid
+            formattedDate = format(date, "dd/MM/yyyy"); // Format tanggal ke "dd/MM/yyyy"
+          }
+        } catch (error) {
+          console.error("Error parsing or formatting date:", error);
+        }
+
+        return (
+          <span
+            style={{
+              display: "block",
+              width: "120px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {formattedDate}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "status",
       header: "Status",
       Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>,
     },
+    {
+      header: "Download",
+      Cell: ({ row }) => {
+        const fileName = row.original.fileName;
+        const vAttchId = row.original.vAttchId;
+        return (
+          <Button
+            onClick={() => downloadFile(fileName, vAttchId)}
+            variant="outlined"
+            color="info"
+            size="small"
+          >
+            Download
+          </Button>
+        );
+      },
+    },
   ];
 
   return (
-    <MaterialReactTable
-      columns={columns}
-      data={files}
-    />
+    <Box>
+      <MaterialReactTable columns={columns} data={files} />
+      {showAlert && (
+        <Alert variant="outlined" severity="error" sx={{ mb: 2 }}>
+          Gagal download template. Hubungi IT Support.
+        </Alert>
+      )}
+    </Box>
   );
 };
 

@@ -166,6 +166,7 @@ const Login: React.FC = () => {
                     >
                       <FormControlLabel
                         value="capex"
+                        id="CAPEX"
                         control={
                           <Radio
                             size="small"
@@ -177,6 +178,7 @@ const Login: React.FC = () => {
                       />
                       <FormControlLabel
                         value="aspack"
+                        id="ASPACK"
                         control={
                           <Radio
                             size="medium"

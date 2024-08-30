@@ -56,7 +56,7 @@ const MasterTemplate = () => {
     };
 
     fetchData();
-  })
+  },[])
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

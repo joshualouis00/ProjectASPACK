@@ -63,7 +63,7 @@ const Login: React.FC = () => {
 
       if (token) {
         console.log("Decode : " + JSON.stringify(decode, null, 2));
-        console.log("Data : " + JSON.stringify(resp.data, null, 2));
+        console.log("Data : " + JSON.stringify(resp.data, null, 2));        
         localStorage.setItem("token", token);
         localStorage.setItem("UserID", decode.UserID);
         localStorage.setItem("UserName", decode.UserName);

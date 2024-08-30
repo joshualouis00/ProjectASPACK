@@ -40,6 +40,9 @@ import OpenPeriod from "./Pages/oPeriode";
 import EmailUpdateTemplate from "./Pages/MstTempEmail";
 import AcordionWrapper from "./Component/AccordionWrapper";
 import HistoryUploadAffco from "./Pages/HistUploadAffco";
+import PageContent from "./Component/PageContent";
+import ConsApprovals from "./Pages/ConsApprovals";
+import AffcoUpload from "./Pages/AffcoUpload";
 
 const drawerWidth: number = 250;
 
@@ -139,7 +142,8 @@ function App() {
   const isLoginRoute = (window.location.pathname === "/" || isToken);
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    
+      <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Router>
@@ -341,11 +345,14 @@ function App() {
                 <Route
                   path="/Approval"
                   element={
-                    <AcordionWrapper
-                    content={<Approvals />}
-                    headerTitle="Uploaded Aspack"
-                    />
+                    <PageContent content={<ConsApprovals />} headerTitle="Aspack Approval"/>
                   }
+                />
+                <Route 
+                path="/AffcoUpload"
+                element={
+                  <PageContent content={<AffcoUpload />} headerTitle="Affco Upload"/>
+                }
                 />
                 <Route
                   path="/MasterWorkflow"
@@ -361,6 +368,24 @@ function App() {
                   element={
                     <WelcomePage />
                   }
+                />
+                <Route 
+                path="/Archived"
+                element={
+                  <AcordionWrapper content={<ConsArchived />} headerTitle="Archived News"/>
+                }
+                />
+                <Route 
+                path="/Recent"
+                element={
+                  <AcordionWrapper content={<ConsRecent />} headerTitle="Recent News"/>
+                }
+                />
+                <Route 
+                path="/Kategori"
+                element={
+                  <AccordionWrapper content={<ConsKategori />} headerTitle="Kategori News"/>
+                }
                 />
                 <Route 
                 path="/MstUserAffco"
@@ -409,7 +434,8 @@ function App() {
           </Box>
         </Router>
       </Box>
-    </ThemeProvider>
+    </ThemeProvider>   
+    
   );
 }
 

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.16.6",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.19",
@@ -18,14 +19,17 @@
     "lodash": "^4.17.21",
     "marked": "^12.0.2",
     "material-react-table": "^2.13.0",
+    "randomstring": "^1.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.3",
+    "react-multi-carousel": "^2.8.5",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -55,7 +59,7 @@
     "@faker-js/faker": "^8.4.1",
     "@mui/lab": "^5.0.0-alpha.171",
     "@mui/x-date-pickers": "^7.9.0",
-    "@tanstack/react-query": "^5.51.11",
+    "@tanstack/react-query": "^5.51.23",
     "@types/styled-components": "^5.1.34",
     "axios": "^1.7.2",
     "axios-cache-interceptor": "^1.5.3",

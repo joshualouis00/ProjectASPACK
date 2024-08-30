@@ -13,6 +13,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import React from "react";
 import ButtonAddNews from "../Component/ButtonAddNews";
+import { getRole } from "../Component/TemplateUrl";
 export default function Kategori() {
   const responsive = {
     superLargeDesktop: {
@@ -60,9 +61,11 @@ export default function Kategori() {
     <div>
       <Box sx={{ width: "100%" }}>
         <Stack direction={"column"}>
-          <Item elevation={0}>
-            <ButtonAddNews />
-          </Item>
+        {getRole === "C" ? (
+            <Item elevation={0}>
+              <ButtonAddNews />
+            </Item>
+          ) : null}
           <Item elevation={0}>
             <Stack direction={"row"}>
               <Item elevation={0}>

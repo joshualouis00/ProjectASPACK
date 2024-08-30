@@ -68,7 +68,7 @@ const MenuItems = (props: MenuItemsProps) => {
   return (
     <List component="nav" sx={{ color: "white" }}>
       {/* Aspack Template */}
-      {role === "CONS" && (
+      {role === "C" && (
         <>
           <ListItemButton onClick={handleOpenMaster}>
             <ListItemIcon>
@@ -269,7 +269,7 @@ const MenuItems = (props: MenuItemsProps) => {
       )}
 
       {/* User Affco Aspack */}
-      {role === "AFFCO" && (
+      {role === "A" && (
         <>
           <ListItemButton onClick={handleOpenAspackAffco}>
             <ListItemIcon>
@@ -282,7 +282,7 @@ const MenuItems = (props: MenuItemsProps) => {
             <List component="div" disablePadding className="subMenus">
               <ListItemButton
                 onClick={() => {
-                  navigate("/affcoUploadForm");
+                  navigate("/AffcoUpload");
                 }}
                 sx={{ bgcolor: "#223c49", color: "white" }}
               >
@@ -306,7 +306,7 @@ const MenuItems = (props: MenuItemsProps) => {
             <List component="div" disablePadding className="subMenus">
               <ListItemButton
                 onClick={() => {
-                  navigate("/affcoRecentNews");
+                  navigate("/Recent");
                 }}
                 sx={{ bgcolor: "#223c49", color: "white" }}
               >
@@ -317,7 +317,7 @@ const MenuItems = (props: MenuItemsProps) => {
               </ListItemButton>
               <ListItemButton
                 onClick={() => {
-                  navigate("/affcoCategoryNews");
+                  navigate("/Kategori");
                 }}
                 sx={{ bgcolor: "#223c49", color: "white" }}
               >

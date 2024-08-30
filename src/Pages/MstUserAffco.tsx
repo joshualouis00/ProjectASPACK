@@ -11,12 +11,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Grid,
   InputLabel,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   Paper,
   Radio,
@@ -30,44 +25,19 @@ import {
 import { SelectChangeEvent } from "@mui/material/Select";
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
+import { MaterialReactTable } from "material-react-table";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
+import IDataAffco, { IAddAffcoProps } from "../Component/Interface/DataAffco";
+import IDataUser, { IAddUserProps } from "../Component/Interface/DataUser";
+import { CustomTabs, a11yProps } from "../Component/CustomTab";
+import {
+  columnMasterUser,
+  columnMasterAffco,
+} from "../Component/TableComponent/ColumnDef/IColumnMaster";
+import { apiUrl, getToken } from "../Component/TemplateUrl";
 
-interface AddUserProps {
-  open: boolean;
-  selectedValue: string;
-  onClose: (value: string) => void;
-  data: DataAffco[];
-}
-
-interface AddAffcoProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-interface DataUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-}
-
-interface DataAffco {
-  no: number;
-  id: string;
-  name: string;
-  category: string;
-  status: string;
-}
-
-function AddAffcoDialog(props: AddAffcoProps) {
+function AddAffcoDialog(props: IAddAffcoProps) {
   const { open, onClose } = props;
   const [catAffco, setCatAffco] = React.useState("");
   const [statusAffco, setStatusAffco] = React.useState("active");
@@ -96,11 +66,11 @@ function AddAffcoDialog(props: AddAffcoProps) {
 
   const submitAddAffco = () => {
     if (affcoID !== "" && affcoName !== "" && catAffco !== "") {
-      fetch("http://192.168.1.207:9020/api/Master/addAffco", {
+      fetch(apiUrl + "api/Master/addAffco", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `bearer ${token}`,
+          Authorization: `bearer ${getToken}`,
           Accept: "*/*",
         },
         body: JSON.stringify({
@@ -206,15 +176,15 @@ function AddAffcoDialog(props: AddAffcoProps) {
     </Dialog>
   );
 }
-function AddUserDialog(props: AddUserProps) {
+function AddUserDialog(props: IAddUserProps) {
   const { onClose, selectedValue, open, data } = props;
   const [value, setValue] = React.useState("nonldap");
   const [userId, setUserId] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [userLdap, setUserldap] = React.useState("")
+  const [userLdap, setUserldap] = React.useState("");
   const [role, setRole] = React.useState("");
-  const [affcom, setAffcom] = React.useState<DataAffco[]>([]);
+  const [affcom, setAffcom] = React.useState<IDataAffco[]>([]);
   const [affco, setAffco] = React.useState("");
   const [status, setStatus] = React.useState("active");
 
@@ -224,37 +194,37 @@ function AddUserDialog(props: AddUserProps) {
     const vEmail = email;
     const vRole = role;
     const vAffcoid = data.filter((id) => id.name === affco);
+    console.log(vAffcoid[0].id);
     const vAffcoId = role === "CONS" ? "CO" : vAffcoid[0].id;
     const vPicAff = affcom.map((val) => {
-      return val.id
-    })
+      return val.id;
+    });
     const vPicAffco = vPicAff.toString();
     const nUserLdap = value === "nonldap" ? false : true;
-    const vLdap = userLdap; 
-    
-    fetch("http://192.168.1.207:9020/api/Auth/register",{
+    const vLdap = userLdap;
+
+    fetch(apiUrl + "api/Auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `bearer ${token}`,
+        Authorization: `bearer ${getToken}`,
       },
-        body: JSON.stringify({
-          "vUserId" : vUserId,
-          "vUserName" : vUserName,
-          "vEmail": vEmail,
-          "vRole": vRole,
-          "vAffcoId": vAffcoId,
-          "vPicAffco": vPicAffco,
-          "vLdap": vLdap,
-          "nUserLdap": nUserLdap
-
-        })      
+      body: JSON.stringify({
+        vUserId: vUserId,
+        vUserName: vUserName,
+        vEmail: vEmail,
+        vRole: vRole,
+        vAffcoId: vAffcoId,
+        vPicAffco: vPicAffco,
+        vLdap: vLdap,
+        nUserLdap: nUserLdap,
+      }),
     }).then((resp) => {
       if (resp.ok) {
         alert("User Added Successfully");
         window.location.reload();
       }
-    })
+    });
   };
 
   const handleClose = () => {
@@ -275,26 +245,24 @@ function AddUserDialog(props: AddUserProps) {
 
   const handleChangeUserId = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUserId(event.target.value);
-  }
+  };
 
   const handleChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
-  }
+  };
 
   const handleChangeUserLdap = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUserldap(event.target.value);
-  }
+  };
 
   const handleChageEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
-  }
-
-
+  };
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-  const affcomData: DataAffco[] = [...data];
+  const affcomData: IDataAffco[] = [...data];
 
   return (
     <Dialog onClose={handleClose} open={open} fullWidth={true}>
@@ -376,14 +344,15 @@ function AddUserDialog(props: AddUserProps) {
           {role !== "" ? (
             <Stack direction={"column"}>
               <Item elevation={0} hidden={role === "AFFCO" ? false : true}>
-                {" "}
-                <FormControl fullWidth >
+                <FormControl fullWidth>
                   <Autocomplete
-                     size="small"
+                    id="affco-autocomplete"
+                    size="small"
                     disablePortal
                     isOptionEqualToValue={(option, value) => true}
                     inputValue={affco}
                     onInputChange={(event, newValue) => {
+                      console.log("ini berubah");
                       setAffco(newValue);
                     }}
                     options={affcomData}
@@ -410,9 +379,10 @@ function AddUserDialog(props: AddUserProps) {
                 </FormControl>
               </Item>
               <Item elevation={0} hidden={role === "CONS" ? false : true}>
-                <FormControl fullWidth >
+                <FormControl fullWidth>
                   <Autocomplete
-                   size="small"
+                    id="cons-autocomplete"
+                    size="small"
                     multiple
                     value={affcom}
                     disableCloseOnSelect
@@ -502,32 +472,6 @@ function AddUserDialog(props: AddUserProps) {
   );
 }
 
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
-
-const token = localStorage.getItem("token");
-
-console.log(" tokennya : ", token);
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
@@ -540,32 +484,31 @@ export default function MstUserAffco() {
   const [value, setValue] = React.useState(0);
   const [open, setOpen] = React.useState(false);
   const [openAffco, setOpenAffco] = React.useState(false);
-  const [data, setData] = React.useState<DataUser[]>([]);
-  const [dataAffco, setDataAffco] = React.useState<DataAffco[]>([]);
-
+  const [dataUser, setDataUser] = React.useState<IDataUser[]>([]);
+  const [dataAffco, setDataAffco] = React.useState<IDataAffco[]>([]);
   React.useEffect(() => {
-    fetch("http://192.168.1.207:9020/api/Master/getUser", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((resp) => {
-      resp.json().then((valData) => {
-        setData(
-          valData.map((val, index) => {
-            return {
-              id: val.vuserid,
-              name: val.vusername,
-              email: val.vemail,
-              role: val.vrole,
-              status: val.bactive === true ? "Active" : "Nonactive",
-            };
-          })
-        );
+    fetch(apiUrl + "api/Master/getUser", {
+        headers: {
+          Authorization: `Bearer ${getToken}`,
+        },
+      }).then((resp) => {
+        resp.json().then((valData) => {
+          setDataUser(
+            valData.map((val, index) => {
+              return {
+                id: val.vuserid,
+                name: val.vusername,
+                email: val.vemail,
+                role: val.vrole,
+                status: val.bactive === true ? "Active" : "Nonactive",
+              };
+            })
+          );
+        });
       });
-    });
-    fetch("http://192.168.1.207:9020/api/Master/getAffco", {
+    fetch(apiUrl + "api/Master/getAffco", {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${getToken}`,
       },
     }).then((resp) => {
       resp.json().then((valData) => {
@@ -582,7 +525,7 @@ export default function MstUserAffco() {
         );
       });
     });
-  }, []);
+  }, []);  
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -603,55 +546,9 @@ export default function MstUserAffco() {
   const handleClose = (value: string) => {
     setOpen(false);
   };
-  const test: DataUser[] = [...data];
+  const test: IDataUser[] = [...dataUser];
 
-  const testAffco: DataAffco[] = [...dataAffco];
-
-  const columnAffco: MRT_ColumnDef<(typeof testAffco)[0]>[] = [
-    {
-      accessorKey: "no",
-      header: "No",
-    },
-    {
-      accessorKey: "id",
-      header: "ID",
-    },
-    {
-      accessorKey: "name",
-      header: "Affco Name",
-    },
-    {
-      accessorKey: "category",
-      header: "Affco Category",
-    },
-    {
-      accessorKey: "status",
-      header: "Affco Status",
-    },
-  ];
-
-  const columnUser: MRT_ColumnDef<(typeof test)[0]>[] = [
-    {
-      accessorKey: "id",
-      header: "ID",
-    },
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
-      accessorKey: "role",
-      header: "Role",
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-    },
-  ];
+  const testAffco: IDataAffco[] = [...dataAffco];
 
   return (
     <div>
@@ -666,7 +563,7 @@ export default function MstUserAffco() {
             <Tab label="Master Affco" {...a11yProps(1)} />
           </Tabs>
         </Box>
-        <CustomTabPanel value={value} index={0}>
+        <CustomTabs value={value} index={0}>
           <Box>
             <Stack direction={"column"}>
               <Item elevation={0}>
@@ -687,15 +584,15 @@ export default function MstUserAffco() {
               </Item>
               <Item elevation={0}>
                 <MaterialReactTable
-                  columns={columnUser}
+                  columns={columnMasterUser}
                   data={test}
                   enableRowSelection
                 />
               </Item>
             </Stack>
           </Box>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
+        </CustomTabs>
+        <CustomTabs value={value} index={1}>
           <Stack direction={"column"}>
             <Item elevation={0}>
               <Button
@@ -710,13 +607,13 @@ export default function MstUserAffco() {
             </Item>
             <Item elevation={0}>
               <MaterialReactTable
-                columns={columnAffco}
+                columns={columnMasterAffco}
                 data={testAffco}
                 enableRowSelection
               />
             </Item>
           </Stack>
-        </CustomTabPanel>
+        </CustomTabs>
       </Box>
     </div>
   );

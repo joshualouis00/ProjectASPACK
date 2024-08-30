@@ -496,11 +496,11 @@ export default function MstUserAffco() {
           setDataUser(
             valData.map((val, index) => {
               return {
-                id: val.vuserid,
-                name: val.vusername,
-                email: val.vemail,
-                role: val.vrole,
-                status: val.bactive === true ? "Active" : "Nonactive",
+                id: val.vUserId,
+                name: val.vUsername,
+                email: val.vEmail,
+                role: val.vRole === "C" ? "Console" : "Affco",
+                status: val.bActive === true ? "Active" : "Nonactive",
               };
             })
           );
@@ -516,10 +516,10 @@ export default function MstUserAffco() {
           valData.map((val, index) => {
             return {
               no: index + 1,
-              id: val.vaffcoid,
-              name: val.vaffconame,
-              category: val.vaffcoctgry,
-              status: val.bactive === true ? "Active" : "Nonactive",
+              id: val.vAffcoId,
+              name: val.vAffcoName,
+              category: val.vAffcoCtgry,
+              status: val.bActive === true ? "Active" : "Nonactive",
             };
           })
         );

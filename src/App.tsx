@@ -10,7 +10,9 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
 import { Button, Menu, MenuItem, Fade } from "@mui/material";
-import Approvals from "./Pages/Approvals";
+import ConsArchived from "./Pages/ConsArchived";
+import ConsRecent from "./Pages/ConsRecent";
+import ConsKategori from "./Pages/ConsKategori";
 import CustomTheme from "./Theme/CustomTheme";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -38,6 +40,7 @@ import HistoryUploadAffco from "./Pages/HistUploadAffco";
 import PageContent from "./Component/PageContent";
 import ConsApprovals from "./Pages/ConsApprovals";
 import AffcoUpload from "./Pages/AffcoUpload";
+import AcordionWrapper from "./Component/AccordionWrapper";
 
 const drawerWidth: number = 250;
 
@@ -113,8 +116,6 @@ const ProtectedRoute = ({ element }) => {
   return isToken ? element : <Navigate to="/" replace />;
 };
 
-
-
 function App() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { open, setOpen } = UseToggleSidebar();
@@ -144,8 +145,7 @@ function App() {
   const noToken = !localStorage.getItem("token");
 
   return (
-    
-      <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Router>
@@ -336,7 +336,10 @@ function App() {
                   <Route path="/" element={<Login />} />
                 ) : (
                   <>
-                  <Route path="" element={<ProtectedRoute element={<WelcomePage />} />} />
+                    <Route
+                      path=""
+                      element={<ProtectedRoute element={<WelcomePage />} />}
+                    />
                     <Route
                       path="/MstTemplate"
                       element={
@@ -354,13 +357,19 @@ function App() {
                     <Route
                       path="/Approval"
                       element={
-                        <ProtectedRoute
-                          element={
-                            <AccordionWrapper
-                              content={<Approvals />}
-                              headerTitle="Uploaded Aspack"
-                            />
-                          }
+                        <PageContent
+                          content={<ConsApprovals />}
+                          headerTitle="Aspack Approval"
+                        />
+                      }
+                    />
+
+                    <Route
+                      path="/AffcoUpload"
+                      element={
+                        <PageContent
+                          content={<AffcoUpload />}
+                          headerTitle="Affco Upload"
                         />
                       }
                     />
@@ -382,6 +391,34 @@ function App() {
                     <Route
                       path="/Welcome"
                       element={<ProtectedRoute element={<WelcomePage />} />}
+                    />
+
+                    <Route
+                      path="/Archived"
+                      element={
+                        <AcordionWrapper
+                          content={<ConsArchived />}
+                          headerTitle="Archived News"
+                        />
+                      }
+                    />
+                    <Route
+                      path="/Recent"
+                      element={
+                        <AcordionWrapper
+                          content={<ConsRecent />}
+                          headerTitle="Recent News"
+                        />
+                      }
+                    />
+                    <Route
+                      path="/Kategori"
+                      element={
+                        <AccordionWrapper
+                          content={<ConsKategori />}
+                          headerTitle="Kategori News"
+                        />
+                      }
                     />
 
                     <Route
@@ -430,8 +467,7 @@ function App() {
           </Box>
         </Router>
       </Box>
-    </ThemeProvider>   
-    
+    </ThemeProvider>
   );
 }
 

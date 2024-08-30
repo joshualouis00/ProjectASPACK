@@ -6,18 +6,29 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import { useNavigate } from "react-router-dom";
-import { Box, Button, FormControl, MenuItem, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  MenuItem,
+  TextField,
+  Tabs,
+  Tab,
+} from "@mui/material";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
+import { format, parse } from "date-fns";
 
 interface StepData {
-  vstepid: string;
-  vstepdesc: string;
+  vStepId: string;
+  vStepDesc: string;
 }
 
 interface TableData {
-  affco: string;
-  periode: string;
-  tahun: string;
+  vAffcoId: string;
+  vAffcoName: string;
+  iMonth: string;
+  iYear: string;
+  vAffcoCategory: string;
   [key: string]: any;
 }
 
@@ -26,32 +37,74 @@ const HistoryUploadAffco: React.FC = () => {
   const [columns, setColumns] = React.useState<MRT_ColumnDef<TableData>[]>([]);
   const [month, setMonth] = React.useState<string>("");
   const [year, setYear] = React.useState<string>("");
+  const [affcoId, setAffcoId] = React.useState<string>("");
+  const [stepId, setStepId] = React.useState<string>("");
+  const [dialogData, setDialogData] = React.useState<TableData[]>([]); // Inisialisasi dengan array kosong
+  const [revisionHistoryData, setRevisionHistoryData] = React.useState<
+    TableData[]
+  >([]); // Inisialisasi dengan array kosong
   const [selectedRows, setSelectedRows] = React.useState<TableData | null>(
     null
   );
   const [viewHistoryOpen, setViewHistoryOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-  const navigate = useNavigate();
+  const [selectedTab, setSelectedTab] = React.useState(0);
+  const handleError401 = useHandleUnauthorized();
 
-  const token = localStorage.getItem("token");
-  console.log("Tokennya : ", token);
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
 
   React.useEffect(() => {
-    const fetchData = async () => {
+    //Main Table
+    const fetchDataMain = async () => {
       try {
+        const bulan = monthNames.indexOf(month) + 1;
         const resp = await axios.get(
-          "http://192.168.1.207:9020/api/WorkflowStep/getStep"
+          `http://192.168.1.207:9020/api/Package/GetReport?nYear=${year}&nMonth=${bulan}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
-        const stepData = resp.data.data;
+        const reportData = resp.data.data;
 
-        console.log("Data: ", JSON.stringify(resp.data.data, null, 2));
+        const extractedAffcoId = reportData[0]?.vAffcoId;
+        const extractedStepId = reportData[0]?.packageReportDetails[0]?.vStepId;
+
+        setAffcoId(extractedAffcoId);
+        setStepId(extractedStepId);
 
         //Generate dynamic columns for steps:
-        const stepCol = stepData.map((step: StepData, index: number) => ({
-          accessorKey: `step${index + 1}`,
-          header: step.vstepdesc,
-          size: 150,
-        }));
+        const stepCol = reportData[0]?.packageReportDetails.map(
+          (detail: { vStepId: string; vStepDesc: string }, index: number) => ({
+            accessorKey: detail.vStepId, // Menggunakan vStepId sebagai accessorKey
+            header: detail.vStepDesc,
+            size: 150,
+            Cell: ({ row, cell }) => (
+              <Button
+                variant="outlined"
+                sx={{ border: "none", color: "black" }}
+                size="small"
+                onClick={() => handleRowDoubleKlik(row.original, cell)}
+              >
+                {cell.getValue()}
+              </Button>
+            ),
+          })
+        );
 
         // Set initial Columns :
         const initialColumns: MRT_ColumnDef<TableData>[] = [
@@ -61,17 +114,17 @@ const HistoryUploadAffco: React.FC = () => {
             Cell: ({ row }) => row.index + 1,
           },
           {
-            accessorKey: "affco",
+            accessorKey: "vAffcoName",
             header: "Affco",
-            size: 100,
+            size: 300,
           },
           {
-            accessorKey: "periode",
+            accessorKey: "iMonth",
             header: "Periode",
-            size: 100,
+            size: 150,
           },
           {
-            accessorKey: "tahun",
+            accessorKey: "iYear",
             header: "Tahun",
             size: 100,
           },
@@ -80,30 +133,98 @@ const HistoryUploadAffco: React.FC = () => {
 
         setColumns(initialColumns);
 
-        // Dummy rows with empty step data
-        const dummyRows: TableData[] = Array(10)
-          .fill(null)
-          .map((_, rowIndex) => ({
-            affco: `Affco ${rowIndex + 1}`,
-            periode: `Periode ${rowIndex + 1}`,
-            tahun: `Tahun ${rowIndex + 1}`,
-            ...stepData.reduce((acc: any, step: StepData, index: number) => {
-              acc[`step${index + 1}`] = ""; // Initialize with empty string or actual data
+        const MainRows = resp.data.data.map((item: any) => {
+          const stepData = item.packageReportDetails.reduce(
+            (acc: any, detail: any) => {
+              acc[detail.vStepId] = detail.vStepStatus;
               return acc;
-            }, {}),
-          }));
+            },
+            {}
+          );
 
-        setRows(dummyRows);
-      } catch (error) {
-        console.error("Errornya: ", error);
+          return {
+            vAffcoId: item.vAffcoId,
+            vAffcoName: item.vAffcoName,
+            iMonth: monthNames[parseInt(item.iMonth) - 1], // Ubah angka bulan kembali ke nama bulan
+            iYear: item.iYear,
+            vAffcoCategory: item.vAffcoCategory,
+            ...stepData, // Menambahkan data step ke dalam row
+          };
+        });
+
+        setRows(MainRows);
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          handleError401();
+        } else {
+          console.error("Error Get Step :", error);
+        }
       }
     };
 
-    fetchData();
+    if (month && year) {
+      fetchDataMain();
+    }
   }, [month, year]);
 
+  React.useEffect(() => {
+    const fetchDialogData = async () => {
+      if (affcoId && stepId && month && year) {
+        const bulan = monthNames.indexOf(month) + 1;
+        try {
+          const response = await axios.get(
+            `http://192.168.1.207:9020/api/Package/GetReportFileHistory?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          setDialogData(response.data.data);
+        } catch (error: any) {
+          if (error.response && error.response.status === 401) {
+            handleError401();
+          } else {
+            console.error("Error Dialog Data :", error);
+          }
+        }
+      }
+    };
+
+    const fetchRevisionHistoryData = async () => {
+      if (affcoId && stepId && month && year) {
+        const bulan = monthNames.indexOf(month) + 1;
+        try {
+          const response = await axios.get(
+            `http://192.168.1.207:9020/api/Package/GetActivity?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          setRevisionHistoryData(response.data.data);
+        } catch (error: any) {
+          if (error.response && error.response.status === 401) {
+            handleError401();
+          } else {
+            console.error("Error Revision History Data :", error);
+          }
+        }
+      }
+    };
+
+    // Panggil kedua fetch
+    fetchDialogData();
+    fetchRevisionHistoryData();
+  }, [affcoId, stepId, month, year]);
+
   const handleMonthChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMonth(event.target.value);
+    const selectedMonth = event.target.value;
+    const monthIndex = monthNames.filter((x) => x === selectedMonth); // Menjadikan 1-based index
+
+    setMonth(monthIndex.toString()); // Simpan sebagai string angka
+    console.log("SetMonth : ", monthIndex.toString());
   };
 
   const handleYearChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,11 +233,29 @@ const HistoryUploadAffco: React.FC = () => {
 
   const generateYears = () => {
     const currentYear = new Date().getFullYear();
-    return Array.from({ length: 10 }, (_, i) => (currentYear - i).toString());
+    return Array.from({ length: 5 }, (_, i) => (currentYear - i).toString());
   };
 
-  const handleRowDoubleKlik = (row: TableData) => {
-    setSelectedRows(row);
+  const handleRowDoubleKlik = async (row: TableData, cell: any) => {
+    // Ambil Affco ID, Step ID, Tahun, dan Bulan dari baris dan cell yang diklik
+    const selectedAffcoId = row.vAffcoId;
+    const selectedStepId = cell.column.id; // Menggunakan ID kolom sebagai Step ID
+    const selectedYear = row.iYear;
+    const selectedMonth = row.iMonth;
+
+    // Logging untuk verifikasi
+    console.log("Affco ID:", selectedAffcoId);
+    console.log("Step ID:", selectedStepId);
+    console.log("Tahun:", selectedYear);
+    console.log("Bulan:", selectedMonth);
+
+    // Lakukan sesuatu dengan nilai-nilai tersebut, seperti membuka dialog atau melakukan panggilan API
+    setAffcoId(selectedAffcoId);
+    setStepId(selectedStepId);
+    setYear(selectedYear);
+    setMonth(selectedMonth);
+
+    // Tampilkan dialog atau lakukan aksi lain
     setOpen(true);
   };
 
@@ -124,6 +263,10 @@ const HistoryUploadAffco: React.FC = () => {
     setOpen(false);
     setViewHistoryOpen(false);
     setSelectedRows(null);
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
   };
 
   const handleViewHistoryClick = () => {
@@ -137,86 +280,62 @@ const HistoryUploadAffco: React.FC = () => {
   const handleResetClick = () => {
     setMonth("");
     setYear("");
+    setRows([]);
   };
 
-  //Kolom saat di double klik nich :
   const dialogColumns: MRT_ColumnDef<any>[] = [
-    { accessorKey: "noDocument", header: "No Document", size: 150 },
-    { accessorKey: "namaFile", header: "Nama File", size: 150 },
-    { accessorKey: "createdDate", header: "Created Date", size: 150 },
-    { accessorKey: "createdBy", header: "Created By", size: 150 },
+    { header: "#", size: 50, Cell: ({ row }) => row.index + 1 },
+    { accessorKey: "vFileName", header: "File Name", size: 100 },
+    { accessorKey: "iVersion", header: "Version", size: 100 },
+    { accessorKey: "vCrea", header: "Created By", size: 100 },
     {
-      header: "Actions",
-      size: 150,
-      Cell: () => (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleViewHistoryClick}
-        >
-          View History
-        </Button>
-      ),
-    },
-  ];
+      accessorKey: "dCrea",
+      header: "Created Date",
+      size: 100,
+      Cell: ({ cell }) => {
+        const dateStr = cell.getValue<string>();
+        let formattedDate = " ";
 
-  // Dummy Datanya :
-  const dialogData = selectedRows
-    ? [
-        {
-          noDocument: "Doc1",
-          namaFile: "File1",
-          createdDate: "2024-07-30",
-          createdBy: "User1",
-        },
-        {
-          noDocument: "Doc2",
-          namaFile: "File2",
-          createdDate: "2024-07-29",
-          createdBy: "User2",
-        },
-      ]
-    : [];
+        try {
+          const date = parse(dateStr, "dd-MM-yyyy", new Date());
+          if (!isNaN(date.getTime())) {
+            formattedDate = format(date, "dd/MM/yyyy");
+          }
+        } catch (error) {
+          console.error("Error parsing or formatting date:", error);
+        }
+
+        return (
+          <span
+            style={{
+              display: "block",
+              width: "120px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {formattedDate}
+          </span>
+        );
+      },
+    },
+    { accessorKey: "vStatus", header: "Status", size: 150 },
+    { accessorKey: "vRemarks", header: "Remarks", size: 150 },
+  ];
 
   //Revision History Table :
   const revisionHistoryColumns: MRT_ColumnDef<any>[] = [
-    { accessorKey: "status", header: "Status", size: 150 },
-    { accessorKey: "remarks", header: "Remarks", size: 150 },
-    { accessorKey: "modifiedBy", header: "Modified By", size: 150 },
-    { accessorKey: "modifiedDate", header: "Modified Date", size: 150 },
-  ];
-
-  const revisionHistoryData = [
-    {
-      status: "Approved",
-      remarks: "ok approve ya..",
-      modifiedBy: "User1",
-      modifiedDate: "2024-07-30",
-    },
-    {
-      status: "Revised",
-      remarks: "Document revised",
-      modifiedBy: "User2",
-      modifiedDate: "2024-07-29",
-    },
-    {
-      status: "Revised",
-      remarks: "Document revised",
-      modifiedBy: "User1",
-      modifiedDate: "2024-07-28",
-    },
-    {
-      status: "Submitted",
-      remarks: "",
-      modifiedBy: "User3",
-      modifiedDate: "2024-07-28",
-    },
+    { header: "#", size: 50, Cell: ({ row }) => row.index + 1 },
+    { accessorKey: "vAction", header: "Status", size: 150 },
+    { accessorKey: "vRemarks", header: "Remarks", size: 150 },
+    { accessorKey: "vUserId", header: "Approval", size: 150 },
+    { accessorKey: "dDateTime", header: "Approval Date", size: 150 },
   ];
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden", padding: 2 }}>
       <Box sx={{ display: "flex", alignItems: "flex-end", marginBottom: 2 }}>
-        <FormControl sx={{ minWidth: 120, marginRight: 2, marginLeft: 2}}>
+        <FormControl sx={{ minWidth: 120, marginRight: 2, marginLeft: 2 }}>
           <TextField
             select
             margin="dense"
@@ -227,26 +346,14 @@ const HistoryUploadAffco: React.FC = () => {
             fullWidth
             variant="standard"
           >
-            {[
-              "Januari",
-              "Februari",
-              "Maret",
-              "April",
-              "Mei",
-              "Juni",
-              "Juli",
-              "Agustus",
-              "September",
-              "Oktober",
-              "November",
-              "Desember",
-            ].map((month, index) => (
-              <MenuItem key={index} value={month}>
+            {monthNames.map((month, index) => (
+              <MenuItem key={index + 1} value={month}>
                 {month}
               </MenuItem>
             ))}
           </TextField>
         </FormControl>
+
         <FormControl sx={{ minWidth: 120, marginRight: 2 }}>
           <TextField
             select
@@ -282,46 +389,53 @@ const HistoryUploadAffco: React.FC = () => {
           pagination: { pageIndex: 0, pageSize: 10 },
         }}
         enableSorting
-        muiTableBodyRowProps={({ row }) => ({
-          onDoubleClick: () => handleRowDoubleKlik(row.original),
-        })}
       />
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-        <DialogTitle>
-          {viewHistoryOpen ? "Revision History" : "Detail Data"}
-        </DialogTitle>
+        <DialogTitle>Detail Data</DialogTitle>
         <DialogContent>
-          {viewHistoryOpen ? (
-            <MaterialReactTable
-              columns={revisionHistoryColumns}
-              data={revisionHistoryData}
-              initialState={{
-                pagination: { pageIndex: 0, pageSize: 5 },
-              }}
-              enableSorting
-            />
-          ) : (
-            <MaterialReactTable
-              columns={dialogColumns}
-              data={dialogData}
-              initialState={{
-                pagination: { pageIndex: 0, pageSize: 5 },
-              }}
-              enableSorting
-            />
-          )}
+          <Tabs value={selectedTab} onChange={handleTabChange}>
+            <Tab label="Detail Data" />
+            <Tab label="Revision History" />
+          </Tabs>
+
+          <Box>
+            {selectedTab === 0 && dialogData && dialogData.length > 0 && (
+              <MaterialReactTable
+                columns={dialogColumns}
+                data={dialogData}
+                initialState={{
+                  pagination: { pageIndex: 0, pageSize: 5 },
+                }}
+                enableSorting
+              />
+            )}
+            {selectedTab === 0 && (!dialogData || dialogData.length === 0) && (
+              <p>No data available for Detail Data.</p> // Pesan jika tidak ada data
+            )}
+
+            {selectedTab === 1 &&
+              revisionHistoryData &&
+              revisionHistoryData.length > 0 && (
+                <MaterialReactTable
+                  columns={revisionHistoryColumns}
+                  data={revisionHistoryData}
+                  initialState={{
+                    pagination: { pageIndex: 0, pageSize: 5 },
+                  }}
+                  enableSorting
+                />
+              )}
+            {selectedTab === 1 &&
+              (!revisionHistoryData || revisionHistoryData.length === 0) && (
+                <p>No data available for Revision History.</p> // Pesan jika tidak ada data
+              )}
+          </Box>
         </DialogContent>
         <DialogActions>
-          {viewHistoryOpen ? (
-            <Button onClick={handleBackClick} color="info">
-              Back
-            </Button>
-          ) : (
-            <Button onClick={handleClose} color="error">
-              Close
-            </Button>
-          )}
+          <Button onClick={handleClose} color="error">
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </Paper>

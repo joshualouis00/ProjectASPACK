@@ -1,6 +1,6 @@
 // src/components/WelcomePage.tsx
 
-import React from "react";
+import React, {useEffect} from "react";
 import { Container, Typography } from "@mui/material";
 import styled from "styled-components";
 import WelcomeBawah from "../assets/Home.png";

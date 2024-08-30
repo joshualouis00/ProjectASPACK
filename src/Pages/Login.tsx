@@ -13,7 +13,6 @@ import {
   Paper,
   FormControl,
   FormControlLabel,
-  FormLabel,
   RadioGroup,
 } from "@mui/material";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
@@ -30,12 +29,15 @@ interface CustomJwtPayload extends JwtPayload {
   UserName: string;
   Email: string;
   Role: string;
+  CoCode: string;
+  exp: number;
 }
 
 const Login: React.FC = () => {
   const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+
   const navigate = useNavigate();
   const combine = password + userId;
   const encodeString = btoa(combine);
@@ -69,6 +71,8 @@ const Login: React.FC = () => {
         localStorage.setItem("UserName", decode.UserName);
         localStorage.setItem("Email", decode.Email);
         localStorage.setItem("Role", decode.Role);
+        localStorage.setItem("CoCode", decode.CoCode);
+
         navigate("/welcome");
         window.location.reload();
       } else {
@@ -162,59 +166,31 @@ const Login: React.FC = () => {
                     >
                       <FormControlLabel
                         value="capex"
-                        control={<Radio size="small"
-                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                          inputProps={{ "aria-label": "FACT" }}/>}
+                        id="CAPEX"
+                        control={
+                          <Radio
+                            size="small"
+                            sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                            inputProps={{ "aria-label": "FACT" }}
+                          />
+                        }
                         label="CAPEX"
                       />
                       <FormControlLabel
                         value="aspack"
-                        control={<Radio size="medium"
-                          sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                          inputProps={{ "aria-label": "FACT" }}/>}
+                        id="ASPACK"
+                        control={
+                          <Radio
+                            size="medium"
+                            sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                            inputProps={{ "aria-label": "FACT" }}
+                          />
+                        }
                         label="ASPACK"
                       />
                     </RadioGroup>
                   </FormControl>
                 </Grid>
-
-                {/* <Grid item>
-                  <Typography
-                    component="h2"
-                    variant="body2"
-                    sx={{ mr: "10px", fontSize: "14px", fontWeight: "bold" }}
-                  >
-                    Portal
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Radio
-                    value="fact"
-                    color="primary"
-                    size="small"
-                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                    inputProps={{ "aria-label": "FACT" }}
-                  />
-                </Grid>
-                <Grid item>
-                  <Typography variant="body1" sx={{ fontSize: 12 }}>
-                    CAPEX
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Radio
-                    value="aspack"
-                    color="primary"
-                    size="small"
-                    sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                    inputProps={{ "aria-label": "ASPACK" }}
-                  />
-                </Grid>
-                <Grid item>
-                  <Typography variant="body1" sx={{ fontSize: 12 }}>
-                    ASPACK
-                  </Typography>
-                </Grid> */}
               </Grid>
               <Button
                 type="submit"

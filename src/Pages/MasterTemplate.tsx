@@ -1,16 +1,23 @@
-import { Box, Typography, Tabs } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, Tabs, Tab, ThemeProvider, useTheme } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import Tab from "@mui/material/Tab";
 import CustomTheme from "../Theme/CustomTheme";
 import TabContent from "../Component/CustomTabPanel";
 import axios from "axios";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   dir?: string;
   index: number;
   value: number;
+}
+
+interface FileData {
+  fileName: string;
+  createDate: string;
+  status: string;
+  vAttchId: string;
+  file: File;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -26,7 +33,7 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 2 }}>
-          <Typography>{children}</Typography>
+          <Box>{children}</Box>
         </Box>
       )}
     </div>
@@ -44,66 +51,144 @@ const MasterTemplate = () => {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
   const [data, setData] = useState<any[]>([]);
+  const [files, setFiles] = useState<{ [key: string]: FileData[] }>({});
+  const navigate = useHandleUnauthorized();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resp = await axios.get('http://192.168.1.207:9020/api/WorkflowStep/getStep');
+        const resp = await axios.get(
+          "http://192.168.1.207:9020/api/WorkflowStep/getStep",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
         setData(resp.data.data);
-      } catch (error) {
-        console.error('Errornya : ', error);
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          navigate();
+        } else {
+          console.error("Error fetching templates:", error);
+        }
       }
     };
 
     fetchData();
-  },[])
+  }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
+  const handleFileChange = (stepId: string, newFiles: FileData[]) => {
+    setFiles((prevFiles) => ({
+      ...prevFiles,
+      [stepId]: newFiles,
+    }));
+  };
+
+  const getTemplates = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.207:9020/api/Template/GetTemplates",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const backendData = response.data.data;
+        console.log("Get Template : " + JSON.stringify(backendData, null, 2));
+        const updatedFiles: { [key: string]: FileData[] } = {};
+
+        backendData.forEach((item: any) => {
+          if (item.vAttchId !== "") {
+            const filesForStep = item.attachment.map((element: any) => ({
+              fileName: element?.vFileName || "",
+              createDate: element?.dCrea,
+              status: element?.vStatus === "1" ? "Active" : "Inactive",
+              file: new File([], element?.vFileName || ""),
+              vAttchId: item.vAttchId,
+            }));
+
+            updatedFiles[item.vStepId] = filesForStep;
+          }
+        });
+
+        setFiles(updatedFiles);
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate();
+      } else {
+        console.error("Error fetching templates:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getTemplates();
+  }, []);
+
+  const activeSteps = data.filter((item) => item.bActive);
+
   return (
-    <Box>
-      <Tabs
-      value={value}
-      onChange={handleChange}
-      TabIndicatorProps={{
-        style: {
-          backgroundColor: CustomTheme.palette.accent.primary,
-        },
-      }}
-      textColor="inherit"
-      variant="scrollable"
-      aria-label="full width tabs example"
-      sx={{
-        '& .MuiTabs-flexContainer': {
-          gap: '10px', // Adjust the spacing between tabs if needed\
-        },
-      }}
-    >
-      {data.map((item, index) => (
-        <Tab
-          label={item.vstepdesc} //description dari workflow step
-          {...a11yProps(index)}
-          key={item.vstepid} //running number yang dari workflow step
-          sx={{
-            minWidth: '50px', // Adjust the minimum width of the tabs
-            fontSize: '10px', // Adjust the font size of the tab labels
-          }}
-        />
-      ))}
-    </Tabs>
-      {data.map((item, index) => (
-        <TabPanel
+    <ThemeProvider theme={CustomTheme}>
+      <Box>
+        <Tabs
           value={value}
-          index={index}
-          dir={theme.direction}
-          key={item.vstepid}
+          onChange={handleChange}
+          TabIndicatorProps={{
+            style: {
+              backgroundColor: CustomTheme.palette.accent.primary,
+            },
+          }}
+          textColor="inherit"
+          variant="scrollable"
+          aria-label="full width tabs example"
+          sx={{
+            "& .MuiTabs-flexContainer": {
+              gap: "10px",
+            },
+          }}
         >
-          <TabContent label={item.vstepdesc} key={item.vstepid} />
-        </TabPanel>
-      ))}
-    </Box>
+          {activeSteps.map((item, index) => (
+            <Tab
+              label={item.vStepDesc}
+              {...a11yProps(index)}
+              key={item.vStepId}
+              sx={{
+                minWidth: "50px",
+                fontSize: "10px",
+                fontWeight: "bold",
+              }}
+            />
+          ))}
+        </Tabs>
+        {activeSteps.map((item, index) => (
+          <TabPanel
+            value={value}
+            index={index}
+            dir={theme.direction}
+            key={item.vStepId}
+          >
+            <TabContent
+              label={item.vStepDesc}
+              vStepId={item.vStepId}
+              vFileType={item.vAttType}
+              files={files[item.vStepId] || []}
+              setFiles={(newFiles: FileData[]) =>
+                handleFileChange(item.vStepId, newFiles)
+              }
+            />
+          </TabPanel>
+        ))}
+      </Box>
+    </ThemeProvider>
   );
 };
 

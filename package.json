@@ -6,6 +6,7 @@
     "@cyntler/react-doc-viewer": "^1.16.6",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@handsontable/react": "^14.5.0",
     "@mui/icons-material": "^5.15.19",
     "@mui/material": "^5.15.19",
     "@testing-library/jest-dom": "^5.17.0",
@@ -16,6 +17,9 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "bcrypt-ts": "^5.0.2",
+    "exceljs": "^4.4.0",
+    "google-auth-library": "^9.13.0",
+    "googleapis": "^140.0.1",
     "lodash": "^4.17.21",
     "marked": "^12.0.2",
     "material-react-table": "^2.13.0",
@@ -23,6 +27,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.3",
+    "react-excel-viewer": "^1.0.8",
     "react-multi-carousel": "^2.8.5",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.23.1",
@@ -69,6 +74,7 @@
     "luxon": "^3.4.4",
     "moment": "^2.30.1",
     "pokenode-ts": "^1.20.0",
+    "react-multi-carousel": "^2.8.5",
     "styled-components": "^6.1.12"
   }
 }

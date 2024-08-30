@@ -8,13 +8,19 @@ import TextField from "@mui/material/TextField";
 import WelcomePage from "./Welcome";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
+import DateTimeFormatted from "../Component/formatDateTime";
 
 const EmailUpdateTemplate: React.FC = () => {
   const [open, setOpen] = React.useState(true);
   const [subject, setSubject] = React.useState("");
   const [body, setBody] = React.useState("");
   const navigate = useNavigate();
-
+  const bulan = new Date();
+  const ibulan = bulan.getMonth();
+  const namaBulan = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
 
   const handleClose = () => {
     setOpen(false);
@@ -38,7 +44,7 @@ const EmailUpdateTemplate: React.FC = () => {
         noValidate
         autoComplete="off"
       >
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
           <DialogTitle>Manage Email Template</DialogTitle>
           <DialogContent>
             <TextField
@@ -63,7 +69,10 @@ const EmailUpdateTemplate: React.FC = () => {
             />
             <Typography sx={{ mb: 1, fontSize: 14}}>Placeholder Variable :</Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Company Name</Typography>
-            <Typography sx={{ mb: 2, fontSize: 12 }}>Affco Name</Typography>
+            <Typography sx={{ mb: 2, fontSize: 12 }}>Template</Typography>
+            <Typography sx={{ mb: 2, fontSize: 12 }}><DateTimeFormatted /></Typography>
+            <Typography sx={{ mb: 2, fontSize: 12 }}>{namaBulan[ibulan]}</Typography>
+            <Typography sx={{ mb: 2, fontSize: 12 }}>Link</Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

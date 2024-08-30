@@ -250,7 +250,7 @@ const MenuItems = (props: MenuItemsProps) => {
                 <ListItemIcon>
                   <FolderOpenOutlinedIcon color="inherit" />
                 </ListItemIcon>
-                <ListItemText primary="Approval Aspack Template" />
+                <ListItemText primary="Approval Aspack" />
               </ListItemButton>
               <ListItemButton
                 onClick={() => {
@@ -261,7 +261,7 @@ const MenuItems = (props: MenuItemsProps) => {
                 <ListItemIcon>
                   <FolderOpenOutlinedIcon color="inherit" />
                 </ListItemIcon>
-                <ListItemText primary="Affco Submit Template" />
+                <ListItemText primary="Affco Submit" />
               </ListItemButton>
             </List>
           </Collapse>

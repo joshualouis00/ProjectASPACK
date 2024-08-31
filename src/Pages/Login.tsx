@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { genSaltSync } from "bcrypt-ts";
+import { apiUrl } from "../Component/TemplateUrl";
 
 const theme = createTheme();
 
@@ -53,7 +54,7 @@ const Login: React.FC = () => {
 
     try {
       const resp = await axios.post(
-        "http://192.168.1.207:9020/api/Auth/Login",
+        apiUrl + "api/Auth/Login",
         {
           Email: userId,
           Password: hashedPassword,

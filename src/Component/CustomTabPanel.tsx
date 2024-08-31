@@ -4,22 +4,8 @@ import AppTable from "./TableComponent/MaterialTableUploadTemplate";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
-
-interface ITabContent {
-  label: string;
-  vStepId: string;
-  vFileType: string;
-  files: FileData[];
-  setFiles: (newFiles: FileData[]) => void;
-}
-
-interface FileData {
-  fileName: string;
-  createDate: string;
-  status: string;
-  vAttchId: string;
-  file: File;
-}
+import { apiUrl, getToken } from "./TemplateUrl";
+import { ITabContent, FileData } from "./Interface/MasterTemplates";
 
 const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, setFiles }) => {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
@@ -29,8 +15,6 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
   useEffect(() => {
     setFileList(files);
   }, [files]);
-
-  const token = localStorage.getItem("token");
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -73,11 +57,11 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
       });
 
       const response = await axios.post(
-        "http://192.168.1.207:9020/api/Template/AddTemplate",
+        apiUrl + "api/Template/AddTemplate",
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ` + getToken,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -103,10 +87,10 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
   const getTemplates = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.1.207:9020/api/Template/GetTemplates",
+        apiUrl + "api/Template/GetTemplates",
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ` + getToken,
           },
         }
       );

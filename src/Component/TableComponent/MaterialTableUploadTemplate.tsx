@@ -3,17 +3,9 @@ import { type MRT_ColumnDef, MaterialReactTable } from "material-react-table";
 import useHandleUnauthorized from "../handleUnauthorized";
 import { Button, Box, Alert } from "@mui/material";
 import { format, parse } from "date-fns";
+import { apiUrl, getToken } from "../TemplateUrl";
+import { FileDataUpload, AppTableProps } from "../Interface/MasterTemplates";
 
-interface FileData {
-  fileName: string;
-  createDate: string;
-  status: string;
-  vAttchId: string;
-}
-
-interface AppTableProps {
-  files: FileData[];
-}
 
 const AppTable: React.FC<AppTableProps> = ({ files }) => {
   const navigate = useHandleUnauthorized();
@@ -27,12 +19,12 @@ const AppTable: React.FC<AppTableProps> = ({ files }) => {
   const downloadFile = async (fileName: string, vAttchId: string) => {
     const encodedFileName = btoa(fileName); // Encode filename
     const iVersion = getLatestVersion(vAttchId).toString();
-    const url = `http://192.168.1.207:9020/api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${iVersion}`;
+    const url = apiUrl + `api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${iVersion}`;
 
     try {
       const response = await fetch(url, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ` + getToken,
         },
       });
 
@@ -56,7 +48,7 @@ const AppTable: React.FC<AppTableProps> = ({ files }) => {
     }
   };
 
-  const columns: MRT_ColumnDef<FileData>[] = [
+  const columns: MRT_ColumnDef<FileDataUpload>[] = [
     {
       accessorKey: "fileName",
       header: "File Name",

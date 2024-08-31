@@ -17,33 +17,21 @@ import {
 } from "@mui/material";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 import { format, parse } from "date-fns";
-
-interface StepData {
-  vStepId: string;
-  vStepDesc: string;
-}
-
-interface TableData {
-  vAffcoId: string;
-  vAffcoName: string;
-  iMonth: string;
-  iYear: string;
-  vAffcoCategory: string;
-  [key: string]: any;
-}
+import tblHst_UploadAffco from "../Component/Interface/Hst_UploadAffco";
+import { apiUrl, getToken} from "../Component/TemplateUrl";
 
 const HistoryUploadAffco: React.FC = () => {
-  const [rows, setRows] = React.useState<TableData[]>([]);
-  const [columns, setColumns] = React.useState<MRT_ColumnDef<TableData>[]>([]);
+  const [rows, setRows] = React.useState<tblHst_UploadAffco[]>([]);
+  const [columns, setColumns] = React.useState<MRT_ColumnDef<tblHst_UploadAffco>[]>([]);
   const [month, setMonth] = React.useState<string>("");
   const [year, setYear] = React.useState<string>("");
   const [affcoId, setAffcoId] = React.useState<string>("");
   const [stepId, setStepId] = React.useState<string>("");
-  const [dialogData, setDialogData] = React.useState<TableData[]>([]); // Inisialisasi dengan array kosong
+  const [dialogData, setDialogData] = React.useState<tblHst_UploadAffco[]>([]); 
   const [revisionHistoryData, setRevisionHistoryData] = React.useState<
-    TableData[]
-  >([]); // Inisialisasi dengan array kosong
-  const [selectedRows, setSelectedRows] = React.useState<TableData | null>(
+    tblHst_UploadAffco[]
+  >([]); 
+  const [selectedRows, setSelectedRows] = React.useState<tblHst_UploadAffco | null>(
     null
   );
   const [viewHistoryOpen, setViewHistoryOpen] = React.useState(false);
@@ -72,10 +60,10 @@ const HistoryUploadAffco: React.FC = () => {
       try {
         const bulan = monthNames.indexOf(month) + 1;
         const resp = await axios.get(
-          `http://192.168.1.207:9020/api/Package/GetReport?nYear=${year}&nMonth=${bulan}`,
+          apiUrl +`api/Package/GetReport?nYear=${year}&nMonth=${bulan}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ` + getToken,
             },
           }
         );
@@ -107,7 +95,7 @@ const HistoryUploadAffco: React.FC = () => {
         );
 
         // Set initial Columns :
-        const initialColumns: MRT_ColumnDef<TableData>[] = [
+        const initialColumns: MRT_ColumnDef<tblHst_UploadAffco>[] = [
           {
             header: "#",
             size: 50,
@@ -173,10 +161,10 @@ const HistoryUploadAffco: React.FC = () => {
         const bulan = monthNames.indexOf(month) + 1;
         try {
           const response = await axios.get(
-            `http://192.168.1.207:9020/api/Package/GetReportFileHistory?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
+            apiUrl + `api/Package/GetReportFileHistory?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ` + getToken,
               },
             }
           );
@@ -196,10 +184,10 @@ const HistoryUploadAffco: React.FC = () => {
         const bulan = monthNames.indexOf(month) + 1;
         try {
           const response = await axios.get(
-            `http://192.168.1.207:9020/api/Package/GetActivity?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
+            apiUrl + `api/Package/GetActivity?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ` + getToken,
               },
             }
           );
@@ -236,7 +224,7 @@ const HistoryUploadAffco: React.FC = () => {
     return Array.from({ length: 5 }, (_, i) => (currentYear - i).toString());
   };
 
-  const handleRowDoubleKlik = async (row: TableData, cell: any) => {
+  const handleRowDoubleKlik = async (row: tblHst_UploadAffco, cell: any) => {
     // Ambil Affco ID, Step ID, Tahun, dan Bulan dari baris dan cell yang diklik
     const selectedAffcoId = row.vAffcoId;
     const selectedStepId = cell.column.id; // Menggunakan ID kolom sebagai Step ID

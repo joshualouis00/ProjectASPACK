@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 import dayjs, { Dayjs } from "dayjs";
+import { apiUrl, getToken } from "../Component/TemplateUrl";
 
 const OpenPeriod: React.FC = () => {
   const [open, setOpen] = React.useState(true);
@@ -26,9 +27,9 @@ const OpenPeriod: React.FC = () => {
 
   React.useEffect(() => {
     axios
-      .get("http://192.168.1.207:9020/api/Setting/GetOpenPeriod", {
+      .get(apiUrl + "api/Setting/GetOpenPeriod", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ` + getToken,
         },
       })
       .then((response) => {
@@ -68,9 +69,9 @@ const OpenPeriod: React.FC = () => {
       dEndDate: endDate ? endDate.format("YYYY-MM-DD") : null,
     };
 
-    axios.post("http://192.168.1.207:9020/api/Setting/EditOpenPeriod",data,{
+    axios.post( apiUrl + "api/Setting/EditOpenPeriod",data,{
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ` + getToken,
       },
     }).then((response) => {
       console.log("ok gaes...", response.data.data);

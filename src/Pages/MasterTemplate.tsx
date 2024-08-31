@@ -4,21 +4,8 @@ import CustomTheme from "../Theme/CustomTheme";
 import TabContent from "../Component/CustomTabPanel";
 import axios from "axios";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  dir?: string;
-  index: number;
-  value: number;
-}
-
-interface FileData {
-  fileName: string;
-  createDate: string;
-  status: string;
-  vAttchId: string;
-  file: File;
-}
+import { apiUrl, getToken } from "../Component/TemplateUrl";
+import { TabPanelProps, FileData } from "../Component/Interface/MasterTemplates";
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -58,10 +45,10 @@ const MasterTemplate = () => {
     const fetchData = async () => {
       try {
         const resp = await axios.get(
-          "http://192.168.1.207:9020/api/WorkflowStep/getStep",
+         apiUrl + "api/WorkflowStep/getStep",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ` + getToken,
             },
           }
         );
@@ -92,17 +79,17 @@ const MasterTemplate = () => {
   const getTemplates = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.1.207:9020/api/Template/GetTemplates",
+       apiUrl + "api/Template/GetTemplates",
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ` + getToken,
           },
         }
       );
 
       if (response.status === 200) {
         const backendData = response.data.data;
-        console.log("Get Template : " + JSON.stringify(backendData, null, 2));
+        
         const updatedFiles: { [key: string]: FileData[] } = {};
 
         backendData.forEach((item: any) => {

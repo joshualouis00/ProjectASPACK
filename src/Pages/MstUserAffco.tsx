@@ -337,13 +337,13 @@ function AddUserDialog(props: IAddUserProps) {
               label="Role"
               onChange={handleChangeRole}
             >
-              <MenuItem value="CONS">Console</MenuItem>
-              <MenuItem value="AFFCO">Affco</MenuItem>
+              <MenuItem value="C">Console</MenuItem>
+              <MenuItem value="A">Affco</MenuItem>
             </Select>
           </FormControl>
           {role !== "" ? (
             <Stack direction={"column"}>
-              <Item elevation={0} hidden={role === "AFFCO" ? false : true}>
+              <Item elevation={0} hidden={role === "A" ? false : true}>
                 <FormControl fullWidth>
                   <Autocomplete
                     id="affco-autocomplete"
@@ -378,7 +378,7 @@ function AddUserDialog(props: IAddUserProps) {
                   />
                 </FormControl>
               </Item>
-              <Item elevation={0} hidden={role === "CONS" ? false : true}>
+              <Item elevation={0} hidden={role === "C" ? false : true}>
                 <FormControl fullWidth>
                   <Autocomplete
                     id="cons-autocomplete"

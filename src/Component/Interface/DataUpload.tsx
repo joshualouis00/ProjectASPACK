@@ -12,7 +12,8 @@ export interface IStepProps {
     apprRemarks: string ,
     userRemarks: string ,
     vTempCode: string ,
-    vApprover: string
+    vApprover: string ,
+    vAttachId: string
 }
 
 export interface ITempFile {
@@ -26,4 +27,19 @@ export interface IHeaderProps {
     iStatus: string,
     vAffcoId: string,
     vPackageId: string
+}
+
+export interface IRespFile {
+    vStepId: string,
+    vAttchName: string,
+    vAttType: string,
+    vRemark: string,
+    vAttchId: string,
+    fAttchContent: string | File 
+}
+
+export interface IDialogProps {
+    open: boolean,
+    onClose: () => void, 
+    data: number  
 }

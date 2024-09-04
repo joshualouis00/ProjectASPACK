@@ -14,15 +14,14 @@ import {
   SelectChangeEvent,
   Stack,
   Step,
-  StepButton,
+  StepButton,  
   Stepper,
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import * as XLSX from "xlsx";
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
+import { MaterialReactTable } from "material-react-table";
 import { useDropzone } from "react-dropzone";
 import { apiUrl, getToken } from "../Component/TemplateUrl";
 import { columnHistoryUpload } from "../Component/TableComponent/ColumnDef/IColumnUpload";
@@ -30,6 +29,7 @@ import {
   IStepProps,
   ITempFile,
   IHeaderProps,
+  IRespFile,
 } from "../Component/Interface/DataUpload";
 import { getUserId } from "../Component/TemplateUrl";
 
@@ -37,21 +37,35 @@ export default function AffcoUpload() {
   const dataMonth = new Date().getMonth();
   const dataYear = new Date().getFullYear();
   const [dataFile, setDataFile] = React.useState<IStepProps[]>([]);
+  const [tempData, setTempData] = React.useState<IStepProps>();
   const [stepData, setStepData] = React.useState("");
   const [dataStep, setDataStep] = React.useState([
-    { id: 100, label: "dummy", desc: "dummy" },
+    {
+      id: 100,
+      label: "loading",
+      desc: "loading",
+    },
   ]);
   const [tempFile, setTempFile] = React.useState<ITempFile[]>([]);
-  const [dataHeader, setDataHeader] = React.useState<IHeaderProps>();
+  const [respFile, setRespFile] = React.useState<IRespFile[]>([]);
+  const [vRespName, setVRespName] = React.useState("");
+  const [dataHeader, setDataHeader] = React.useState<IHeaderProps>({
+    iMonth: "",
+    iYear: "",
+    iStatus: "",
+    vAffcoId: "",
+    vPackageId: "",
+  });
+  const [filter, setFilter] = React.useState(false);
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
       var randomstring = require("randomstring");
 
-    const tempCode = randomstring.generate({
-      length: 7,
-  charset: 'alphabetic'
-    })
+      const tempCode = randomstring.generate({
+        length: 7,
+        charset: "alphabetic",
+      });
       const files: IStepProps[] = acceptedFiles.map((val) => ({
         filename: val.name,
         createDate: Date().toString(),
@@ -64,7 +78,8 @@ export default function AffcoUpload() {
         apprRemarks: "",
         userRemarks: "",
         vTempCode: tempCode,
-        vApprover: ""
+        vApprover: "",
+        vAttachId: "",
       }));
 
       const temFiles: ITempFile[] = acceptedFiles.map((val) => ({
@@ -74,6 +89,8 @@ export default function AffcoUpload() {
 
       setDataFile((prev) => [...prev, ...files]);
       setTempFile((prevFile) => [...prevFile, ...temFiles]);
+
+      
     },
     [stepData]
   );
@@ -87,101 +104,6 @@ export default function AffcoUpload() {
   const [completed, setCompleted] = React.useState<{ [k: number]: boolean }>(
     {}
   );
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      await fetch(apiUrl + "api/WorkflowStep/getStep", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${getToken}`,
-        },
-      }).then((resp) => {
-        resp.json().then((valData) => {
-          setDataStep(
-            valData.data
-              .filter((x) => x.bActive === true)
-              .map((val, index) => {
-                return {
-                  id: index,
-                  label: val.vStepId,
-                  desc: val.vStepDesc,
-                };
-              })
-          );
-        });
-      });
-    };
-
-    const fetchPackage = async () => {
-      await fetch(
-        apiUrl +
-          "api/Package/getPackage?nYear=" +
-          year +
-          "&nMonth=" +
-          month +
-          "&vAffcoId=",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${getToken}`,
-          },
-        }
-      ).then((resp) => {
-        resp.json().then((valData) => {
-          valData.header.vPackageId !== ""
-            ? setDataFile(
-                valData.detail.map((dtl) => {
-                  return {
-                    filename:
-                      dtl.fPackageFile.length > 0
-                        ? dtl.fPackageFile[0].vAttchName
-                        : "",
-                    createDate:
-                      dtl.fPackageFile.length > 0
-                        ? dtl.fPackageFile[0].dCrea
-                        : "",
-                    createBy:
-                      dtl.fPackageFile.length > 0
-                        ? dtl.fPackageFile[0].vCrea
-                        : "",
-                    docVersion:
-                      dtl.fPackageFile.length > 0
-                        ? "V" + dtl.fPackageFile.length
-                        : "",
-                    status:
-                      dtl.vStatus === "S"
-                        ? "Submitted"
-                        : dtl.vStatus === "A"
-                        ? "Approved"
-                        : dtl.vStatus === "R"
-                        ? "Revised"
-                        : "",
-                    stepid: dtl.vStepId,
-                    dApprover: dtl.dApprover,
-                    dDueDate: dtl.dDueDate,
-                    apprRemarks: dtl.vApprRemarks,
-                    userRemarks: dtl.vUsrRemarks,
-                    vTempCode: dtl.vTemporalCode,
-                  };
-                })
-              )
-            : setDataFile([]);
-
-          setDataHeader({
-            vPackageId: valData.header.vPackageId,
-            iMonth: valData.header.iMonth,
-            iYear: valData.header.iYear,
-            iStatus: valData.header.iStatus,
-            vAffcoId: valData.header.vAffcoId
-          }          
-          );
-        });
-      });
-    };
-
-    fetchData();
-    fetchPackage();
-  }, [year, month]);
 
   const steps = dataStep;
 
@@ -244,57 +166,163 @@ export default function AffcoUpload() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("klik filter");
+    fetch(apiUrl + "api/WorkflowStep/getStep", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken}`,
+      },
+    }).then((resp) => {
+      resp.json().then((valData) => {
+        setDataStep(
+          valData.data
+            .filter((x) => x.bActive === true)
+            .map((val, index) => {
+              return {
+                id: index,
+                label: val.vStepId,
+                desc: val.vStepDesc,
+              };
+            })
+        );
+      });
+    });
+    fetch(
+      apiUrl +
+        "api/Package/getPackage?nYear=" +
+        year +
+        "&nMonth=" +
+        month +
+        "&vAffcoId=",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getToken}`,
+        },
+      }
+    ).then((resp) => {
+      resp.json().then((valData) => {
+        
+        if(valData.header.vPackageId !== ""){
+          
+
+          
+          setDataFile(
+            valData.detail.map((dtl) => {
+              return {
+                filename:
+                  dtl.fPackageFile.length > 0
+                    ? dtl.fPackageFile[0].vAttchName
+                    : "",
+                createDate:
+                  dtl.fPackageFile.length > 0
+                    ? dtl.fPackageFile[0].dCrea
+                    : "",
+                createBy:
+                  dtl.fPackageFile.length > 0
+                    ? dtl.fPackageFile[0].vCrea
+                    : "",
+                docVersion:
+                  dtl.fPackageFile.length > 0
+                    ? "V" + dtl.fPackageFile.length
+                    : "",
+                status:
+                  dtl.vStatus === "S"
+                    ? "Submitted"
+                    : dtl.vStatus === "A"
+                    ? "Approved"
+                    : dtl.vStatus === "R"
+                    ? "Revised"
+                    : "",
+                stepid: dtl.vStepId,
+                dApprover: dtl.dApprover,
+                dDueDate: dtl.dDueDate,
+                apprRemarks: dtl.vApprRemarks,
+                userRemarks: dtl.vUsrRemarks,
+                vTempCode: dtl.vTemporalCode,
+                vAttachId: dtl.vAttchId,
+              };
+            })
+            
+            )
+            
+        } else {
+          setDataFile([]);
+        }
+
+        setDataHeader({
+          vPackageId: valData.header.vPackageId,
+          iMonth: valData.header.iMonth,
+          iYear: valData.header.iYear,
+          iStatus: valData.header.iStatus,
+          vAffcoId: valData.header.vAffcoId,
+        });
+      });
+    });
+
+    const testData = dataFile.filter((x) => x.stepid === stepData);
+    
+    console.log(testData);
+
+    setFilter(true);
   };
 
   const handleSubmitFiles = () => {
     const dataForm = new FormData();
     
 
-    dataForm.append("Header.vPackageId", "")
-    dataForm.append("Header.iYear", year)
-    dataForm.append("Header.iMonth", month)
-    dataForm.append("Header.iStatus", "")
-    dataForm.append("Header.vAffcoId", "")
+    const packId = dataHeader?.vPackageId !== "" ? dataHeader?.vPackageId : "";
+    dataForm.append("Header.vPackageId", packId);
+    dataForm.append("Header.iYear", year);
+    dataForm.append("Header.iMonth", month);
+    dataForm.append("Header.iStatus", "");
+    dataForm.append("Header.vAffcoId", "");
 
-    dataFile?.filter((x) => x.status === "Draft").map((val,index) => {
-      return (
-        dataForm.append(`Detail[${index}].vAttchId`, ""),
-        dataForm.append(`Detail[${index}].vStepId`, val.stepid),
-        dataForm.append(`Detail[${index}].vApprover`, val.vApprover),
-        dataForm.append(`Detail[${index}].dApprover`, val.dApprover),
-        dataForm.append(`Detail[${index}].dDueDate`, val.dDueDate),
-        dataForm.append(`Detail[${index}].vApprRemarks`, val.apprRemarks),
-        dataForm.append(`Detail[${index}].vUsrRemarks`, val.userRemarks),
-        dataForm.append(`Detail[${index}].vTemporalCode`, val.vTempCode),
-        dataForm.append(`DtlAttach[${index}].vAttchName`, val.filename),
-        dataForm.append(`DtlAttach[${index}].vRemarks`, ""),
-        dataForm.append(`DtlAttach[${index}].vAttchId`, "")
-      )
-    })
+    dataFile.filter((x) => x.status !== "Revised").map((val, index) => {
+        console.log(val.vAttachId)
+        return (
+          dataForm.append(
+            `Detail[${index}].vAttchId`, val.vAttachId            
+          ),
+          dataForm.append(`Detail[${index}].vStepId`, val.stepid),
+          dataForm.append(`Detail[${index}].vApprover`, val.vApprover),
+          dataForm.append(`Detail[${index}].dApprover`, val.dApprover),
+          dataForm.append(`Detail[${index}].dDueDate`, val.dDueDate),
+          dataForm.append(`Detail[${index}].vStatus`, val.status === "Approved" ? "A" : "S" ),
+          dataForm.append(`Detail[${index}].vApprRemarks`, val.apprRemarks),
+          dataForm.append(`Detail[${index}].vUsrRemarks`, val.userRemarks),
+          dataForm.append(`Detail[${index}].vTemporalCode`, val.vTempCode),
+          dataForm.append(`DtlAttach[${index}].vAttchName`, val.filename),
+          dataForm.append(`DtlAttach[${index}].vRemarks`, ""),
+          dataForm.append(
+            `DtlAttach[${index}].vAttchId`,
+            dataHeader?.vPackageId !== "" ? val.vAttachId : ""
+          )
+        );
+      });
 
-    tempFile?.map((val,index) => {
+    tempFile?.map((val, index) => {
       return (
         dataForm.append(`DtlAttach[${index}].vTemporalCode`, val.vTempCode),
         dataForm.append(`DtlAttach[${index}].fAttchContent`, val.dtlFIle)
-      )
-    })
+      );
+    });
 
-    fetch(apiUrl + "api/Package/SubmitPackage",{
-      method: "POST",
-      headers: {
-        
-        Authorization: `bearer ${getToken}`,
-          Accept: "*/*",
-      },
-      body: dataForm,
-
-    }).then((resp) => {
-      console.log(resp.status)
-    })
-
-    
-  }
+    // fetch(apiUrl + "api/Package/SubmitPackage", {
+    //   method: "POST",
+    //   headers: {
+    //     Authorization: `bearer ${getToken}`,
+    //     Accept: "*/*",
+    //   },
+    //   body: dataForm,
+    // }).then((resp) => {
+    //   if (resp.ok) {
+    //     alert("berhasil");
+    //     window.location.reload();
+    //   } else {
+    //     alert("something wrong : " + resp.status);
+    //   }
+    // });
+  };
 
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -305,31 +333,29 @@ export default function AffcoUpload() {
   }));
 
   const handleDownloadTemplate = (stepid: string) => () => {
-    fetch(apiUrl + "api/Package/DownloadTemplate?vStepId=" +stepid,{
+    fetch(apiUrl + "api/Package/DownloadTemplate?vStepId=" + stepid, {
       method: "GET",
       headers: {
-        Authorization: `bearer ${getToken}`
-      }
+        Authorization: `bearer ${getToken}`,
+      },
     }).then((resp) => {
-      if(resp.status === 404){
-        return alert("Template tidak tersedia")
+      if (resp.status === 404) {
+        return alert("Template tidak tersedia");
       } else {
-        if(resp.status === 200){
-          resp.blob().then((blob) =>{
+        if (resp.status === 200) {
+          resp.blob().then((blob) => {
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            const a = document.createElement("a");
             a.href = url;
             a.download = "Template " + stepid;
             a.click();
-          })
+          });
         } else {
-          return alert("Server Error : " + resp.status)
+          return alert("Server Error : " + resp.status);
         }
-
       }
-      
-    })
-  }
+    });
+  };
 
   return (
     <Box
@@ -415,94 +441,173 @@ export default function AffcoUpload() {
         </AccordionSummary>
         <Divider />
         <AccordionDetails>
-          <Stack direction={"column"}>
-            <Item elevation={0}>
-              <Stepper nonLinear activeStep={activeStep} alternativeLabel>
-                {steps.map((label, index) => (
-                  <Step key={label.id} completed={completed[index]}>
-                    <StepButton
-                      color="inherit"
-                      onClick={handleStep(index, label.label)}
-                    >
-                      {label.desc}
-                    </StepButton>
-                  </Step>
-                ))}
-              </Stepper>
-            </Item>
-            {stepData !== "" ? (
-              <Box
-                {...getRootProps()}
-                sx={{
-                  border: "0.5px dashed #ccc",
-                  borderRadius: "4px",
-                  padding: "20px",
-                  height: "200px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <input {...getInputProps()} />
-                <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
-                  Drag 'n' drop some files here, or click to select files
-                </Typography>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  border: "0.5px dashed #ccc",
-                  borderRadius: "4px",
-                  padding: "20px",
-                  height: "200px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <input {...getInputProps()} />
-                <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
-                  Drag 'n' drop some files here, or click to select files
-                </Typography>
-              </Box>
-            )}
-            <Item elevation={0}>
-              <Button variant="contained" color="primary" sx={{ float: "right"}} onClick={handleDownloadTemplate(stepData)} disabled={stepData === "" ? true : false}>Download Template</Button>
-            </Item>
-
-            <Item elevation={0}>
-              {allStepsCompleted() ? (
-                <Box></Box>
-              ) : (
-                <Box>
-                  <Stack direction={"column"}>
-                    <Item elevation={0}>
-                      <Typography sx={{ marginBottom: 1 }}>
-                        {stepData !== "" ? "History " + stepData : null}
-                      </Typography>
-                      <MaterialReactTable
-                        columns={columnHistoryUpload}
-                        data={dataFile.filter((v) => v.stepid === stepData)}
-                        renderBottomToolbarCustomActions={() => {
-                          const countStep = dataStep?.length
-                          console.log("countStep : "+ countStep + " countTemp : " + tempFile?.length + " countFile : " + dataFile?.length)
-                          return (
-                            <Button variant="contained" disabled={dataHeader?.vPackageId === "" && dataFile?.length === countStep ? false : true} onClick={handleSubmitFiles}>
-                              Submit Files
-                            </Button>
+          {filter ? (
+            <Stack direction={"column"}>
+              <Item elevation={0}>
+                <Stepper nonLinear activeStep={activeStep} alternativeLabel>
+                  {dataHeader.vPackageId !== ""
+                    ? dataFile.filter((x) => x.status !== "Draft").map((val, index) => {
+                        const iconProps: {
+                          active?: boolean;
+                          completed?: boolean;
+                        } = {};
+                        const labelProps: {
+                          optional?: React.ReactNode;
+                        } = {};
+                        if (val.status === "Submitted") {
+                          iconProps.active = true;
+                          labelProps.optional = (
+                            <Typography variant="caption" color="blue">
+                              Waiting for Approval
+                            </Typography>
                           );
-                        }}
-                      />
-                    </Item>
-                  </Stack>
+                        } else {
+                          if (val.status === "Revised") {
+                            iconProps.completed = true;
+                            labelProps.optional = (
+                              <Typography variant="caption" color="red">
+                                Revised
+                              </Typography>
+                            );
+                          } else if (val.status === "Approved") {
+                            iconProps.completed = true;
+                            labelProps.optional = (
+                              <Typography variant="caption" color="green">
+                                Approved
+                              </Typography>
+                            );
+                          } else {
+                            iconProps.active = true;
+                            labelProps.optional = (
+                              <Typography variant="caption" color="blue">
+                                Waiting for Approval
+                              </Typography>
+                            );
+                          }
+                        }
+                        return (
+                          <Step key={val.stepid} {...iconProps} sx={val.status === "Approved" ? { "& .Mui-completed": { color: "green" } } : { "& .Mui-completed": { color: "red" } }}>
+                            <StepButton
+                              color="inherit"
+                              onClick={handleStep(index, val.stepid)}
+                              {...labelProps}
+                            >
+                              {val.stepid}
+                            </StepButton>
+                            
+                          </Step>
+                        );
+                      })
+                    : steps.map((label, index) => (
+                        <Step key={label.id} completed={completed[index] }>
+                          <StepButton
+                            color="inherit"
+                            onClick={handleStep(index, label.label)}
+                          >
+                            {label.desc}
+                          </StepButton>
+                        </Step>
+                      ))}
+                </Stepper>
+              </Item>
+              {stepData !== "" ? (
+                <Box
+                  {...getRootProps()}
+                  sx={{
+                    border: "0.5px dashed #ccc",
+                    borderRadius: "4px",
+                    padding: "20px",
+                    height: "200px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <input {...getInputProps()} />
+                  <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
+                    Drag 'n' drop some files here, or click to select files
+                  </Typography>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    border: "0.5px dashed #ccc",
+                    borderRadius: "4px",
+                    padding: "20px",
+                    height: "200px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <input {...getInputProps()} />
+                  <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
+                    Select Step for upload
+                  </Typography>
                 </Box>
               )}
-            </Item>
-          </Stack>
+              <Item elevation={0}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ float: "right" }}
+                  onClick={handleDownloadTemplate(stepData)}
+                  disabled={stepData === "" ? true : false}
+                >
+                  Download Template
+                </Button>
+              </Item>
+
+              <Item elevation={0}>
+                {allStepsCompleted() ? (
+                  <Box></Box>
+                ) : (
+                  <Box>
+                    <Stack direction={"column"}>
+                      <Item elevation={0}>
+                        <Typography sx={{ marginBottom: 1 }}>
+                          {stepData !== "" ? "History " + stepData : null}
+                        </Typography>
+                        <MaterialReactTable
+                          columns={columnHistoryUpload}
+                          data={dataFile.filter((v) => v.stepid === stepData)}
+                          renderBottomToolbarCustomActions={() => {
+                            const countStep = dataStep?.length;
+                            const countRevise = dataFile.filter((v) => v.status === "Revised").length
+                            const countApproved = dataFile.filter((v) => v.status === "Approved").length
+                            const countDraft = dataFile.filter((v) => v.status === "Draft").length
+
+                            return (
+                              <Button
+                                variant="contained"
+                                disabled={
+                                  dataHeader?.vPackageId === "" &&
+                                  dataFile?.length === countStep
+                                    ? false
+                                    : dataHeader?.vPackageId !== "" && dataFile?.length === countApproved ? false : dataHeader?.vPackageId !== "" && countRevise === countDraft ? false :true
+                                }
+                                onClick={handleSubmitFiles}
+                              >
+                                Submit Files
+                              </Button>
+                            );
+                          }}
+                        />
+                      </Item>
+                    </Stack>
+                  </Box>
+                )}
+              </Item>
+            </Stack>
+          ) : (
+            <Box>
+              <Typography>clik filter to show data</Typography>
+            </Box>
+          )}
         </AccordionDetails>
       </Accordion>
     </Box>

@@ -18,6 +18,7 @@ import {
   TextField,
 } from "@mui/material";
 import React from "react";
+import { apiUrl, getToken } from "./TemplateUrl";
 
 interface AddNewsProps {
   open: boolean;
@@ -26,11 +27,79 @@ interface AddNewsProps {
 
 function AddNewsDialog(props: AddNewsProps) {
   const { open, onClose } = props;
-  const [category, setCategory] = React.useState("");
+  const [category, setCategory] = React.useState("");  
+  const [dataFile, setDataFile] = React.useState<File>();
+  const [title, setTitle] = React.useState("");
+  const [subTitle, setSubTitle] = React.useState("");
+  const [desc, setDesc] = React.useState("");
+  const [attchName, setAttchName] = React.useState("");
 
   const handleChangeCategory = (event: SelectChangeEvent) => {
     setCategory(event.target.value as string);
   };
+
+  const handleFileUpload = (event) => {
+    setDataFile(event.target.files[0])
+    setAttchName(event.target.files[0].name)
+  }
+
+  const handleChangeTitle = (event) => {
+    setTitle(event.target.value);
+  }
+
+  const handleChangeSubtitle = (event) => {
+    setSubTitle(event.target.value);
+  }
+
+  const handleChangeDesc = (event) => {
+    setDesc(event.target.value)
+  }
+
+  const handleCreateNews =  () => {
+    
+    const dataForm = new FormData();
+    
+    dataForm.append("uUid","");
+    dataForm.append("vTitle", title);
+    dataForm.append("vSubTitle", subTitle);
+    dataForm.append("vDescription", desc);
+    dataForm.append("vConsolidateCategory", category);
+    dataForm.append("vAttachment", attchName);
+    dataFile ? dataForm.append("fAttachment", dataFile) : dataForm.append("fAttachment", "")
+    fetch(apiUrl + "api/Consolidate/SubmitConsolidateNews",{
+      method: "POST",
+      headers: {
+        Authorization: `bearer ${getToken}`,
+          Accept: "*/*",
+      },
+      body: dataForm
+    }).then((resp) => {
+      if(resp.ok){
+        resp.json().then((val) => {
+          if(val.success){
+            onClose();
+            setCategory("")
+            setTitle("");
+            setSubTitle("");
+            setDesc("");
+            setDataFile(undefined);
+            window.location.reload();
+          } else {
+            alert(val.message);
+            setCategory("")
+            setTitle("");
+            setSubTitle("");
+            setDesc("");
+            setDataFile(undefined);
+          }
+        })
+        
+        
+      }
+    })
+  }
+
+
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -64,17 +133,18 @@ function AddNewsDialog(props: AddNewsProps) {
           sx={{ display: "flex", flexDirection: "column", alignItems: "left" }}
         >
           <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <TextField size="small" label="Title News" name="vTitle" />
+            <TextField size="small" label="Title News" value={title} onChange={handleChangeTitle}/>
           </FormControl>
           <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <TextField size="small" label="Sub Title News" name="vSubTitle" />
+            <TextField size="small" label="Sub Title News" name="vSubTitle" value={subTitle} onChange={handleChangeSubtitle} />
           </FormControl>
           <FormControl sx={{ m: 1, minWidth: 120 }}>
             <TextField
-              multiline
-              maxRows={5}
+              multiline              
               label="Description"
               name="vDesc"
+              value={desc}
+              onChange={handleChangeDesc}
               rows={3}
             ></TextField>
           </FormControl>
@@ -87,9 +157,9 @@ function AddNewsDialog(props: AddNewsProps) {
               value={category}
               onChange={handleChangeCategory}
             >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="kategori 1">Kategori 1</MenuItem>
-              <MenuItem value="kategori 2">Kategori 2</MenuItem>
+              <MenuItem value="ALL">All</MenuItem>
+              <MenuItem value="KAT1">Kategori 1</MenuItem>
+              <MenuItem value="KAT2">Kategori 2</MenuItem>
             </Select>
           </FormControl>
           <FormControl sx={{ m: 1, minWidth: 120 }}>
@@ -102,13 +172,16 @@ function AddNewsDialog(props: AddNewsProps) {
               startIcon={<CloudUploadIcon />}
             >
               Upload file
-              <VisuallyHiddenInput type="file" />
+              <VisuallyHiddenInput type="file" onChange={handleFileUpload}/>
             </Button>
+          </FormControl>
+          <FormControl>
+          <FormLabel  sx={{ marginBottom: 1}}>{dataFile ? dataFile?.name : "no file selected"}</FormLabel>
           </FormControl>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button color="success" variant="contained" startIcon={<Create />}>
+        <Button color="success" variant="contained" startIcon={<Create />} onClick={handleCreateNews}>
           Create
         </Button>
         <Button

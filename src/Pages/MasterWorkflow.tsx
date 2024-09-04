@@ -11,6 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
 import axios from "axios";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
+import { apiUrl, getToken } from "../Component/TemplateUrl";
 
 interface Data {
   vStepId: string;
@@ -33,23 +34,21 @@ export const DataWorkflow: React.FC = () => {
   const [editMode, setEditMode] = React.useState(false);
   const [selectedStep, setselectedStep] = React.useState<Data | null>(null);
 
-  const token = localStorage.getItem("token");
-
   const navigate = useHandleUnauthorized();
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         const resp = await axios.get(
-          "http://192.168.1.207:9020/api/WorkflowStep/getStep",
+          apiUrl + "api/WorkflowStep/getStep",
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ` + getToken,
               Accept: "*/*",
             },
           }
         );
-        console.log("Data : ", JSON.stringify(resp.data, null, 2));
+        
         setRows(resp.data.data);
       } catch (error: any) {
         if (error.response && error.response.status === 401) {
@@ -90,7 +89,6 @@ export const DataWorkflow: React.FC = () => {
 
   //Add Step
   const handleSaveStep = async () => {
-    const token = localStorage.getItem("token");
     const stepData = {
       vstepid:
         editMode && selectedStep
@@ -104,22 +102,18 @@ export const DataWorkflow: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `http://192.168.1.207:9020/api/WorkflowStep/${
+        apiUrl + `api/WorkflowStep/${
           editMode ? "editStep" : "addStep"
         }`,
         stepData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ` + getToken,
             Accept: "*/*",
           },
         }
       );
 
-      console.log(
-        `${editMode ? "Edit" : "Tambah"} : `,
-        JSON.stringify(stepData, null, 2)
-      );
       if (response.status === 200) {
         handleClose();
         setChange(true);

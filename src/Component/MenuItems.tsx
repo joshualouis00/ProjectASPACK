@@ -11,9 +11,8 @@ import LayersIcon from "@mui/icons-material/Layers";
 import { useNavigate } from "react-router-dom";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import DatasetIcon from "@mui/icons-material/Dataset";
-export interface MenuItemsProps {
-  DrawerStatus: boolean;
-}
+import { getRole } from "./TemplateUrl";
+import { MenuItemsProps } from "./Interface/MenuItemsProps";
 
 const MenuItems = (props: MenuItemsProps) => {
   const [openMaster, setOpenMaster] = useState(false);
@@ -24,8 +23,6 @@ const MenuItems = (props: MenuItemsProps) => {
   const [openUserWorkflow, setUserWorkflow] = useState(false);
   const [openEmail, setEmail] = useState(false);
   const navigate = useNavigate();
-
-  const role = localStorage.getItem("Role");
 
   const handleEmail = () => {
     setEmail(!openEmail);
@@ -68,7 +65,7 @@ const MenuItems = (props: MenuItemsProps) => {
   return (
     <List component="nav" sx={{ color: "white" }}>
       {/* Aspack Template */}
-      {role === "C" && (
+      {getRole === "C" && (
         <>
           <ListItemButton onClick={handleOpenMaster}>
             <ListItemIcon>
@@ -269,7 +266,7 @@ const MenuItems = (props: MenuItemsProps) => {
       )}
 
       {/* User Affco Aspack */}
-      {role === "A" && (
+      {getRole === "A" && (
         <>
           <ListItemButton onClick={handleOpenAspackAffco}>
             <ListItemIcon>

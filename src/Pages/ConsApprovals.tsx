@@ -33,7 +33,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
 import IDataAffco from "../Component/Interface/DataAffco";
 import IDataTemplate from "../Component/Interface/DataTemplate";
-import { apiUrl, getToken, getUserId} from "../Component/TemplateUrl";
+import { apiUrl, generateMonths, generateYears, getToken, getUserId} from "../Component/TemplateUrl";
 import { CustomTabs, a11yProps } from "../Component/CustomTab";
 import { IDialogProps, IHeaderProps, IRespFile, IStepProps } from "../Component/Interface/DataUpload";
 import { MaterialReactTable } from "material-react-table";
@@ -224,13 +224,12 @@ export default function AspackAprroval() {
   const handleClickApprove = (data: number) => {
     const date = dayjs(Date())
     const user = getUserId !== null ? getUserId : ""
+    
     const updateData = {...dataAffco[data], status:"Approve", dDueDate: "", apprRemarks: "", dApprover: date.format("YYYY-MM-DD"), vApprover: user}
       const newDataAffco = [...dataAffco];
-      newDataAffco[data] = updateData;
+      newDataAffco[data] = updateData;      
       setDataAffco(newDataAffco);
-
       const resData = dataResponse.filter((x) => x.vStepId !== dataAffco[data].stepid)
-
       setDataResponse(resData)
 
   }
@@ -395,10 +394,6 @@ export default function AspackAprroval() {
     })
 
   }
-
-  console.log(dataResponse)
-  console.log(dataAffco)
-
   return (
     <Box
       sx={{
@@ -416,6 +411,30 @@ export default function AspackAprroval() {
         <AccordionDetails>
           <Box component="form" onSubmit={handleSubmitFilter}>
             <Stack direction={"row"}>
+            <Item elevation={0}>
+                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+                  <InputLabel id="year">Select Periode Year</InputLabel>
+                  <Select
+                    labelId="year"
+                    name="vYear"
+                    value={year}
+                    label="Select Periode Year"
+                    onChange={handleChangeYear}
+                    error={hasErrorYear}
+                  >
+                    { generateYears().map((val,index) => {
+                        return (
+                          <MenuItem key={index} value={val}>{val}</MenuItem>
+                        )
+                      })}
+                  </Select>
+                  {hasErrorYear && (
+                    <FormHelperText sx={{ color: "red" }}>
+                      This is required!
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Item>
               <Item elevation={0}>
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <InputLabel id="month">Select Periode Month</InputLabel>
@@ -427,18 +446,11 @@ export default function AspackAprroval() {
                     onChange={handleChangeMonth}
                     error={hasErrorMonth}
                   >
-                    <MenuItem value="1">Januari</MenuItem>
-                    <MenuItem value="2">Februari</MenuItem>
-                    <MenuItem value="3">Maret</MenuItem>
-                    <MenuItem value="4">April</MenuItem>
-                    <MenuItem value="5">Mei</MenuItem>
-                    <MenuItem value="6">Juni</MenuItem>
-                    <MenuItem value="7">Juli</MenuItem>
-                    <MenuItem value="8">Agustus</MenuItem>
-                    <MenuItem value="9">September</MenuItem>
-                    <MenuItem value="10">Oktober</MenuItem>
-                    <MenuItem value="11">November</MenuItem>
-                    <MenuItem value="12">Desember</MenuItem>
+                    { generateMonths.map((val) => {
+                      return (
+                        <MenuItem key={val.id} value={val.id}>{val.name}</MenuItem>
+                      )
+                    })}
                   </Select>
                   {hasErrorMonth && (
                     <FormHelperText sx={{ color: "red" }}>
@@ -446,28 +458,7 @@ export default function AspackAprroval() {
                     </FormHelperText>
                   )}
                 </FormControl>
-              </Item>
-              <Item elevation={0}>
-                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-                  <InputLabel id="year">Select Periode Year</InputLabel>
-                  <Select
-                    labelId="year"
-                    name="vYear"
-                    value={year}
-                    label="year"
-                    onChange={handleChangeYear}
-                    error={hasErrorYear}
-                  >
-                    <MenuItem value="2024">2024</MenuItem>
-                    <MenuItem value="2023">2023</MenuItem>
-                  </Select>
-                  {hasErrorYear && (
-                    <FormHelperText sx={{ color: "red" }}>
-                      This is required!
-                    </FormHelperText>
-                  )}
-                </FormControl>
-              </Item>
+              </Item>              
               <Item elevation={0}>
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <Autocomplete
@@ -658,7 +649,7 @@ export default function AspackAprroval() {
                               variant="contained"
                               color="warning"
                               onClick={() => {
-                                const index = row.index;                               
+                                const index = dataAffco.findIndex((val) => val.stepid === row.original.stepid);                               
 
                                 handleClickRevise(index)
                               }}
@@ -671,7 +662,7 @@ export default function AspackAprroval() {
                               variant="contained"
                               color="success"
                               onClick={() => {
-                                const index = row.index;
+                                const index = dataAffco.findIndex((val) => val.stepid === row.original.stepid);
                                 handleClickApprove(index)
                               }}
                             >

@@ -18,7 +18,7 @@ import {
   TextField,
 } from "@mui/material";
 import React from "react";
-import { apiUrl, getToken } from "./TemplateUrl";
+import { apiUrl, generateCategory, getToken } from "./TemplateUrl";
 
 interface AddNewsProps {
   open: boolean;
@@ -157,9 +157,13 @@ function AddNewsDialog(props: AddNewsProps) {
               value={category}
               onChange={handleChangeCategory}
             >
-              <MenuItem value="ALL">All</MenuItem>
-              <MenuItem value="KAT1">Kategori 1</MenuItem>
-              <MenuItem value="KAT2">Kategori 2</MenuItem>
+              {
+                generateCategory.map((val,index) => {
+                  return (
+                    <MenuItem key={index} value={val.id}>{val.name}</MenuItem>
+                  )
+                })
+              }
             </Select>
           </FormControl>
           <FormControl sx={{ m: 1, minWidth: 120 }}>

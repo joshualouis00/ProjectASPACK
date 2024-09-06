@@ -17,6 +17,9 @@ export interface IStepProps {
 }
 
 export interface ITempFile {
+    vAttchName: string,
+    vRemarks: string,
+    vAttchId: string,
     vTempCode: string,
     dtlFIle: File
 }

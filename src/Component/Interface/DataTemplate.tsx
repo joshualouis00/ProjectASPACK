@@ -14,5 +14,12 @@ export interface IConsNewsProps {
     vAttachment: string,
     vConsolidateCategory: string,
     dCrea: string,
-    vCrea: string    
+    vCrea: string,
+    bActive: boolean    
+}
+
+export interface IConsProps{
+    open: boolean,
+    onClose: () => void,
+    data: IConsNewsProps
 }

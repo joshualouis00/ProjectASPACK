@@ -1,6 +1,9 @@
 import { styled } from "@mui/material/styles";
 import {
   Box,  
+  Card,  
+  CardContent,  
+  CardHeader,  
   FormControl,
   InputLabel,
   MenuItem,
@@ -8,12 +11,14 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
+  Typography,
 } from "@mui/material";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import React from "react";
 import ButtonAddNews from "../Component/ButtonAddNews";
-import { getRole } from "../Component/TemplateUrl";
+import { apiUrl, getRole, getToken , generateYears} from "../Component/TemplateUrl";
+import { IConsNewsProps } from "../Component/Interface/DataTemplate";
 export default function Kategori() {
   const responsive = {
     superLargeDesktop: {
@@ -45,6 +50,7 @@ export default function Kategori() {
   const [month, setMonth] = React.useState("");
   const [year, setYear] = React.useState("");
   const [category, setCategory] = React.useState("");
+  const [dataNews, setDataNews] = React.useState<IConsNewsProps[]>([]);
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
     setMonth(event.target.value as string);
@@ -57,6 +63,33 @@ export default function Kategori() {
   const handleChangeCategory = (event: SelectChangeEvent) => {
     setCategory(event.target.value as string);
   };
+
+  React.useEffect(() => {
+    fetch(apiUrl + "api/Consolidate/GetConsolidateNews", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken}`,
+      },
+    }).then((resp) => {
+      resp.json().then((news) => {
+        setDataNews(
+          news.data.map((val) => {
+            return {
+              uUid: val.uUid,
+              vTitle: val.vTitle,
+              vDescription: val.vDescription,
+              vSubTitle: val.vSubTitle,
+              vAttachment: val.vAttachment,
+              vConsolidateCategory: val.vConsolidateCategory,
+              dCrea: val.dCrea,
+              vCrea: val.vCrea,
+              bActive: val.bActive
+            };
+          })
+        );
+      });
+    });
+  }, []);
   return (
     <div>
       <Box sx={{ width: "100%" }}>
@@ -69,7 +102,7 @@ export default function Kategori() {
           <Item elevation={0}>
             <Stack direction={"row"}>
               <Item elevation={0}>
-                <FormControl sx={{ m: 1, minWidth: 200 }}>
+                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <InputLabel id="category">Select Category</InputLabel>
                   <Select
                     labelId="category"
@@ -85,7 +118,7 @@ export default function Kategori() {
                 </FormControl>
               </Item>
               <Item elevation={0}>
-                <FormControl sx={{ m: 1, minWidth: 200 }}>
+                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <InputLabel id="month">Select Periode Month</InputLabel>
                   <Select
                     labelId="month"
@@ -99,23 +132,24 @@ export default function Kategori() {
                   </Select>
                 </FormControl>
               </Item>
-              {month !== "" ? (
-                <Item elevation={0}>
-                  <FormControl sx={{ m: 1, minWidth: 200 }}>
+              <Item elevation={0}>
+                  <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                     <InputLabel id="year">Select Periode Year</InputLabel>
                     <Select
                       labelId="year"
                       name="vYear"
                       value={year}
-                      label="year"
+                      label="Select Periode Year"
                       onChange={handleChangeYear}
                     >
-                      <MenuItem value="2024">2024</MenuItem>
-                      <MenuItem value="2023">2023</MenuItem>
+                      { generateYears().map((val,index) => {
+                        return (
+                          <MenuItem key={index} value={val}>{val}</MenuItem>
+                        )
+                      })}
                     </Select>
                   </FormControl>
                 </Item>
-              ) : null}
             </Stack>
           </Item>
           <Item elevation={0}>
@@ -136,40 +170,30 @@ export default function Kategori() {
               dotListClass="custom-dot-list-style"
               itemClass="carousel-item-padding-40-px"
             >
-              { category !== "" ? Array.from({ length: 3 }).map((item, index) => (
-                <div
-                  style={{
-                    background: "yellow",
-                    width: 250,
-                    height: 250,
-                    border: "10px solid white",
-                    textAlign: "center",
-                    lineHeight: "240px",
-                    boxSizing: "border-box",
+              {dataNews?.map((item, index) => (
+                <Card
+                  sx={{
+                    maxWidth: 300,
+                    maxHeight: 300,
+                    marginBottom: 5,
+                    borderRadius: 3,
+                    marginTop: 1,
+                    marginLeft: 1,
+                    marginRight: 1,
                   }}
                   key={index}
                 >
-                  {index}
-                </div>
-              )): Array.from({ length: 10 }).map((item, index) => (
-                <div
-                  style={{
-                    background: "yellow",
-                    width: 250,
-                    height: 250,
-                    border: "5px solid white",                                        
-                    boxSizing: "border-box",
-                  }}
-                  key={index}
-                >
-                  <p style={{ textAlign:"center"}}>
-                    Title {index}                     
-                  </p>
-                  
-                  <p style={{ textAlign:"center"}}>Subtitle</p>
-                  
-                  <p style={{ textAlign:"justify", paddingLeft:15, paddingRight:15}}>lorem ipsum dolor is amet, lorem ipsum dolor is ametlorem ipsum dolor is ametlorem ipsum dolor is ametlorem ipsum dolor is ametlorem ipsum dolor is amet</p>
-                </div>
+                  <CardHeader
+                    title={item.vTitle}
+                    subheader={item.vSubTitle}
+                    
+                  />
+                  <CardContent>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.vDescription}
+                    </Typography>
+                  </CardContent>
+                </Card>
               ))}
             </Carousel>
           </Item>

@@ -17,6 +17,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "bcrypt-ts": "^5.0.2",
+    "clientapp": "file:",
     "exceljs": "^4.4.0",
     "google-auth-library": "^9.13.0",
     "googleapis": "^140.0.1",

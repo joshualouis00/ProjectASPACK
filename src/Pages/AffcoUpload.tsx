@@ -14,7 +14,7 @@ import {
   SelectChangeEvent,
   Stack,
   Step,
-  StepButton,  
+  StepButton,
   Stepper,
   Typography,
 } from "@mui/material";
@@ -23,7 +23,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import { MaterialReactTable } from "material-react-table";
 import { useDropzone } from "react-dropzone";
-import { apiUrl, getToken } from "../Component/TemplateUrl";
+import { apiUrl, generateMonths, generateYears, getToken } from "../Component/TemplateUrl";
 import { columnHistoryUpload } from "../Component/TableComponent/ColumnDef/IColumnUpload";
 import {
   IStepProps,
@@ -32,12 +32,14 @@ import {
   IRespFile,
 } from "../Component/Interface/DataUpload";
 import { getUserId } from "../Component/TemplateUrl";
+import { format } from "date-fns";
 
 export default function AffcoUpload() {
   const dataMonth = new Date().getMonth();
   const dataYear = new Date().getFullYear();
   const [dataFile, setDataFile] = React.useState<IStepProps[]>([]);
-  const [tempData, setTempData] = React.useState<IStepProps>();
+  const [tempData, setTempData] = React.useState<IStepProps[]>([]);
+  const [submitData, setSubmitData] =  React.useState<IStepProps[]>([]);
   const [stepData, setStepData] = React.useState("");
   const [dataStep, setDataStep] = React.useState([
     {
@@ -57,6 +59,8 @@ export default function AffcoUpload() {
     vPackageId: "",
   });
   const [filter, setFilter] = React.useState(false);
+  const [index, setIndex] = React.useState<number>(-1);
+  const [allowUpload, setAllowUpload] = React.useState(false);
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
@@ -68,7 +72,7 @@ export default function AffcoUpload() {
       });
       const files: IStepProps[] = acceptedFiles.map((val) => ({
         filename: val.name,
-        createDate: Date().toString(),
+        createDate: format(Date(),"yyyy-MM-dd"),
         createBy: getUserId,
         docVersion: "draft",
         status: "Draft",
@@ -83,16 +87,26 @@ export default function AffcoUpload() {
       }));
 
       const temFiles: ITempFile[] = acceptedFiles.map((val) => ({
+        vAttchName: val.name,
+        vRemarks: "",
+        vAttchId: "",
         vTempCode: tempCode,
         dtlFIle: val,
       }));
 
+      if(dataHeader?.vPackageId !== "" && index > -1){
+        const newData = {...submitData[index], status:"Submitted", filename: acceptedFiles[0].name, vTempCode: tempCode, dApprover:"",dDueDate: "", apprRemarks: "",userRemarks: "",vApprover: ""}
+        const newSubmitData = [...submitData]
+        newSubmitData[index] = newData
+        setSubmitData(newSubmitData)
+        setAllowUpload(false)
+
+      }
+
       setDataFile((prev) => [...prev, ...files]);
       setTempFile((prevFile) => [...prevFile, ...temFiles]);
-
-      
     },
-    [stepData]
+    [stepData, dataHeader?.vPackageId, index, submitData]
   );
 
   const [month, setMonth] = React.useState((dataMonth + 1).toString());
@@ -113,45 +127,29 @@ export default function AffcoUpload() {
 
   const completedSteps = () => {
     return Object.keys(completed).length;
-  };
-
-  const isLastStep = () => {
-    return activeStep === totalSteps() - 1;
-  };
+  };  
 
   const allStepsCompleted = () => {
     return completedSteps() === totalSteps();
   };
 
-  const handleNext = () => {
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed,
-          // find the first step that has been completed
-          steps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
   const handleStep = (step: number, stepName: string) => () => {
     setActiveStep(step);
-    setStepData(stepName);
-  };
-
-  const handleComplete = () => {
-    const newCompleted = completed;
-    newCompleted[activeStep] = true;
-    setCompleted(newCompleted);
-    handleNext();
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
+    setStepData(stepName);   
+    
+    const testindex = submitData.filter((c) => c.status === "Revised" && c.stepid === stepName)
+    if(testindex.length > 0){
+      const index = submitData.findIndex((x) => x.stepid === stepName)
+      setIndex(index)
+    }
+    const countRevise = dataFile.filter((x) => x.status === "Revised" && x.stepid === stepName)
+    const isDraft = dataFile.filter((x) => x.status === "Draft" && x.stepid === stepName)
+    const isApproved = dataFile.filter((x) => x.status === "Approved" && x.stepid === stepName)
+    if(dataHeader?.vPackageId !== "" && countRevise.length > 0 && isDraft.length < 1 && isApproved.length === 0){
+      setAllowUpload(true)
+    } else {
+      setAllowUpload(false)
+    }
   };
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -166,6 +164,7 @@ export default function AffcoUpload() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setTempData([])
     fetch(apiUrl + "api/WorkflowStep/getStep", {
       method: "GET",
       headers: {
@@ -201,35 +200,23 @@ export default function AffcoUpload() {
       }
     ).then((resp) => {
       resp.json().then((valData) => {
-        
-        if(valData.header.vPackageId !== ""){
-          
-
-          
-          setDataFile(
-            valData.detail.map((dtl) => {
-              return {
-                filename:
-                  dtl.fPackageFile.length > 0
-                    ? dtl.fPackageFile[0].vAttchName
-                    : "",
-                createDate:
-                  dtl.fPackageFile.length > 0
-                    ? dtl.fPackageFile[0].dCrea
-                    : "",
-                createBy:
-                  dtl.fPackageFile.length > 0
-                    ? dtl.fPackageFile[0].vCrea
-                    : "",
-                docVersion:
-                  dtl.fPackageFile.length > 0
-                    ? "V" + dtl.fPackageFile.length
-                    : "",
+        if (valData.header.vPackageId !== "") {
+          valData.detail.map((dtl) =>
+            dtl.fPackageFile.map((fp, index) => (
+              tempData.push({
+                filename: fp.vAttchName,
+                createDate: fp.dCrea,
+                createBy: fp.vCrea,
+                docVersion: "V" + (dtl.fPackageFile.length - index),
                 status:
-                  dtl.vStatus === "S"
+                  dtl.vStatus === "S" && index === 0
                     ? "Submitted"
-                    : dtl.vStatus === "A"
+                    : dtl.vStatus === "S" && index !== 0
+                    ? "Revised"
+                    : dtl.vStatus === "A" && index === 0
                     ? "Approved"
+                    : dtl.vStatus === "A" && index !== 0
+                    ? "Revised"
                     : dtl.vStatus === "R"
                     ? "Revised"
                     : "",
@@ -240,11 +227,46 @@ export default function AffcoUpload() {
                 userRemarks: dtl.vUsrRemarks,
                 vTempCode: dtl.vTemporalCode,
                 vAttachId: dtl.vAttchId,
-              };
-            })
-            
-            )
-            
+              } as IStepProps)
+            ))
+          );
+
+          setDataFile(tempData);
+          setSubmitData(valData.detail.map((dtl) => {
+            return {
+              filename:
+                dtl.fPackageFile.length > 0
+                  ? dtl.fPackageFile[0].vAttchName
+                  : "",
+              createDate:
+                dtl.fPackageFile.length > 0
+                  ? dtl.fPackageFile[0].dCrea
+                  : "",
+              createBy:
+                dtl.fPackageFile.length > 0
+                  ? dtl.fPackageFile[0].vCrea
+                  : "",
+              docVersion:
+                dtl.fPackageFile.length > 0
+                  ? "V" + dtl.fPackageFile.length
+                  : "",
+              status:
+                dtl.vStatus === "S"
+                  ? "Submitted"
+                  : dtl.vStatus === "A"
+                  ? "Approved"
+                  : dtl.vStatus === "R"
+                  ? "Revised"
+                  : "",
+              stepid: dtl.vStepId,
+              dApprover: dtl.dApprover,
+              dDueDate: dtl.dDueDate,
+              apprRemarks: dtl.vApprRemarks,
+              userRemarks: dtl.vUsrRemarks,
+              vTempCode: dtl.vTemporalCode,
+              vAttachId: dtl.vAttchId,
+            };
+          }))
         } else {
           setDataFile([]);
         }
@@ -259,16 +281,12 @@ export default function AffcoUpload() {
       });
     });
 
-    const testData = dataFile.filter((x) => x.stepid === stepData);
-    
-    console.log(testData);
-
     setFilter(true);
+    
   };
 
   const handleSubmitFiles = () => {
     const dataForm = new FormData();
-    
 
     const packId = dataHeader?.vPackageId !== "" ? dataHeader?.vPackageId : "";
     dataForm.append("Header.vPackageId", packId);
@@ -277,51 +295,93 @@ export default function AffcoUpload() {
     dataForm.append("Header.iStatus", "");
     dataForm.append("Header.vAffcoId", "");
 
-    dataFile.filter((x) => x.status !== "Revised").map((val, index) => {
-        console.log(val.vAttachId)
+    if(dataHeader?.vPackageId !== ""){
+      submitData.map((val, index) => {
         return (
+          dataForm.append(`Detail[${index}].vAttchId`, val.vAttachId),
+          dataForm.append(`Detail[${index}].vStepId`, val.stepid),
+          dataForm.append(`Detail[${index}].vApprover`, ""),
+          dataForm.append(`Detail[${index}].dApprover`, ""),
+          dataForm.append(`Detail[${index}].dDueDate`, ""),
           dataForm.append(
-            `Detail[${index}].vAttchId`, val.vAttachId            
+            `Detail[${index}].vStatus`,
+            val.status === "Approved" ? "A" : "S"
           ),
+          dataForm.append(`Detail[${index}].vApprRemarks`, ""),
+          dataForm.append(`Detail[${index}].vUsrRemarks`, ""),
+          dataForm.append(`Detail[${index}].vTemporalCode`, val.vTempCode)
+        )
+      })
+
+    } else {
+      dataFile
+      .filter((x) => x.status === "Draft")
+      .map((val, index) => {        
+        return (
+          dataForm.append(`Detail[${index}].vAttchId`, val.vAttachId),
           dataForm.append(`Detail[${index}].vStepId`, val.stepid),
           dataForm.append(`Detail[${index}].vApprover`, val.vApprover),
           dataForm.append(`Detail[${index}].dApprover`, val.dApprover),
           dataForm.append(`Detail[${index}].dDueDate`, val.dDueDate),
-          dataForm.append(`Detail[${index}].vStatus`, val.status === "Approved" ? "A" : "S" ),
+          dataForm.append(
+            `Detail[${index}].vStatus`,
+            val.status === "Approved" ? "A" : "S"
+          ),
           dataForm.append(`Detail[${index}].vApprRemarks`, val.apprRemarks),
           dataForm.append(`Detail[${index}].vUsrRemarks`, val.userRemarks),
-          dataForm.append(`Detail[${index}].vTemporalCode`, val.vTempCode),
-          dataForm.append(`DtlAttach[${index}].vAttchName`, val.filename),
-          dataForm.append(`DtlAttach[${index}].vRemarks`, ""),
-          dataForm.append(
-            `DtlAttach[${index}].vAttchId`,
-            dataHeader?.vPackageId !== "" ? val.vAttachId : ""
-          )
+          dataForm.append(`Detail[${index}].vTemporalCode`, val.vTempCode)
+          
         );
       });
 
-    tempFile?.map((val, index) => {
-      return (
-        dataForm.append(`DtlAttach[${index}].vTemporalCode`, val.vTempCode),
-        dataForm.append(`DtlAttach[${index}].fAttchContent`, val.dtlFIle)
-      );
-    });
+    }
 
-    // fetch(apiUrl + "api/Package/SubmitPackage", {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `bearer ${getToken}`,
-    //     Accept: "*/*",
-    //   },
-    //   body: dataForm,
-    // }).then((resp) => {
-    //   if (resp.ok) {
-    //     alert("berhasil");
-    //     window.location.reload();
-    //   } else {
-    //     alert("something wrong : " + resp.status);
-    //   }
-    // });
+    
+
+      if(tempFile.length > 0){
+        tempFile.map((val, index) => {
+          return (
+            dataForm.append(`DtlAttach[${index}].vAttchName`, val.vAttchName),
+              dataForm.append(`DtlAttach[${index}].vRemarks`, val.vRemarks),
+              dataForm.append(
+                `DtlAttach[${index}].vAttchId`,
+                dataHeader?.vPackageId !== "" ? val.vAttchId : ""
+              ),
+            dataForm.append(`DtlAttach[${index}].vTemporalCode`, val.vTempCode),
+            dataForm.append(`DtlAttach[${index}].fAttchContent`, val.dtlFIle)
+          );
+        });
+      }
+
+      if(respFile.length > 0){
+        respFile.map((val,index) => {
+          return (
+            dataForm.append(`Response[${index}].vStepId`, val.vStepId),
+            dataForm.append(`Response[${index}].vAttchName`, val.vAttchName),
+            dataForm.append(`Response[${index}].vRemarks`, val.vRemark),
+            dataForm.append(`Response[${index}].vAttchId`, val.vAttchId),
+            dataForm.append(`Response[${index}].fAttchContent`, val.fAttchContent)
+          )
+        })
+      }
+
+    
+
+    fetch(apiUrl + "api/Package/SubmitPackage", {
+      method: "POST",
+      headers: {
+        Authorization: `bearer ${getToken}`,
+        Accept: "*/*",
+      },
+      body: dataForm,
+    }).then((resp) => {
+      if (resp.ok) {
+        alert("berhasil");
+        window.location.reload();
+      } else {
+        alert("something wrong : " + resp.status);
+      }
+    });
   };
 
   const Item = styled(Paper)(({ theme }) => ({
@@ -374,6 +434,24 @@ export default function AffcoUpload() {
         <AccordionDetails>
           <Box component="form" onSubmit={handleSubmitFilter}>
             <Stack direction={"row"}>
+            <Item elevation={0}>
+                  <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+                    <InputLabel id="year">Select Periode Year</InputLabel>
+                    <Select
+                      labelId="year"
+                      name="vYear"
+                      value={year}
+                      label="Select Periode Year"
+                      onChange={handleChangeYear}
+                    >
+                      { generateYears().map((val,index) => {
+                        return (
+                          <MenuItem key={index} value={val}>{val}</MenuItem>
+                        )
+                      })}
+                    </Select>
+                  </FormControl>
+                </Item>
               <Item elevation={0}>
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <InputLabel id="month">Select Periode Month</InputLabel>
@@ -385,18 +463,11 @@ export default function AffcoUpload() {
                     onChange={handleChangeMonth}
                     error={hasErrorMonth}
                   >
-                    <MenuItem value="1">Januari</MenuItem>
-                    <MenuItem value="2">Februari</MenuItem>
-                    <MenuItem value="3">Maret</MenuItem>
-                    <MenuItem value="4">April</MenuItem>
-                    <MenuItem value="5">Mei</MenuItem>
-                    <MenuItem value="6">Juni</MenuItem>
-                    <MenuItem value="7">Juli</MenuItem>
-                    <MenuItem value="8">Agustus</MenuItem>
-                    <MenuItem value="9">September</MenuItem>
-                    <MenuItem value="10">Oktober</MenuItem>
-                    <MenuItem value="11">November</MenuItem>
-                    <MenuItem value="12">Desember</MenuItem>
+                    { generateMonths.map((val) => {
+                      return (
+                        <MenuItem key={val.id} value={val.id}>{val.name}</MenuItem>
+                      )
+                    })}
                   </Select>
                   {hasErrorMonth && (
                     <FormHelperText sx={{ color: "red" }}>
@@ -404,28 +475,7 @@ export default function AffcoUpload() {
                     </FormHelperText>
                   )}
                 </FormControl>
-              </Item>
-              <Item elevation={0}>
-                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-                  <InputLabel id="year">Select Periode Year</InputLabel>
-                  <Select
-                    labelId="year"
-                    name="vYear"
-                    value={year}
-                    label="year"
-                    onChange={handleChangeYear}
-                    error={hasErrorYear}
-                  >
-                    <MenuItem value="2024">2024</MenuItem>
-                    <MenuItem value="2023">2023</MenuItem>
-                  </Select>
-                  {hasErrorYear && (
-                    <FormHelperText sx={{ color: "red" }}>
-                      This is required!
-                    </FormHelperText>
-                  )}
-                </FormControl>
-              </Item>
+              </Item>              
               <Item elevation={0}>
                 <Button type="submit" variant="contained" sx={{ m: 1 }}>
                   Filter
@@ -446,60 +496,79 @@ export default function AffcoUpload() {
               <Item elevation={0}>
                 <Stepper nonLinear activeStep={activeStep} alternativeLabel>
                   {dataHeader.vPackageId !== ""
-                    ? dataFile.filter((x) => x.status !== "Draft").map((val, index) => {
-                        const iconProps: {
-                          active?: boolean;
-                          completed?: boolean;
-                        } = {};
-                        const labelProps: {
-                          optional?: React.ReactNode;
-                        } = {};
-                        if (val.status === "Submitted") {
-                          iconProps.active = true;
-                          labelProps.optional = (
-                            <Typography variant="caption" color="blue">
-                              Waiting for Approval
-                            </Typography>
+                    ? dataFile
+                        .reduce((acc: IStepProps[], current) => {
+                          const x = acc.find(
+                            (item) => item.stepid === current.stepid
                           );
-                        } else {
-                          if (val.status === "Revised") {
-                            iconProps.completed = true;
-                            labelProps.optional = (
-                              <Typography variant="caption" color="red">
-                                Revised
-                              </Typography>
-                            );
-                          } else if (val.status === "Approved") {
-                            iconProps.completed = true;
-                            labelProps.optional = (
-                              <Typography variant="caption" color="green">
-                                Approved
-                              </Typography>
-                            );
+                          if (!x) {
+                            return acc.concat([current]);
                           } else {
+                            return acc;
+                          }
+                        }, [])
+                        .filter((x) => x.status !== "Draft")
+                        .map((val, index) => {
+                          const iconProps: {
+                            active?: boolean;
+                            completed?: boolean;
+                          } = {};
+                          const labelProps: {
+                            optional?: React.ReactNode;
+                          } = {};
+                          if (val.status === "Submitted") {
                             iconProps.active = true;
                             labelProps.optional = (
                               <Typography variant="caption" color="blue">
                                 Waiting for Approval
                               </Typography>
                             );
+                          } else {
+                            if (val.status === "Revised") {
+                              iconProps.completed = true;
+                              labelProps.optional = (
+                                <Typography variant="caption" color="red">
+                                  Revised
+                                </Typography>
+                              );
+                            } else if (val.status === "Approved") {
+                              iconProps.completed = true;
+                              labelProps.optional = (
+                                <Typography variant="caption" color="green">
+                                  Approved
+                                </Typography>
+                              );
+                            } else {
+                              iconProps.active = true;
+                              labelProps.optional = (
+                                <Typography variant="caption" color="blue">
+                                  Waiting for Approval
+                                </Typography>
+                              );
+                            }
                           }
-                        }
-                        return (
-                          <Step key={val.stepid} {...iconProps} sx={val.status === "Approved" ? { "& .Mui-completed": { color: "green" } } : { "& .Mui-completed": { color: "red" } }}>
-                            <StepButton
-                              color="inherit"
-                              onClick={handleStep(index, val.stepid)}
-                              {...labelProps}
+                          return (
+                            <Step
+                              key={val.stepid}
+                              {...iconProps}
+                              sx={
+                                val.status === "Approved"
+                                  ? { "& .Mui-completed": { color: "green" } }
+                                  : { "& .Mui-completed": { color: "red" } }
+                              }
                             >
-                              {val.stepid}
-                            </StepButton>
-                            
-                          </Step>
-                        );
-                      })
+                              <StepButton
+                                color="inherit"
+                                onClick={handleStep(index, val.stepid)}
+                                {...labelProps}
+                              >
+                                {val.stepid}
+                              </StepButton>
+                            </Step>
+                          );
+                        })
                     : steps.map((label, index) => (
-                        <Step key={label.id} completed={completed[index] }>
+                        <Step key={label.id} completed={completed[index]}>
                           <StepButton
                             color="inherit"
                             onClick={handleStep(index, label.label)}
@@ -510,7 +579,27 @@ export default function AffcoUpload() {
                       ))}
                 </Stepper>
               </Item>
-              {stepData !== "" ? (
+              {stepData !== "" && dataHeader?.vPackageId === "" ? (
+                <Box
+                  {...getRootProps()}
+                  sx={{
+                    border: "0.5px dashed #ccc",
+                    borderRadius: "4px",
+                    padding: "20px",
+                    height: "200px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <input {...getInputProps()} />
+                  <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
+                    Drag 'n' drop some files here, or click to select files
+                  </Typography>
+                </Box>
+              ) : stepData !== "" && dataHeader?.vPackageId !== "" && allowUpload ? (
                 <Box
                   {...getRootProps()}
                   sx={{
@@ -546,7 +635,7 @@ export default function AffcoUpload() {
                 >
                   <input {...getInputProps()} />
                   <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
-                    Select Step for upload
+                    { submitData.length === submitData.filter((x) => x.status === "Approved").length ? "All Aspack Approved" : stepData !== "" && !allowUpload ? "upload disabled" : "Select Step for upload"  }
                   </Typography>
                 </Box>
               )}
@@ -576,19 +665,38 @@ export default function AffcoUpload() {
                           columns={columnHistoryUpload}
                           data={dataFile.filter((v) => v.stepid === stepData)}
                           renderBottomToolbarCustomActions={() => {
+                            const dataCount = (dataFile.reduce((acc:IStepProps[], current) => {
+                              const x = acc.find(item => item.stepid === current.stepid);
+                              if (!x) {
+                                return acc.concat([current]);
+                              } else {
+                                return acc;
+                              }
+                            }, [])).length;
+                            
                             const countStep = dataStep?.length;
-                            const countRevise = dataFile.filter((v) => v.status === "Revised").length
-                            const countApproved = dataFile.filter((v) => v.status === "Approved").length
-                            const countDraft = dataFile.filter((v) => v.status === "Draft").length
+                            const countRevise = dataFile.filter(
+                              (v) => v.status === "Revised" && v.stepid === stepData
+                            ).length;                            
+                            const countDraft = dataFile.filter(
+                              (v) => v.status === "Draft" && v.stepid === stepData
+                            ).length; 
+                            
+                            const countApproved = dataFile.filter(
+                              (v) => v.status === "Approved" && v.stepid === stepData
+                            ).length;
 
                             return (
                               <Button
                                 variant="contained"
                                 disabled={
                                   dataHeader?.vPackageId === "" &&
-                                  dataFile?.length === countStep
+                                  dataCount === countStep
                                     ? false
-                                    : dataHeader?.vPackageId !== "" && dataFile?.length === countApproved ? false : dataHeader?.vPackageId !== "" && countRevise === countDraft ? false :true
+                                    : dataHeader?.vPackageId !== "" &&
+                                      countRevise > 0 && countDraft > 0 && countApproved === 0
+                                    ? false
+                                    : true
                                 }
                                 onClick={handleSubmitFiles}
                               >

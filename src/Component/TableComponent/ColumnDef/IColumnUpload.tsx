@@ -1,5 +1,6 @@
 import { MRT_ColumnDef } from "material-react-table";
 import {  IStepProps } from "../../Interface/DataUpload";
+import { Button } from "@mui/material";
 
 export const columnWaiting: MRT_ColumnDef<(IStepProps)>[] = [
     {
@@ -81,5 +82,26 @@ export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
     {
         accessorKey: "status",
         header: "Status"
+    },
+    {
+        header: "Action",
+        Cell: ({cell}) => {
+            return (
+                <Button variant="contained" size="small" color="inherit">Preview</Button>
+            )
+        }
+    },
+    {
+        header: "Remarks",
+        Cell: ({cell}) => {
+
+            if(cell.row.original.status === "Revised"){
+                return (
+                    <Button variant="contained" size="small" color="success">{cell.row.original.filename}</Button>
+                
+                )
+            }
+            
+        }
     }
 ]

@@ -90,6 +90,7 @@ export default function Recent() {
               vConsolidateCategory: val.vConsolidateCategory,
               dCrea: val.dCrea,
               vCrea: val.vCrea,
+              bActive: val.bActive
             };
           })
         );

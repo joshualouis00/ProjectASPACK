@@ -4,6 +4,10 @@ import IDataAffco from "../../Interface/DataAffco";
 import { IConsNewsProps } from "../../Interface/DataTemplate";
 
 export const columnMasterUser: MRT_ColumnDef<IDataUser>[] = [
+  { header: "#", 
+    Cell: ({ row }) => row.index + 1 ,
+    size: 50
+  },
     {
         accessorKey: "id",
         header: "ID",
@@ -27,10 +31,10 @@ export const columnMasterUser: MRT_ColumnDef<IDataUser>[] = [
 ]
 
 export const columnMasterAffco: MRT_ColumnDef<IDataAffco>[] = [
-    {
-        accessorKey: "no",
-        header: "No",
-      },
+  { header: "#", 
+    Cell: ({ row }) => row.index + 1 ,
+    size: 50
+  },
       {
         accessorKey: "id",
         header: "ID",

@@ -10,3 +10,9 @@ export interface IAddAffcoProps {
   open: boolean;
   onClose: () => void;
 }
+
+export interface IAffcoProps {
+  open: boolean;
+  onClose: () => void;
+  data: IDataAffco;
+}

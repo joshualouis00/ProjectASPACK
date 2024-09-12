@@ -711,7 +711,7 @@ export default function AspackAprroval() {
                   </CustomTabs>
                 </Box>
               ) : (
-                <h1>Belum ada isi</h1>
+                <h1>Select filter to show data</h1>
               )}
             </Item>
           </Stack>

@@ -20,7 +20,7 @@ import "react-multi-carousel/lib/styles.css";
 import React from "react";
 import ButtonAddNews from "../Component/ButtonAddNews";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { apiUrl, getRole, getToken } from "../Component/TemplateUrl";
+import { apiUrl, generateMonths, generateYears, getRole, getToken } from "../Component/TemplateUrl";
 import { IConsNewsProps } from "../Component/Interface/DataTemplate";
 
 export default function Recent() {
@@ -109,6 +109,24 @@ export default function Recent() {
           ) : null}
           <Item elevation={0}>
             <Stack direction={"row"}>
+            <Item elevation={0}>
+                <FormControl sx={{ minWidth: 200 }} size="small">
+                  <InputLabel id="year">Select Periode Year</InputLabel>
+                  <Select
+                    labelId="year"
+                    name="vYear"
+                    value={year}
+                    label="year"
+                    onChange={handleChangeYear}
+                  >
+                    { generateYears().map((val,index) => {
+                        return (
+                          <MenuItem key={index} value={val}>{val}</MenuItem>
+                        )
+                      })}
+                  </Select>
+                </FormControl>
+              </Item>
               <Item elevation={0}>
                 <FormControl sx={{ minWidth: 200 }} size="small">
                   <InputLabel id="month">Select Periode Month</InputLabel>
@@ -119,26 +137,14 @@ export default function Recent() {
                     label="Select Periode Month"
                     onChange={handleChangeMonth}
                   >
-                    <MenuItem value="januari">Januari</MenuItem>
-                    <MenuItem value="februari">Februari</MenuItem>
+                    { generateMonths.map((val) => {
+                      return (
+                        <MenuItem key={val.id} value={val.id}>{val.name}</MenuItem>
+                      )
+                    })}
                   </Select>
                 </FormControl>
-              </Item>
-              <Item elevation={0}>
-                <FormControl sx={{ minWidth: 200 }} size="small">
-                  <InputLabel id="year">Select Periode Year</InputLabel>
-                  <Select
-                    labelId="year"
-                    name="vYear"
-                    value={year}
-                    label="year"
-                    onChange={handleChangeYear}
-                  >
-                    <MenuItem value="2024">2024</MenuItem>
-                    <MenuItem value="2023">2023</MenuItem>
-                  </Select>
-                </FormControl>
-              </Item>
+              </Item>              
             </Stack>
           </Item>
           <Item elevation={0}>

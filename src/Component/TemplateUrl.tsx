@@ -1,3 +1,7 @@
+import { Alert, Snackbar } from "@mui/material";
+import { ISnackProps } from "./Interface/DataTemplate";
+import useHandleUnauthorized from "./handleUnauthorized";
+
 export const apiUrl = "http://192.168.1.207:9030/";
 export const getToken = localStorage.getItem('token');
 export const getRole = localStorage.getItem('Role');
@@ -12,18 +16,18 @@ export const generateYears = () => {
   };
 
 export const generateMonths = [
-  { id: 1, name: "Januari" },
-  { id: 2, name: "Februari" },
-  { id: 3, name: "Maret" },
+  { id: 1, name: "January" },
+  { id: 2, name: "February" },
+  { id: 3, name: "March" },
   { id: 4, name: "April" },
-  { id: 5, name: "Mei" },
-  { id: 6, name: "Juni" },
-  { id: 7, name: "Juli" },
-  { id: 8, name: "Agustus" },
+  { id: 5, name: "May" },
+  { id: 6, name: "June" },
+  { id: 7, name: "July" },
+  { id: 8, name: "August" },
   { id: 9, name: "September" },
-  { id: 10, name: "Oktober" },
+  { id: 10, name: "October" },
   { id: 11, name: "November" },
-  { id: 12, name: "Desember" }
+  { id: 12, name: "December" }
 ];
 
 export const generateCategory = [
@@ -31,3 +35,23 @@ export const generateCategory = [
   { id: "KAT1", name: "Kategori 1"},
   { id: "KAT2", name: "Kategori 2"}
 ]
+
+export function CustomSnackBar(props: ISnackProps){
+  const { open, message, error, onClose } = props
+
+  return (
+    <Snackbar
+                open={open}
+                onClose={onClose}                
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                autoHideDuration={5000}
+              >
+                <Alert
+                  severity={error ? "error" : "success"}
+                  sx={{ width: "100%" }}
+                >
+                  {message}
+                </Alert>
+              </Snackbar>
+  )
+}

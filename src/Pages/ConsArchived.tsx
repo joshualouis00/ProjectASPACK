@@ -23,168 +23,10 @@ import {
 } from "../Component/Interface/DataTemplate";
 import React from "react";
 import { columnConsNews } from "../Component/TableComponent/ColumnDef/IColumnMaster";
-import { apiUrl, generateCategory, getToken } from "../Component/TemplateUrl";
+import { apiUrl, CustomSnackBar, generateCategory, getToken } from "../Component/TemplateUrl";
 import CloseIcon from "@mui/icons-material/Close";
 
-function EditConsNews(props: IConsProps) {
-  const { open, onClose, data } = props;
-  const [vTitle, setVTitle] = React.useState("");
-  const [vSubTitle, setVSubTitle] = React.useState("");
-  const [vDesc, setVDesc] = React.useState("");
-  const [vCategory, setVCategory] = React.useState("");
-  const [vStatus, setVStatus] = React.useState(false);
-  const [vId, setVId] = React.useState("");  
-  
 
-  React.useEffect(() => {
-    setVTitle(data.vTitle);
-    setVSubTitle(data.vSubTitle);
-    setVDesc(data.vDescription);
-    setVCategory(data.vConsolidateCategory);
-    setVStatus(data.bActive);
-    setVId(data.uUid);
-    
-  }, [data]);
-
-  const submitEditConsNews = () => {
-    const editForm = new FormData();
-
-    editForm.append("uUid", vId);
-    editForm.append("vTitle", vTitle);
-    editForm.append("vSubTitle", vSubTitle);
-    editForm.append("vDescription", vDesc);
-    editForm.append("vConsolidateCategory", vCategory);
-    editForm.append("bActive", vStatus ? "true" : "false");
-    fetch(apiUrl + "api/Consolidate/SubmitConsolidateNews", {
-      method: "POST",
-      headers: {
-        Authorization: `bearer ${getToken}`,
-        Accept: "*/*",
-      },
-      body: editForm,
-    }).then((resp) => {
-      if (resp.ok) {
-        
-        alert("Success");
-        onClose();        
-        window.location.reload();
-      } else {
-        alert("Failed");
-      }
-    });
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Edit Consolidate News</DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={(theme) => ({
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
-        })}
-      >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent dividers>
-        <FormControl fullWidth>
-          <FormLabel sx={{ m: 1 }}>Title</FormLabel>
-          <TextField
-            value={vTitle}
-            onChange={(val) => {
-              setVTitle(val.target.value);
-            }}
-            size="small"
-          />
-        </FormControl>
-        <FormControl fullWidth>
-          <FormLabel sx={{ m: 1 }}>Sub Title</FormLabel>
-          <TextField
-            value={vSubTitle}
-            onChange={(val) => {
-              setVSubTitle(val.target.value);
-            }}
-            size="small"
-          />
-        </FormControl>
-        <FormControl fullWidth>
-          <FormLabel sx={{ m: 1 }}>Description</FormLabel>
-          <TextField
-            multiline
-            rows={4}
-            value={vDesc}
-            onChange={(val) => {
-              setVDesc(val.target.value);
-            }}
-            size="small"
-          />
-        </FormControl>
-        <FormControl fullWidth size="small">
-          <FormLabel sx={{ m: 1 }}>Category News</FormLabel>
-
-          <Select
-            value={vCategory}
-            onChange={(val) => {
-              setVCategory(val.target.value);
-            }}
-          >
-            {generateCategory.map((val, index) => {
-              return <MenuItem key={index} value={val.id}>{val.name}</MenuItem>;
-            })}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <FormLabel sx={{ m: 1 }}>Status</FormLabel>
-          <RadioGroup
-            row
-            aria-labelledby="statusAffco"
-            name="statusAffco"
-            value={vStatus}
-            onChange={(val) => {
-              setVStatus(val.target.value === "true" ? true : false);
-            }}
-          >
-            <FormControlLabel
-              value={"true"}
-              control={<Radio />}
-              label="Active"
-            />
-            <FormControlLabel
-              value={"false"}
-              control={<Radio />}
-              label="Non Active"
-            />
-          </RadioGroup>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Box sx={{ m: 1 }}>
-          <Button
-            variant="contained"
-            size="small"
-            color="primary"
-            sx={{ m: 1 }}
-            onClick={submitEditConsNews}
-          >
-            Edit
-          </Button>
-          <Button
-            onClick={onClose}
-            variant="contained"
-            size="small"
-            color="inherit"
-            sx={{ m: 1 }}
-          >
-            Cancel
-          </Button>
-        </Box>
-      </DialogActions>
-    </Dialog>
-  );
-}
 export default function Archived() {
   const [dataCons, setDataCons] = React.useState<IConsNewsProps[]>([]);
   const [open, setOpen] = React.useState(false);
@@ -199,8 +41,177 @@ export default function Archived() {
     vConsolidateCategory: "",
     bActive: false,
   });
+  const [message, setMessage] = React.useState("");
+    const [openSnack, setOpenSnack] = React.useState(false);
+    const [error, setError] = React.useState(false); 
 
-  React.useEffect(() => {
+  function EditConsNews(props: IConsProps) {
+    const { open, onClose, data } = props;
+    const [vTitle, setVTitle] = React.useState("");
+    const [vSubTitle, setVSubTitle] = React.useState("");
+    const [vDesc, setVDesc] = React.useState("");
+    const [vCategory, setVCategory] = React.useState("");
+    const [vStatus, setVStatus] = React.useState(false);
+    const [vId, setVId] = React.useState(""); 
+    
+    
+  
+    React.useEffect(() => {
+      setVTitle(data.vTitle);
+      setVSubTitle(data.vSubTitle);
+      setVDesc(data.vDescription);
+      setVCategory(data.vConsolidateCategory);
+      setVStatus(data.bActive);
+      setVId(data.uUid);
+      
+    }, [data]);
+  
+    const submitEditConsNews = () => {
+      const editForm = new FormData();
+  
+      editForm.append("uUid", vId);
+      editForm.append("vTitle", vTitle);
+      editForm.append("vSubTitle", vSubTitle);
+      editForm.append("vDescription", vDesc);
+      editForm.append("vConsolidateCategory", vCategory);
+      editForm.append("bActive", vStatus ? "true" : "false");
+      fetch(apiUrl + "api/Consolidate/SubmitConsolidateNews", {
+        method: "POST",
+        headers: {
+          Authorization: `bearer ${getToken}`,
+          Accept: "*/*",
+        },
+        body: editForm,
+      }).then((resp) => {
+        if (resp.ok) {
+          fetchConsNews()
+          setMessage("Consolidate news edited successfully.")
+          setOpenSnack(true)
+          setError(false)
+          onClose()     
+          
+        } else {
+          setMessage("Consolidate news failed to edit.")
+          setOpenSnack(true)
+          setError(true)
+          onClose()
+        }
+      });
+    };
+  
+    return (
+      <Dialog open={open} onClose={onClose} fullWidth>
+        <DialogTitle>Edit Consolidate News</DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={(theme) => ({
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: theme.palette.grey[500],
+          })}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent dividers>
+          <FormControl fullWidth>
+            <FormLabel sx={{ m: 1 }}>Title</FormLabel>
+            <TextField
+              value={vTitle}
+              onChange={(val) => {
+                setVTitle(val.target.value);
+              }}
+              size="small"
+            />
+          </FormControl>
+          <FormControl fullWidth>
+            <FormLabel sx={{ m: 1 }}>Sub Title</FormLabel>
+            <TextField
+              value={vSubTitle}
+              onChange={(val) => {
+                setVSubTitle(val.target.value);
+              }}
+              size="small"
+            />
+          </FormControl>
+          <FormControl fullWidth>
+            <FormLabel sx={{ m: 1 }}>Description</FormLabel>
+            <TextField
+              multiline
+              rows={4}
+              value={vDesc}
+              onChange={(val) => {
+                setVDesc(val.target.value);
+              }}
+              size="small"
+            />
+          </FormControl>
+          <FormControl fullWidth size="small">
+            <FormLabel sx={{ m: 1 }}>Category News</FormLabel>
+  
+            <Select
+              value={vCategory}
+              onChange={(val) => {
+                setVCategory(val.target.value);
+              }}
+            >
+              {generateCategory.map((val, index) => {
+                return <MenuItem key={index} value={val.id}>{val.name}</MenuItem>;
+              })}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <FormLabel sx={{ m: 1 }}>Status</FormLabel>
+            <RadioGroup
+              row
+              aria-labelledby="statusAffco"
+              name="statusAffco"
+              value={vStatus}
+              onChange={(val) => {
+                setVStatus(val.target.value === "true" ? true : false);
+              }}
+            >
+              <FormControlLabel
+                value={"true"}
+                control={<Radio />}
+                label="Active"
+              />
+              <FormControlLabel
+                value={"false"}
+                control={<Radio />}
+                label="Non Active"
+              />
+            </RadioGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Box sx={{ m: 1 }}>
+            <Button
+              variant="contained"
+              size="small"
+              color="primary"
+              sx={{ m: 1 }}
+              onClick={submitEditConsNews}
+            >
+              Edit
+            </Button>
+            <Button
+              onClick={onClose}
+              variant="contained"
+              size="small"
+              color="inherit"
+              sx={{ m: 1 }}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+  const fetchConsNews = () => {
     fetch(apiUrl + "api/Consolidate/GetConsolidateNews", {
       method: "GET",
       headers: {
@@ -224,7 +235,12 @@ export default function Archived() {
           })
         );
       });
-    });
+    })
+
+  }
+
+  React.useEffect(() => {
+    fetchConsNews()
   }, []);
 
   const handleClickEdit = (data: IConsNewsProps) => {
@@ -236,6 +252,11 @@ export default function Archived() {
     <Box>
       <ButtonAddNews />
       <br />
+      {
+        message && (
+          <CustomSnackBar open={openSnack} onClose={() => { setOpenSnack(false)}} message={message} error={error}/>
+        )
+      }
       <MaterialReactTable
         columns={columnConsNews}
         data={dataCons}

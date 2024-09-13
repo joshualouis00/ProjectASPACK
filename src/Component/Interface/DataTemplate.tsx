@@ -23,3 +23,10 @@ export interface IConsProps{
     onClose: () => void,
     data: IConsNewsProps
 }
+
+export interface ISnackProps {
+    open: boolean,
+    message: string,
+    error: boolean,
+    onClose: () => void
+}

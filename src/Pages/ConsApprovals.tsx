@@ -47,6 +47,7 @@ import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 export default function AspackAprroval() {
   const dataMonth = new Date().getMonth();
@@ -66,58 +67,78 @@ export default function AspackAprroval() {
   const [open, setOpen] = React.useState(false);
   const [index, setIndex] = React.useState<number>(0);  
   const [dataResponse, setDataResponse] = React.useState<IRespFile[]>([]);
+  const [filterCategory, setFilterCategory] = React.useState("")
 
+  const navigate = useHandleUnauthorized()
 
-  React.useEffect(() => {
+  const fetchAffcoFilter = () => {
     fetch(apiUrl + "api/Package/GeneratePICAffcoFilter", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken}`,
       },
     }).then((resp) => {
-      resp.json().then((valData) => {
-        setAffco(
-          valData.data.map((val, index) => {
-            return {
-              no: index + 1,
-              id: val.vAffcoId,
-              name: val.vAffcoName,
-              category: val.vAffcoCategory,
-              status: "Active" 
-            };
-          })
-        );
-      });
-    });
 
+      if(resp.ok){
+        resp.json().then((valData) => {
+          setAffco(
+            valData.data.map((val, index) => {
+              return {
+                no: index + 1,
+                id: val.vAffcoId,
+                name: val.vAffcoName,
+                category: val.vAffcoCategory,
+                status: "Active" 
+              };
+            })
+          );
+        });
+      } else {
+        navigate()
+      }
+      
+    })
+  }
+
+  const fetchStep = () => {    
     fetch(apiUrl + "api/WorkflowStep/getStep", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken}`,
       },
     }).then((resp) => {
-      resp.json().then((valData) => {
-        const data = valData.data;
-        setTemplate(
-          data.map((val, index) => {
-            return {
-              id: val.vStepId,
-              name: val.vStepDesc,
-              category: val.vAffcoCtgry,
-              filetype: val.vAttType,
-              status: val.bActive,
-            };
-          })
-        );
-      });
-    });
+
+      if(resp.ok){
+        resp.json().then((valData) => {
+          const data = valData.data;
+          setTemplate(
+            data.map((val, index) => {
+              return {
+                id: val.vStepId,
+                name: val.vStepDesc,
+                category: val.vAffcoCtgry,
+                filetype: val.vAttType,
+                status: val.bActive,
+              };
+            })
+          );
+        });
+      } else {
+        navigate()
+      }
+      
+    })
+
+  }
+
+
+  React.useEffect(() => {
+    fetchAffcoFilter()
+    fetchStep()
   }, []);
 
-  const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (year !== "" && vAffco !== undefined) {
-      setStatus(true);
-      fetch(
+  const fetchGetPackage = () => {
+    fetch(
         apiUrl +
           `api/Package/getPackage?nYear=${year}&nMonth=${month}&vAffcoId=${vAffco?.id}`,
         {
@@ -127,69 +148,83 @@ export default function AspackAprroval() {
           },
         }
       ).then((resp) => {
-        resp.json().then((valData) => {
-          setDataHeader({
-            vPackageId: valData.header.vPackageId,
-            iMonth: valData.header.iMonth,
-            iYear: valData.header.iYear,
-            iStatus: valData.header.iStatus,
-            vAffcoId: valData.header.vAffcoId,
+        if(resp.ok){
+          resp.json().then((valData) => {
+            setDataHeader({
+              vPackageId: valData.header.vPackageId,
+              iMonth: valData.header.iMonth,
+              iYear: valData.header.iYear,
+              iStatus: valData.header.iStatus,
+              vAffcoId: valData.header.vAffcoId,
+            });
+  
+            if (valData.header.vPackageId !== "") {
+              setDataAffco(
+                valData.detail.map((dtl) => {
+                  return {
+                    filename:
+                      dtl.fPackageFile.length > 0
+                        ? dtl.fPackageFile[0].vAttchName
+                        : "",
+                    createDate:
+                      dtl.fPackageFile.length > 0
+                        ? dtl.fPackageFile[0].dCrea
+                        : "",
+                    createBy:
+                      dtl.fPackageFile.length > 0
+                        ? dtl.fPackageFile[0].vCrea
+                        : "",
+                    docVersion:
+                      dtl.fPackageFile.length > 0
+                        ? "V" + dtl.fPackageFile.length
+                        : "",
+                    status:
+                      dtl.vStatus === "S"
+                        ? "Submitted"
+                        : dtl.vStatus === "A"
+                        ? "Approved"
+                        : dtl.vStatus === "R"
+                        ? "Revised"
+                        : "",
+                    stepid: dtl.vStepId,
+                    dApprover: dtl.dApprover,
+                    dDueDate: dtl.dDueDate,
+                    apprRemarks: dtl.vApprRemarks,
+                    userRemarks: dtl.vUsrRemarks,
+                    vTempCode: dtl.vTemporalCode,
+                    vAttachId: dtl.vAttchId
+                  };
+                })
+              );
+            } else {
+              setDataAffco([]);
+            }
           });
+        } else {
+          navigate()
+        }
+        
+      })
 
-          if (valData.header.vPackageId !== "") {
-            setDataAffco(
-              valData.detail.map((dtl) => {
-                return {
-                  filename:
-                    dtl.fPackageFile.length > 0
-                      ? dtl.fPackageFile[0].vAttchName
-                      : "",
-                  createDate:
-                    dtl.fPackageFile.length > 0
-                      ? dtl.fPackageFile[0].dCrea
-                      : "",
-                  createBy:
-                    dtl.fPackageFile.length > 0
-                      ? dtl.fPackageFile[0].vCrea
-                      : "",
-                  docVersion:
-                    dtl.fPackageFile.length > 0
-                      ? "V" + dtl.fPackageFile.length
-                      : "",
-                  status:
-                    dtl.vStatus === "S"
-                      ? "Submitted"
-                      : dtl.vStatus === "A"
-                      ? "Approved"
-                      : dtl.vStatus === "R"
-                      ? "Revised"
-                      : "",
-                  stepid: dtl.vStepId,
-                  dApprover: dtl.dApprover,
-                  dDueDate: dtl.dDueDate,
-                  apprRemarks: dtl.vApprRemarks,
-                  userRemarks: dtl.vUsrRemarks,
-                  vTempCode: dtl.vTemporalCode,
-                  vAttachId: dtl.vAttchId
-                };
-              })
-            );
-          } else {
-            setDataAffco([]);
-          }
-        });
-      });
+  }
+
+  const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();  
+    console.log("submit : ", status)
+    console.log("affco : ", vAffco)  
+    if (year !== "" && vAffco !== undefined ) {
+      console.log("masuk ke kondisi ini")
+      setStatus(true)
+      fetchGetPackage()      
     } else {
       if (year === "") {
         setHasErrorYear(true);
         setStatus(false);
       }
-      if (vAffco === undefined) {
+      if (vAffco === undefined) {        
         setHasErrorAffco(true);
         setStatus(false);
-      } else {
-        console.log("masuk ", vAffco);
-      }
+      } 
     }
   };
 
@@ -389,7 +424,7 @@ export default function AspackAprroval() {
       if(resp.ok){
         window.location.reload()
       } else {
-        alert("something wrong : " + resp.status)
+        navigate()
       }
     })
 
@@ -403,7 +438,7 @@ export default function AspackAprroval() {
         alignItems: "left",
       }}
     >
-      <Accordion>
+      <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           Filter Periode
         </AccordionSummary>
@@ -467,8 +502,20 @@ export default function AspackAprroval() {
                     isOptionEqualToValue={(option, value) => true}
                     value={vAffco}
                     onChange={(event, newValue) => {
-                      setHasErrorAffco(false);
+                      console.log("change : ", newValue);
+                      
+                      if(newValue === null){
+                        console.log("masuk ke null : ", status)
+                        setHasErrorAffco(true); 
+                        setStatus(false)                       
+                        setVAffco(newValue);
+
+                      }else{
+                        fetchGetPackage()
+                        setHasErrorAffco(false);
                       setVAffco(newValue);
+
+                      }
                     }}
                     disablePortal
                     options={affco}
@@ -518,17 +565,11 @@ export default function AspackAprroval() {
         <AccordionDetails>
           <Stack direction={"column"}>
             <Item elevation={0}>
-              {status === true ? (
+              {status === true && vAffco !== null ? (
                 <Box sx={{ width: "100%" }}>
                   <Stepper alternativeLabel activeStep={-1}>
-                    {template
-                      .filter(
-                        (val) =>
-                          val.category === vAffco?.category ||
-                          val.category === "All"
-                      )
-                      .map((value, index) => {
-                        const iconProps: {
+                    { dataHeader.vPackageId !== "" ? dataAffco.map((value,index) => {
+                      const iconProps: {
                           active?: boolean;
                           completed?: boolean;
                         } = {};
@@ -570,7 +611,7 @@ export default function AspackAprroval() {
                         }
                         return (
                           <Step
-                            key={value.name}
+                            key={value.stepid}
                             {...iconProps}
                             sx={
                               dataAffco.length > 0
@@ -588,11 +629,13 @@ export default function AspackAprroval() {
                                 },
                               }}
                             >
-                              {value.name}
+                              {value.stepid}
                             </StepLabel>
                           </Step>
-                        );
-                      })}
+                        )
+                    }) : template.filter((val) =>
+                          val.category === vAffco?.category ||
+                          val.category === "All").map((value,index) => { return (<Step key={value.name}><StepLabel>{value.name}</StepLabel></Step>)})}
                   </Stepper>
                   <Divider sx={{ marginTop: 3, marginBottom: 5 }} />
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -633,7 +676,7 @@ export default function AspackAprroval() {
                               <Button
                                 color="success"
                                 variant="contained"
-                                disabled={countSubmitted === 0 && dataHeader?.vPackageId !== "" ? false : true}
+                                disabled={countSubmitted === 0 && dataHeader?.vPackageId === "" && dataAffco.length > 0 ? false : true}
                                 onClick={submitApprovals}
                               >
                                 Submit Approval
@@ -711,7 +754,7 @@ export default function AspackAprroval() {
                   </CustomTabs>
                 </Box>
               ) : (
-                <h1>Select filter to show data</h1>
+                <h1>{ (status === true && vAffco === null) || (status === false && vAffco === null) ? "Select Affiliate Company to show data" : "Click filter to show data"}</h1>
               )}
             </Item>
           </Stack>

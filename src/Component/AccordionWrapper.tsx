@@ -14,7 +14,7 @@ import {
         <Typography variant="h6">{props.headerTitle}</Typography>
         <Divider sx={{ mt: "2px", mb: "7px" }} />
         
-        <Accordion>
+        <Accordion defaultExpanded>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"
           id="panel1-header">

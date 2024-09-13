@@ -42,10 +42,9 @@ import {
   columnMasterUser,
   columnMasterAffco,
 } from "../Component/TableComponent/ColumnDef/IColumnMaster";
-import { apiUrl, getToken } from "../Component/TemplateUrl";
+import { apiUrl, CustomSnackBar, getToken } from "../Component/TemplateUrl";
 import CloseIcon from "@mui/icons-material/Close";
-import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -83,6 +82,8 @@ export default function MstUserAffco() {
   const [message, setMessage] = React.useState("");
   const [openSnack, setOpenSnack] = React.useState(false);
   const [error, setError] = React.useState(false);
+
+  const navigate = useHandleUnauthorized()
 
   function AddUserDialog(props: IAddUserProps) {
     const { onClose, selectedValue, open, data } = props;
@@ -138,11 +139,16 @@ export default function MstUserAffco() {
           setError(false);
           onClose();
         } else {
-          fetchUser();
+          if(resp.status === 401){
+            navigate()
+          } else {
+            fetchUser();
           setMessage("Add User Failed.");
           setOpenSnack(true);
           setError(true);
           onClose();
+          }
+          
         }
       });
     };
@@ -502,11 +508,17 @@ export default function MstUserAffco() {
           setOpenSnack(true);
           onClose();
         } else {
-          fetchUser();
+          if(resp.status === 401){
+            navigate()
+          }
+          else {
+            fetchUser();
           setMessage("Edit Data Failed.");
           setError(true);
           setOpenSnack(true);
           onClose();
+          }
+          
         }
       });
     };
@@ -781,11 +793,17 @@ export default function MstUserAffco() {
             setOpenSnack(true);
             onClose();
           } else {
-            fetchAffco();
+            if(resp.status === 401){
+              navigate()
+            }
+            else {
+              fetchAffco();
             setMessage("Affco Added Failed.");
             setError(true);
             setOpenSnack(true);
             onClose();
+            }
+            
           }
         });
       }
@@ -932,11 +950,17 @@ export default function MstUserAffco() {
           setOpenSnack(true);
           onClose();
         } else {
-          fetchAffco();
+          if(resp.status === 401){
+            navigate()
+          }
+          else{
+            fetchAffco();
           setMessage("Affco Edited Failed.");
           setError(true);
           setOpenSnack(true);
           onClose();
+          }
+          
         }
       })
 
@@ -1044,23 +1068,29 @@ export default function MstUserAffco() {
         Authorization: `Bearer ${getToken}`,
       },
     }).then((resp) => {
-      resp.json().then((valData) => {
-        setDataUser(
-          valData.map((val, index) => {
-            return {
-              id: val.vUserId,
-              name: val.vUserName,
-              email: val.vEmail,
-              role: val.vRole === "C" ? "Console" : "Affco",
-              status: val.bActive === true ? "Active" : "Nonactive",
-              ldapLogin: val.nUserLdap,
-              affcoId: val.vAffcoId,
-              vLdap: val.vLdap,
-              vPicAffco: val.vPicAffco,
-            };
-          })
-        );
-      });
+
+      if(resp.ok){
+        resp.json().then((valData) => {
+          setDataUser(
+            valData.map((val, index) => {
+              return {
+                id: val.vUserId,
+                name: val.vUserName,
+                email: val.vEmail,
+                role: val.vRole === "C" ? "Console" : "Affco",
+                status: val.bActive === true ? "Active" : "Nonactive",
+                ldapLogin: val.nUserLdap,
+                affcoId: val.vAffcoId,
+                vLdap: val.vLdap,
+                vPicAffco: val.vPicAffco,
+              };
+            })
+          );
+        });
+      } else {
+        navigate()
+      }
+      
     });
   };
   const fetchAffco = () => {
@@ -1069,19 +1099,25 @@ export default function MstUserAffco() {
         Authorization: `Bearer ${getToken}`,
       },
     }).then((resp) => {
-      resp.json().then((valData) => {
-        setDataAffco(
-          valData.map((val, index) => {
-            return {
-              no: index + 1,
-              id: val.vAffcoId,
-              name: val.vAffcoName,
-              category: val.vAffcoCtgry,
-              status: val.bActive === true ? "Active" : "Nonactive",
-            };
-          })
-        );
-      });
+
+      if(resp.ok){
+        resp.json().then((valData) => {
+          setDataAffco(
+            valData.map((val, index) => {
+              return {
+                no: index + 1,
+                id: val.vAffcoId,
+                name: val.vAffcoName,
+                category: val.vAffcoCtgry,
+                status: val.bActive === true ? "Active" : "Nonactive",
+              };
+            })
+          );
+        });
+      } else {
+        navigate()
+      }
+      
     });
   };
 
@@ -1132,28 +1168,14 @@ export default function MstUserAffco() {
             onChange={handleChange}
             aria-label="basic tabs example"
           >
-            <Tab label="Master User" {...a11yProps(0)} />
-            <Tab label="Master Affco" {...a11yProps(1)} />
+            <Tab label="Master User" {...a11yProps(0)} sx={{ borderRight: 1, borderRightStyle: "double"}}/>
+            <Tab label="Master Affco" {...a11yProps(1)} sx={{ borderRight: 1, borderRightStyle: "double"}}/>
           </Tabs>
         </Box>
         <CustomTabs value={value} index={0}>
           <Box>
             {message && (
-              <Snackbar
-                open={openSnack}
-                onClose={() => {
-                  setOpenSnack(false);
-                }}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                autoHideDuration={5000}
-              >
-                <Alert
-                  severity={error ? "error" : "success"}
-                  sx={{ width: "100%" }}
-                >
-                  {message}
-                </Alert>
-              </Snackbar>
+              <CustomSnackBar open={openSnack} message={message} error={error} onClose={() => { setOpenSnack(false)}}/>              
             )}
             <Stack direction={"column"}>
               <Item elevation={0}>
@@ -1209,21 +1231,7 @@ export default function MstUserAffco() {
         </CustomTabs>
         <CustomTabs value={value} index={1}>
         {message && (
-              <Snackbar
-                open={openSnack}
-                onClose={() => {
-                  setOpenSnack(false);
-                }}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                autoHideDuration={5000}
-              >
-                <Alert
-                  severity={error ? "error" : "success"}
-                  sx={{ width: "100%" }}
-                >
-                  {message}
-                </Alert>
-              </Snackbar>
+              <CustomSnackBar open={openSnack} message={message} error={error} onClose={() => { setOpenSnack(false)}}/>
             )}
           <Stack direction={"column"}>
             <Item elevation={0}>

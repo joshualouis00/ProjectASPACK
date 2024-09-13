@@ -11,6 +11,7 @@ export const columnMasterUser: MRT_ColumnDef<IDataUser>[] = [
     {
         accessorKey: "id",
         header: "ID",
+        size: 50
       },
       {
         accessorKey: "name",
@@ -23,10 +24,12 @@ export const columnMasterUser: MRT_ColumnDef<IDataUser>[] = [
       {
         accessorKey: "role",
         header: "Role",
+        size: 50
       },
       {
         accessorKey: "status",
         header: "Status",
+        size: 50
       }
 ]
 
@@ -38,18 +41,21 @@ export const columnMasterAffco: MRT_ColumnDef<IDataAffco>[] = [
       {
         accessorKey: "id",
         header: "ID",
+        size: 50
       },
       {
         accessorKey: "name",
-        header: "Affco Name",
+        header: "Name",
       },
       {
         accessorKey: "category",
-        header: "Affco Category",
+        header: "Category",
+        size: 50
       },
       {
         accessorKey: "status",
-        header: "Affco Status",
+        header: "Status",
+        size: 50
       }
 ]
 

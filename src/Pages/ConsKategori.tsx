@@ -17,7 +17,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import React from "react";
 import ButtonAddNews from "../Component/ButtonAddNews";
-import { apiUrl, getRole, getToken , generateYears} from "../Component/TemplateUrl";
+import { apiUrl, getRole, getToken , generateYears, generateMonths, generateCategory} from "../Component/TemplateUrl";
 import { IConsNewsProps } from "../Component/Interface/DataTemplate";
 export default function Kategori() {
   const responsive = {
@@ -111,24 +111,13 @@ export default function Kategori() {
                     label="Select Category"
                     onChange={handleChangeCategory}
                   >
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="kategori1">Kategori 1</MenuItem>
-                    <MenuItem value="kategori2">Kategori 2</MenuItem>
-                  </Select>
-                </FormControl>
-              </Item>
-              <Item elevation={0}>
-                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-                  <InputLabel id="month">Select Periode Month</InputLabel>
-                  <Select
-                    labelId="month"
-                    name="vMonth"
-                    value={month}
-                    label="Select Periode Month"
-                    onChange={handleChangeMonth}
-                  >
-                    <MenuItem value="januari">Januari</MenuItem>
-                    <MenuItem value="februari">Februari</MenuItem>
+                    {
+                  generateCategory.map((val,index) => {
+                    return (
+                      <MenuItem key={index} value={val.id}>{val.name}</MenuItem>
+                    )
+                  })
+                }
                   </Select>
                 </FormControl>
               </Item>
@@ -150,6 +139,25 @@ export default function Kategori() {
                     </Select>
                   </FormControl>
                 </Item>
+              <Item elevation={0}>
+                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+                  <InputLabel id="month">Select Periode Month</InputLabel>
+                  <Select
+                    labelId="month"
+                    name="vMonth"
+                    value={month}
+                    label="Select Periode Month"
+                    onChange={handleChangeMonth}
+                  >
+                    { generateMonths.map((val) => {
+                      return (
+                        <MenuItem key={val.id} value={val.id}>{val.name}</MenuItem>
+                      )
+                    })}
+                  </Select>
+                </FormControl>
+              </Item>
+              
             </Stack>
           </Item>
           <Item elevation={0}>

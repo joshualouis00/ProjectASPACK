@@ -292,21 +292,24 @@ export const DataWorkflow: React.FC = () => {
             onChange={(e) => setStepDescription(e.target.value)}
             required
           />
-          <TextField
-            select
-            margin="dense"
-            id="category"
-            label="Category"
-            fullWidth
-            variant="standard"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-          >
-            <MenuItem value="All">All</MenuItem>
-            <MenuItem value="ASSO JV">ASSO JV</MenuItem>
-            <MenuItem value="SUBS">SUBS</MenuItem>
-          </TextField>
+
+      <TextField
+        select
+        margin="dense"
+        id="category"
+        label="Category"
+        fullWidth
+        variant="standard"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        required
+        disabled={editMode}
+      >
+        <MenuItem value="All">All</MenuItem>
+        <MenuItem value="ASSO JV">ASSO JV</MenuItem>
+        <MenuItem value="SUBS">SUBS</MenuItem>
+      </TextField>
+    
           <TextField
             select
             margin="dense"

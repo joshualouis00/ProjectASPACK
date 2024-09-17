@@ -7,7 +7,7 @@ import { apiUrl, getToken } from "../TemplateUrl";
 import { FileDataUpload, AppTableProps } from "../Interface/MasterTemplates";
 
 
-const AppTable: React.FC<AppTableProps> = ({ files }) => {
+const AppTable: React.FC<AppTableProps & { uploadStatus: string | null }> = ({ files, uploadStatus }) => {
   const navigate = useHandleUnauthorized();
   const [showAlert, setShowAlert] = React.useState(false);
 
@@ -106,12 +106,14 @@ const AppTable: React.FC<AppTableProps> = ({ files }) => {
       Cell: ({ row }) => {
         const fileName = row.original.fileName;
         const vAttchId = row.original.vAttchId;
+        const fileStatus = row.original.status; 
         return (
           <Button
             onClick={() => downloadFile(fileName, vAttchId)}
             variant="outlined"
             color="info"
             size="small"
+            disabled={fileStatus === "Draft" || uploadStatus === "Upload successful"}
           >
             Download
           </Button>

@@ -39,6 +39,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
 
+  const [value, setValue] = React.useState('aspack');
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValue((event.target as HTMLInputElement).value);
+  };
+
   const navigate = useNavigate();
   const combine = password + userId;
   const encodeString = btoa(combine);
@@ -164,6 +170,8 @@ const Login: React.FC = () => {
                       row
                       aria-labelledby="portal-label"
                       name="portal-login"
+                      value={value}
+                      onChange={handleChange}
                     >
                       <FormControlLabel
                         value="capex"
@@ -172,7 +180,6 @@ const Login: React.FC = () => {
                           <Radio
                             size="small"
                             sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                            inputProps={{ "aria-label": "FACT" }}
                           />
                         }
                         label="CAPEX"

@@ -10,6 +10,7 @@ import { ITabContent, FileData } from "./Interface/MasterTemplates";
 const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, setFiles }) => {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [fileList, setFileList] = useState<FileData[]>(files);
+  const [isUploading, setIsUploading] = useState(false);
   const navigate = useHandleUnauthorized();
 
   useEffect(() => {
@@ -43,19 +44,19 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   const handleUpload = async () => {
+    setIsUploading(true);
     try {
       const formData = new FormData();
-
+  
       // Filter only files with "Draft" status for upload
       const draftFiles = fileList.filter(file => file.status === "Draft");
-
+  
       draftFiles.forEach((file, index) => {
         formData.append(`template[${index}].vAttchId`, "");
         formData.append(`template[${index}].vStepId`, vStepId);
         formData.append(`template[${index}].attachment[0].fFile`, file.file);
         formData.append(`template[${index}].attachment[0].vFileName`, file.fileName);
       });
-
       const response = await axios.post(
         apiUrl + "api/Template/AddTemplate",
         formData,
@@ -66,11 +67,10 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
           },
         }
       );
-
       if (response.status === 200) {
         setUploadStatus("Upload successful");
-        setTimeout(() => setUploadStatus(null), 5000);
-        await getTemplates(); // Update file list after successful upload
+        await getTemplates(); 
+        setTimeout(() => setUploadStatus(null), 5000); 
       }
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -81,8 +81,10 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
       } else {
         console.error("Error Add templates:", error);
       }
+    } finally {
+      setIsUploading(false); 
     }
-  };
+  };  
 
   const getTemplates = async () => {
     try {
@@ -124,6 +126,8 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
       }
     }
   };
+
+  const draftExists = fileList.some(file => file.status === "Draft");
   
   return (
     <Container
@@ -161,10 +165,11 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
         variant="contained"
         color="info"
         sx={{mb: 1}}
+        disabled={!draftExists || isUploading}
       >
         Submit
       </Button>
-      <AppTable files={fileList} />
+      <AppTable files={fileList} uploadStatus={uploadStatus}/>
       {uploadStatus && (
         <Typography
           variant="body1"

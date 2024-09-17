@@ -125,7 +125,7 @@ const MasterTemplate = () => {
 
   return (
     <ThemeProvider theme={CustomTheme}>
-      <Box>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
           onChange={handleChange}
@@ -152,6 +152,7 @@ const MasterTemplate = () => {
                 minWidth: "50px",
                 fontSize: "10px",
                 fontWeight: "bold",
+                borderRight: 1,
               }}
             />
           ))}

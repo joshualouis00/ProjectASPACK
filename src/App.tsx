@@ -85,6 +85,8 @@ const LeftDrawer = styled(MuiDrawer, {
       duration: theme.transitions.duration.enteringScreen,
     }),
     boxSizing: "border-box",
+    height: "100vh", // Ensures full viewport height, important for scrolling
+    overflowY: "auto", // Enable vertical scroll if content overflows
     ...(!open && {
       overflowX: "hidden",
       transition: theme.transitions.create("width", {
@@ -109,7 +111,18 @@ const LeftDrawer = styled(MuiDrawer, {
   },
 }));
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          overflow: 'hidden', // Disable overflow globally
+        },
+      },
+    },
+  },
+});
+
 
 const ProtectedRoute = ({ element }) => {
   const isToken = localStorage.getItem("token");

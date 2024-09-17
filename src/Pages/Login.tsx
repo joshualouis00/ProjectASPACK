@@ -38,7 +38,6 @@ const Login: React.FC = () => {
   const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-
   const [value, setValue] = React.useState('aspack');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,9 +69,7 @@ const Login: React.FC = () => {
       const { token } = resp.data;
       const decode = jwtDecode<CustomJwtPayload>(token);
 
-      if (token) {
-        console.log("Decode : " + JSON.stringify(decode, null, 2));
-        console.log("Data : " + JSON.stringify(resp.data, null, 2));        
+      if (token) {  
         localStorage.setItem("token", token);
         localStorage.setItem("UserID", decode.UserID);
         localStorage.setItem("UserName", decode.UserName);
@@ -95,7 +92,6 @@ const Login: React.FC = () => {
     setOpen(true);
   };
 
-  //Style
   const paperStyle = {
     padding: "10px",
     height: "58vh",

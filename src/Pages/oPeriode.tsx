@@ -74,7 +74,6 @@ const OpenPeriod: React.FC = () => {
         Authorization: `Bearer ` + getToken,
       },
     }).then((response) => {
-      console.log("ok gaes...", response.data.data);
       handleClose();
     }).catch((error) => {
       if (error.response && error.response.status === 401) {

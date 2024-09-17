@@ -3,24 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@cyntler/react-doc-viewer": "^1.16.6",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@handsontable/react": "^14.5.0",
     "@mui/icons-material": "^5.15.19",
     "@mui/material": "^5.15.19",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.98",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "bcrypt-ts": "^5.0.2",
     "clientapp": "file:",
-    "exceljs": "^4.4.0",
-    "google-auth-library": "^9.13.0",
-    "googleapis": "^140.0.1",
     "lodash": "^4.17.21",
     "marked": "^12.0.2",
     "material-react-table": "^2.13.0",
@@ -33,9 +26,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "typescript": "^4.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -62,7 +53,6 @@
     ]
   },
   "devDependencies": {
-    "@faker-js/faker": "^8.4.1",
     "@mui/lab": "^5.0.0-alpha.171",
     "@mui/x-date-pickers": "^7.9.0",
     "@tanstack/react-query": "^5.51.23",
@@ -74,7 +64,6 @@
     "jwt-decode": "^4.0.0",
     "luxon": "^3.4.4",
     "moment": "^2.30.1",
-    "pokenode-ts": "^1.20.0",
     "react-multi-carousel": "^2.8.5",
     "styled-components": "^6.1.12"
   }

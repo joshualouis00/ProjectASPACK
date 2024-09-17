@@ -1,5 +1,3 @@
-// src/components/WelcomePage.tsx
-
 import React, {useEffect} from "react";
 import { Container, Typography } from "@mui/material";
 import styled from "styled-components";

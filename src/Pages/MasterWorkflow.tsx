@@ -29,11 +29,8 @@ export const DataWorkflow: React.FC = () => {
   const [fileType, setFileType] = React.useState("");
   const [bactive, setBactive] = React.useState<boolean>(true);
   const [change, setChange] = React.useState<boolean>(false);
-
-  //Buat si Edit
   const [editMode, setEditMode] = React.useState(false);
   const [selectedStep, setselectedStep] = React.useState<Data | null>(null);
-
   const navigate = useHandleUnauthorized();
 
   React.useEffect(() => {
@@ -87,7 +84,6 @@ export const DataWorkflow: React.FC = () => {
     setBactive(true);
   };
 
-  //Add Step
   const handleSaveStep = async () => {
     const stepData = {
       vstepid:
@@ -309,7 +305,6 @@ export const DataWorkflow: React.FC = () => {
         <MenuItem value="ASSO JV">ASSO JV</MenuItem>
         <MenuItem value="SUBS">SUBS</MenuItem>
       </TextField>
-    
           <TextField
             select
             margin="dense"
@@ -325,7 +320,6 @@ export const DataWorkflow: React.FC = () => {
             <MenuItem value="PDF">PDF</MenuItem>
             <MenuItem value="Both">Both</MenuItem>
           </TextField>
-          {/* Tambahkan pilihan untuk bactive */}
           <TextField
             select
             margin="dense"

@@ -676,7 +676,7 @@ export default function AspackAprroval() {
                               <Button
                                 color="success"
                                 variant="contained"
-                                disabled={countSubmitted === 0 && dataHeader?.vPackageId === "" && dataAffco.length > 0 ? false : true}
+                                disabled={countSubmitted === 0 && dataHeader?.vPackageId !== "" && dataAffco.length > 0 ? false : true}
                                 onClick={submitApprovals}
                               >
                                 Submit Approval

@@ -145,9 +145,11 @@ export default function AffcoUpload() {
     const countRevise = dataFile.filter((x) => x.status === "Revised" && x.stepid === stepName)
     const isDraft = dataFile.filter((x) => x.status === "Draft" && x.stepid === stepName)
     const isApproved = dataFile.filter((x) => x.status === "Approved" && x.stepid === stepName)
-    if(dataHeader?.vPackageId !== "" && countRevise.length > 0 && isDraft.length < 1 && isApproved.length === 0){
+    const isSubmitted = dataFile.filter((x) => x.status === "Submitted" && x.stepid === stepName)
+    if(dataHeader?.vPackageId !== "" && countRevise.length > 0 && isDraft.length < 1 && isApproved.length === 0 && isSubmitted.length === 0){
       setAllowUpload(true)
     } else {
+      
       setAllowUpload(false)
     }
   };
@@ -164,6 +166,7 @@ export default function AffcoUpload() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log("allow upload : " , allowUpload)
     setTempData([])
     fetch(apiUrl + "api/WorkflowStep/getStep", {
       method: "GET",
@@ -364,9 +367,6 @@ export default function AffcoUpload() {
           )
         })
       }
-
-    
-
     fetch(apiUrl + "api/Package/SubmitPackage", {
       method: "POST",
       headers: {

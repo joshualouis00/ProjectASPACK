@@ -155,7 +155,7 @@ const MenuItems = (props: MenuItemsProps) => {
                 <ListItemIcon>
                   <FolderOpenOutlinedIcon color="inherit" />
                 </ListItemIcon>
-                <ListItemText primary="Kategori News" />
+                <ListItemText primary="Category News" />
               </ListItemButton>
             </List>
           </Collapse>

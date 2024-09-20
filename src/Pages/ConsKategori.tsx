@@ -1,9 +1,9 @@
 import { styled } from "@mui/material/styles";
 import {
-  Box,  
-  Card,  
-  CardContent,  
-  CardHeader,  
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
   FormControl,
   InputLabel,
   MenuItem,
@@ -17,7 +17,14 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import React from "react";
 import ButtonAddNews from "../Component/ButtonAddNews";
-import { apiUrl, getRole, getToken , generateYears, generateMonths, generateCategory} from "../Component/TemplateUrl";
+import {
+  apiUrl,
+  getRole,
+  getToken,
+  generateYears,
+  generateMonths,
+  generateCategory,
+} from "../Component/TemplateUrl";
 import { IConsNewsProps } from "../Component/Interface/DataTemplate";
 export default function Kategori() {
   const responsive = {
@@ -49,7 +56,7 @@ export default function Kategori() {
 
   const [month, setMonth] = React.useState("");
   const [year, setYear] = React.useState("");
-  const [category, setCategory] = React.useState("");
+  const [category, setCategory] = React.useState("ALL");
   const [dataNews, setDataNews] = React.useState<IConsNewsProps[]>([]);
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -83,7 +90,7 @@ export default function Kategori() {
               vConsolidateCategory: val.vConsolidateCategory,
               dCrea: val.dCrea,
               vCrea: val.vCrea,
-              bActive: val.bActive
+              bActive: val.bActive,
             };
           })
         );
@@ -94,7 +101,7 @@ export default function Kategori() {
     <div>
       <Box sx={{ width: "100%" }}>
         <Stack direction={"column"}>
-        {getRole === "C" ? (
+          {getRole === "C" ? (
             <Item elevation={0}>
               <ButtonAddNews />
             </Item>
@@ -107,38 +114,43 @@ export default function Kategori() {
                   <Select
                     labelId="category"
                     name="vCategory"
+                    defaultValue={category}
                     value={category}
                     label="Select Category"
                     onChange={handleChangeCategory}
                   >
-                    {
-                  generateCategory.map((val,index) => {
-                    return (
-                      <MenuItem key={index} value={val.id}>{val.name}</MenuItem>
-                    )
-                  })
-                }
+                    <MenuItem value="ALL">All</MenuItem>
+                    {generateCategory.map((val, index) => {
+                      return (
+                        <MenuItem key={index} value={val.id}>
+                          {val.name}
+                        </MenuItem>
+                      );
+                    })}
                   </Select>
                 </FormControl>
               </Item>
               <Item elevation={0}>
-                  <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-                    <InputLabel id="year">Select Periode Year</InputLabel>
-                    <Select
-                      labelId="year"
-                      name="vYear"
-                      value={year}
-                      label="Select Periode Year"
-                      onChange={handleChangeYear}
-                    >
-                      { generateYears().map((val,index) => {
-                        return (
-                          <MenuItem key={index} value={val}>{val}</MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                </Item>
+                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+                  <InputLabel id="year">Select Periode Year</InputLabel>
+                  <Select
+                    labelId="year"
+                    name="vYear"
+                    value={year}
+                    label="Select Periode Year"
+                    onChange={handleChangeYear}
+                  >
+                    <MenuItem value="">Select Periode Year</MenuItem>
+                    {generateYears().map((val, index) => {
+                      return (
+                        <MenuItem key={index} value={val}>
+                          {val}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Item>
               <Item elevation={0}>
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <InputLabel id="month">Select Periode Month</InputLabel>
@@ -149,61 +161,365 @@ export default function Kategori() {
                     label="Select Periode Month"
                     onChange={handleChangeMonth}
                   >
-                    { generateMonths.map((val) => {
+                    <MenuItem value="">Select Periode Month</MenuItem>
+                    {generateMonths.map((val) => {
                       return (
-                        <MenuItem key={val.id} value={val.id}>{val.name}</MenuItem>
-                      )
+                        <MenuItem key={val.id} value={val.id}>
+                          {val.name}
+                        </MenuItem>
+                      );
                     })}
                   </Select>
                 </FormControl>
               </Item>
-              
             </Stack>
           </Item>
           <Item elevation={0}>
-            <Carousel
-              swipeable={true}
-              draggable={true}
-              showDots={true}
-              responsive={responsive}
-              ssr={true} // means to render carousel on server-side.
-              infinite={true}
-              autoPlay={true}
-              autoPlaySpeed={2000}
-              keyBoardControl={true}
-              customTransition="all .5"
-              transitionDuration={500}
-              containerClass="carousel-container"
-              removeArrowOnDeviceType={["tablet", "mobile"]}
-              dotListClass="custom-dot-list-style"
-              itemClass="carousel-item-padding-40-px"
-            >
-              {dataNews?.map((item, index) => (
-                <Card
-                  sx={{
-                    maxWidth: 300,
-                    maxHeight: 300,
-                    marginBottom: 5,
-                    borderRadius: 3,
-                    marginTop: 1,
-                    marginLeft: 1,
-                    marginRight: 1,
-                  }}
-                  key={index}
-                >
-                  <CardHeader
-                    title={item.vTitle}
-                    subheader={item.vSubTitle}
-                    
-                  />
-                  <CardContent>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.vDescription}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </Carousel>
+            {category === "ALL" && year === "" && month === "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : category === "ALL" && year !== "" && month !== "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : category === "ALL" && year !== "" && month === "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year))).map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : category === "ALL" && year === "" && month !== "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : category !== "ALL" && year === "" && month === "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category)).map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : category !== "ALL" && year !== "" && month !== "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : category !== "ALL" && year !== "" && month === "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year))).map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : category !== "ALL" && year === "" && month !== "" ? (
+              <Carousel
+                swipeable={true}
+                draggable={true}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={true}
+                autoPlaySpeed={2000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                  <Card
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 300,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginLeft: 1,
+                      marginRight: 1,
+                    }}
+                    key={index}
+                  >
+                    <CardHeader
+                      title={item.vTitle}
+                      subheader={item.vSubTitle}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.vDescription}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Carousel>
+            ) : null}
           </Item>
         </Stack>
       </Box>

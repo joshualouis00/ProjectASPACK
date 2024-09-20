@@ -2,8 +2,10 @@ import styled from "@emotion/styled";
 import { ArrowBack, Create } from "@mui/icons-material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -33,6 +35,7 @@ export default function ButtonAddNews() {
   const [message, setMessage] = React.useState("");
     const [openSnack, setOpenSnack] = React.useState(false);
     const [error, setError] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -50,7 +53,8 @@ export default function ButtonAddNews() {
     const [hasErrorSub, setHasErrorSub] = React.useState(false);
     const [hasErrorDesc, setHasErrorDesc] = React.useState(false);
     const [hasErrorFile, setHasErrorFile] = React.useState(false);
-    const [hasErrorCat, setHasErrorCat] = React.useState(false);    
+    const [hasErrorCat, setHasErrorCat] = React.useState(false);  
+    const [btnCreate, setBtnCreate] = React.useState(false);  
   
     const handleChangeCategory = (event: SelectChangeEvent) => {
       if(event.target.value === ""){
@@ -115,6 +119,8 @@ export default function ButtonAddNews() {
       
       const dataForm = new FormData();
       if(title !== "" && subTitle !== "" && desc !== "" && dataFile !== undefined && category !== ""){
+        setBtnCreate(true);
+        setLoading(true);
         dataForm.append("uUid","");
       dataForm.append("vTitle", title);
       dataForm.append("vSubTitle", subTitle);
@@ -132,7 +138,8 @@ export default function ButtonAddNews() {
       }).then((resp) => {
         if(resp.ok){
           resp.json().then((val) => {
-            if(val.success){            
+            if(val.success){  
+              setLoading(false)          
               setCategory("")
               setTitle("");
               setSubTitle("");
@@ -142,11 +149,13 @@ export default function ButtonAddNews() {
               setError(false);
               setOpenSnack(true);
               onClose();
+              setBtnCreate(false)
               setTimeout(() => {
                 window.location.reload();
               },2000)
               
-            } else {            
+            } else {   
+              setLoading(false)          
               setCategory("")
               setTitle("");
               setSubTitle("");
@@ -156,6 +165,7 @@ export default function ButtonAddNews() {
               setError(true);
               setOpenSnack(true);
               onClose();
+              setBtnCreate(false)
             }
           })       
           
@@ -298,10 +308,14 @@ export default function ButtonAddNews() {
               }
             <FormLabel  sx={{ marginBottom: 1}}>{dataFile ? dataFile?.name : "no file selected"}</FormLabel>
             </FormControl>
+            
           </Box>
+          {
+              loading && (<Backdrop open={loading}><CircularProgress color="inherit" /></Backdrop>)
+            }
         </DialogContent>
         <DialogActions>
-          <Button color="success" variant="contained" startIcon={<Create />} onClick={handleCreateNews}>
+          <Button color="success" variant="contained" startIcon={<Create />} onClick={handleCreateNews} disabled={btnCreate}>
             Create
           </Button>
           <Button

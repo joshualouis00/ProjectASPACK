@@ -30,3 +30,8 @@ export interface ISnackProps {
     error: boolean,
     onClose: () => void
 }
+
+export interface IProfileProps {
+    open: boolean,
+    onClose: () => void
+}

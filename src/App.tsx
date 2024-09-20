@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
-import { Button, Menu, MenuItem, Fade } from "@mui/material";
+import { Button, Menu, MenuItem, Fade, Dialog, DialogTitle, DialogContent, FormControl, TextField, InputLabel } from "@mui/material";
 import ConsArchived from "./Pages/ConsArchived";
 import ConsRecent from "./Pages/ConsRecent";
 import ConsKategori from "./Pages/ConsKategori";
@@ -41,6 +41,8 @@ import PageContent from "./Component/PageContent";
 import ConsApprovals from "./Pages/ConsApprovals";
 import AffcoUpload from "./Pages/AffcoUpload";
 import AcordionWrapper from "./Component/AccordionWrapper";
+import { IProfileProps } from "./Component/Interface/DataTemplate";
+import CloseIcon from "@mui/icons-material/Close";
 
 const drawerWidth: number = 250;
 
@@ -132,8 +134,68 @@ const ProtectedRoute = ({ element }) => {
 function App() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { open, setOpen } = UseToggleSidebar();
+  const [openProfile, setOpenProfile] = React.useState(false);
+  const [oldPassword, setOldPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   const openMenu = Boolean(anchorEl);
   const username = localStorage.getItem("UserID");
+  function ProfileDialog(props: IProfileProps){
+    const {open, onClose} = props
+    return(
+      <Dialog open={open} onClose={onClose} fullWidth>
+        <DialogTitle>Change Password</DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={(theme) => ({
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: theme.palette.grey[500],
+          })}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent dividers>
+          <Box sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "left",
+            }}>
+              <FormControl fullWidth>                
+                <TextField 
+                sx={{ m:1}}
+                value={oldPassword}
+                onChange={(val) => { setOldPassword(val.target.value)}}
+                label="Old Password"
+                size="small"
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <TextField 
+                sx={{ m:1}}
+                value={newPassword}
+                onChange={(val) => { setNewPassword(val.target.value)}}
+                label="New Password"
+                size="small"
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <TextField 
+                sx={{ m:1}}
+                value={confirmPassword}
+                onChange={(val) => { setConfirmPassword(val.target.value)}}
+                label="Confirm Password"
+                size="small"
+                />
+              </FormControl>
+            </Box>
+        </DialogContent>        
+      </Dialog>
+    )
+
+  }
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -239,9 +301,10 @@ function App() {
                       horizontal: "right",
                     }}
                   >
-                    <MenuItem onClick={handleClose}>Profile</MenuItem>
+                    <MenuItem onClick={() => {setOpenProfile(true)}}>Profile</MenuItem>
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                   </Menu>
+                  <ProfileDialog open={openProfile} onClose={() => { setOpenProfile(false)}}/>
                 </Toolbar>
               </AppBar>
               <LeftDrawer variant="permanent" open={open}>
@@ -429,7 +492,7 @@ function App() {
                       element={
                         <AccordionWrapper
                           content={<ConsKategori />}
-                          headerTitle="Kategori News"
+                          headerTitle="Category News"
                         />
                       }
                     />

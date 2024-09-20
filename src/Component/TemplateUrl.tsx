@@ -30,8 +30,7 @@ export const generateMonths = [
   { id: 12, name: "December" }
 ];
 
-export const generateCategory = [
-  { id: "ALL", name: "All"},
+export const generateCategory = [  
   { id: "KAT1", name: "Kategori 1"},
   { id: "KAT2", name: "Kategori 2"}
 ]

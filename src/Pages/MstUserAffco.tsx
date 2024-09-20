@@ -1,15 +1,18 @@
 import { ArrowBack, Create, Person } from "@mui/icons-material";
 import {
   Autocomplete,
+  Backdrop,
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   FormLabel,
   IconButton,
   InputLabel,
@@ -82,6 +85,7 @@ export default function MstUserAffco() {
   const [message, setMessage] = React.useState("");
   const [openSnack, setOpenSnack] = React.useState(false);
   const [error, setError] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const navigate = useHandleUnauthorized()
 
@@ -89,16 +93,20 @@ export default function MstUserAffco() {
     const { onClose, selectedValue, open, data } = props;
     const [value, setValue] = React.useState("nonldap");
     const [userId, setUserId] = React.useState("");
+    const [hasErrorId, setHasErrorId] = React.useState(false)
     const [username, setUsername] = React.useState("");
+    const [hasErrorName, setHasErrorNam] = React.useState(false)
     const [email, setEmail] = React.useState("");
+    const [hasErrorEmail, setHasErrorEmail] = React.useState(false)
     const [userLdap, setUserldap] = React.useState("");
     const [role, setRole] = React.useState("");
+    const [hasErrorRole, setHasErrorRole] = React.useState(false)
     const [affcom, setAffcom] = React.useState<IDataAffco[]>([]);
-    const [affco, setAffco] = React.useState("");
-    const [status, setStatus] = React.useState("active");
-
+    const [affco, setAffco] = React.useState("")
     const submitAddUser = () => {
-      const vUserId = userId;
+      if(userId !== "" && username !== "" && email !== "" && role !== ""){
+        setLoading(true);
+        const vUserId = userId;
       const vUserName = username;
       const vEmail = email;
       const vRole = role;
@@ -133,6 +141,7 @@ export default function MstUserAffco() {
         }),
       }).then((resp) => {
         if (resp.ok) {
+          setLoading(false);
           fetchUser();
           setMessage("Add User Success.");
           setOpenSnack(true);
@@ -142,6 +151,7 @@ export default function MstUserAffco() {
           if(resp.status === 401){
             navigate()
           } else {
+            setLoading(false);
             fetchUser();
           setMessage("Add User Failed.");
           setOpenSnack(true);
@@ -151,6 +161,22 @@ export default function MstUserAffco() {
           
         }
       });
+
+      } else {
+        if(userId === ""){
+          setHasErrorId(true)
+        }
+        if(username === ""){
+          setHasErrorNam(true)
+        }
+        if(email === ""){
+          setHasErrorEmail(true)
+        }
+        if(role === ""){
+          setHasErrorRole(true)
+        }
+      }
+      
     };
 
     const handleClose = () => {
@@ -162,21 +188,39 @@ export default function MstUserAffco() {
     };
 
     const handleChangeRole = (event: SelectChangeEvent) => {
-      setRole(event.target.value as string);
-    };
-
-    const handleChangeStatus = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setStatus((event.target as HTMLInputElement).value);
-    };
+      if(event.target.value !== ""){
+        setRole(event.target.value);
+        setHasErrorRole(false)
+      } else {
+        setRole(event.target.value);
+        setHasErrorRole(true)
+      }
+      
+    };    
 
     const handleChangeUserId = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setUserId(event.target.value);
+      if(event.target.value !== ""){
+        setUserId(event.target.value);
+        setHasErrorId(false)
+      } else {
+        setUserId(event.target.value);
+        setHasErrorId(true)
+      }
+      
     };
 
     const handleChangeUsername = (
       event: React.ChangeEvent<HTMLInputElement>
     ) => {
-      setUsername(event.target.value);
+      if(event.target.value !== ""){
+        setUsername(event.target.value);
+        setHasErrorNam(false)
+
+      } else {
+        setUsername(event.target.value);
+        setHasErrorNam(true)
+      }
+      
     };
 
     const handleChangeUserLdap = (
@@ -186,7 +230,14 @@ export default function MstUserAffco() {
     };
 
     const handleChageEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(event.target.value);
+      if(event.target.value !== ""){
+        setEmail(event.target.value);
+        setHasErrorEmail(false)
+      } else {
+        setEmail(event.target.value);
+        setHasErrorEmail(true)
+      }
+      
     };
 
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -219,6 +270,7 @@ export default function MstUserAffco() {
           >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <TextField
+                error={hasErrorId}
                 size="small"
                 aria-labelledby="userid"
                 label="User ID"
@@ -226,6 +278,9 @@ export default function MstUserAffco() {
                 value={userId}
                 onChange={handleChangeUserId}
               />
+              {
+                hasErrorId && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <FormLabel id="loginmode">Login Mode</FormLabel>
@@ -261,6 +316,7 @@ export default function MstUserAffco() {
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <TextField
+                error={hasErrorName}
                 size="small"
                 aria-labelledby="nameuser"
                 label="Name"
@@ -268,9 +324,13 @@ export default function MstUserAffco() {
                 value={username}
                 onChange={handleChangeUsername}
               />
+              {
+                hasErrorName && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <TextField
+                error={hasErrorEmail}
                 size="small"
                 aria-labelledby="emailuser"
                 label="Email"
@@ -278,10 +338,14 @@ export default function MstUserAffco() {
                 value={email}
                 onChange={handleChageEmail}
               />
+              {
+                hasErrorEmail && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
               <InputLabel id="roleuser">Role</InputLabel>
               <Select
+                error={hasErrorRole}
                 labelId="roleuser"
                 name="roleUser"
                 value={role}
@@ -291,6 +355,9 @@ export default function MstUserAffco() {
                 <MenuItem value="C">Console</MenuItem>
                 <MenuItem value="A">Affco</MenuItem>
               </Select>
+              {
+                hasErrorRole && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+              }
             </FormControl>
             {role !== "" ? (
               <Stack direction={"column"}>
@@ -371,27 +438,11 @@ export default function MstUserAffco() {
                 </Item>
               </Stack>
             ) : null}
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <FormLabel id="statususer">Status User</FormLabel>
-              <RadioGroup
-                row
-                aria-labelledby="statususer"
-                name="statusUser"
-                value={status}
-                onChange={handleChangeStatus}
-              >
-                <FormControlLabel
-                  value="active"
-                  control={<Radio />}
-                  label="Active"
-                />
-                <FormControlLabel
-                  value="nonactive"
-                  control={<Radio />}
-                  label="Non Active"
-                />
-              </RadioGroup>
-            </FormControl>
+
+            {
+              loading && (<Backdrop open={loading}><CircularProgress color="inherit" /></Backdrop>)
+            }
+            
           </Box>
         </DialogContent>
         <DialogActions>
@@ -419,21 +470,16 @@ export default function MstUserAffco() {
   function EditUserDialog(props: IUserProps) {
     const { open, onClose, data, affco } = props;
     const [username, setUsername] = React.useState("");
+    const [hasErrorName, setHasErrorName] = React.useState(false)
     const [status, setStatus] = React.useState("");
     const [email, setEmail] = React.useState("");
+    const [hasErrorEmail, setHasErrorEmail] = React.useState(false)
     const [ldapLogin, setLdapLogin] = React.useState(false);
     const [ldapName, setLdapName] = React.useState("");
-    const [affcom, setAffcom] = React.useState<IDataAffco[]>([]);
-    const [vAffco, setVAffco] = React.useState("");
-    const [affcoData, setAffcoData] = React.useState<IDataAffco>({
-      no: 1,
-      id: "AAIJ",
-      name: "PT Akebono Brake Astra Indonesia",
-      category: "SUBS",
-      status: "Active",
-    });
+    const [affcom, setAffcom] = React.useState<IDataAffco[]>([]);    
+    const [affcoData, setAffcoData] = React.useState<IDataAffco | null>(null);
+    const [hasErrorAffco, setHasErrorAffco] = React.useState(false)
     const [role, setRole] = React.useState("");
-
     React.useEffect(() => {
       setUsername(data.name);
       setStatus(data.status);
@@ -457,8 +503,7 @@ export default function MstUserAffco() {
         if (data.affcoId !== "") {
           const dataX = affco.filter((v) => v.id === data.affcoId);
 
-          setAffcoData(dataX[0]);
-          setVAffco(dataX[0].name);
+          setAffcoData(dataX[0]);          
         }
       }
     }, [data, affco]);
@@ -469,58 +514,78 @@ export default function MstUserAffco() {
     const affcomData: IDataAffco[] = [...affco];
 
     const submitEditUser = () => {
-      const vUserId = data.id;
+      if(username !== "" && email !== ""){
+        const vUserId = data.id;
       const vUserName = username;
       const vEmail = email;
       const vRole = role;
-      const vAffcoid = affco.filter((id) => id.name === vAffco);
-      const vAffcoId = role === "C" ? "CO" : vAffcoid[0].id;
+      
+      const vAffcoId = role === "C" ? "CO" : affcoData?.id;
       const vPicAff = affcom.map((val) => {
         return val.id;
       });
       const vPicAffco = vPicAff.toString();
       const nUserLdap = ldapLogin;
       const vLdap = ldapName;
-      const bActive = status === "Active" ? true : false;
+      const bActive = status === "Active" ? true : false; 
+      
+      if(vAffcoId === null){
+        setHasErrorAffco(true)
 
-      fetch(apiUrl + "api/Master/editUser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `bearer ${getToken}`,
-        },
-        body: JSON.stringify({
-          vUserId: vUserId,
-          vUserName: vUserName,
-          vEmail: vEmail,
-          vRole: vRole,
-          vAffcoId: vAffcoId,
-          vPicAffco: vPicAffco,
-          vLdap: vLdap,
-          nUserLdap: nUserLdap,
-          bActive: bActive,
-        }),
-      }).then((resp) => {
-        if (resp.ok) {
-          fetchUser();
-          setMessage("Edit Data Success.");
-          setError(false);
-          setOpenSnack(true);
-          onClose();
-        } else {
-          if(resp.status === 401){
-            navigate()
-          }
-          else {
+      } else {
+        
+        fetch(apiUrl + "api/Master/editUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `bearer ${getToken}`,
+          },
+          body: JSON.stringify({
+            vUserId: vUserId,
+            vUserName: vUserName,
+            vEmail: vEmail,
+            vRole: vRole,
+            vAffcoId: vAffcoId,
+            vPicAffco: vPicAffco,
+            vLdap: vLdap,
+            nUserLdap: nUserLdap,
+            bActive: bActive,
+          }),
+        }).then((resp) => {
+          if (resp.ok) {
             fetchUser();
-          setMessage("Edit Data Failed.");
-          setError(true);
-          setOpenSnack(true);
-          onClose();
+            setMessage("Edit Data Success.");
+            setError(false);
+            setOpenSnack(true);
+            onClose();
+          } else {
+            if(resp.status === 401){
+              navigate()
+            }
+            else {
+              fetchUser();
+            setMessage("Edit Data Failed.");
+            setError(true);
+            setOpenSnack(true);
+            onClose();
+            }
+            
           }
-          
+        });
+
+      }
+
+      
+      } else {
+        if(username === ""){
+          setHasErrorName(true)
         }
-      });
+        if(email === ""){
+          setHasErrorEmail(true)
+        }
+        
+      }
+      
     };
 
     return (
@@ -590,23 +655,45 @@ export default function MstUserAffco() {
             </FormControl>
             <FormControl sx={{ m: 1 }} fullWidth>
               <TextField
+                error={hasErrorName}
                 value={username}
                 label="Name"
                 onChange={(val) => {
-                  setUsername(val.target.value);
+                  if(val.target.value !== ""){
+                    setUsername(val.target.value);
+                    setHasErrorName(false)
+                  } else {
+                    setUsername(val.target.value);
+                    setHasErrorName(true)
+                  }
+                  
                 }}
                 size="small"
               />
+              {
+                hasErrorName && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1 }} fullWidth>
               <TextField
+                error={hasErrorEmail}
                 value={email}
                 label="Email"
                 onChange={(val) => {
-                  setEmail(val.target.value);
+                  if(val.target.value !== ""){
+                    setEmail(val.target.value);
+                    setHasErrorEmail(false)
+                  } else {
+                    setEmail(val.target.value);
+                    setHasErrorEmail(true)
+                  }
+                  
                 }}
                 size="small"
               />
+              {
+                hasErrorEmail && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
               <InputLabel>Role</InputLabel>
@@ -618,15 +705,24 @@ export default function MstUserAffco() {
             <Stack direction={"column"}>
               <Item elevation={0} hidden={role === "A" ? false : true}>
                 <FormControl fullWidth>
-                  <Autocomplete
+                  <Autocomplete  
+                  disabled                  
                     id="affco-autocomplete"
                     size="small"
                     disablePortal
                     isOptionEqualToValue={(option, value) => true}
                     value={affcoData}
-                    inputValue={vAffco}
-                    onInputChange={(event, newValue) => {
-                      setVAffco(newValue);
+                    onChange={(event, newValue) =>{
+                      if(newValue !== null){
+                        setAffcoData(newValue);
+                        setHasErrorAffco(false)
+
+                      } else {
+                        setAffcoData(newValue);
+                        setHasErrorAffco(true);
+                      }
+                      
+
                     }}
                     options={affcomData}
                     getOptionLabel={(option) => option.name}
@@ -649,6 +745,11 @@ export default function MstUserAffco() {
                       />
                     )}
                   />
+                  {
+                    hasErrorAffco && (<FormHelperText sx={{ color: "red" }}>
+                      This is required!
+                    </FormHelperText>)
+                  }
                 </FormControl>
               </Item>
               <Item elevation={0} hidden={role === "C" ? false : true}>
@@ -744,32 +845,52 @@ export default function MstUserAffco() {
   function AddAffcoDialog(props: IAddAffcoProps) {
     const { open, onClose } = props;
     const [catAffco, setCatAffco] = React.useState("");
-    const [statusAffco, setStatusAffco] = React.useState("active");
+    const [hasErrorCat, setHasErrorCat] = React.useState(false)
+    const [statusAffco, setStatusAffco] = React.useState("Active");
     const [affcoID, setAffcoID] = React.useState("");
+    const [hasErrorId, setHasErrorId] = React.useState(false)
     const [affcoName, setAffcoName] = React.useState("");
+    const [hasErrorName, setHasErrorName] = React.useState(false)
 
     const handleChangeAffcoId = (
       event: React.ChangeEvent<HTMLInputElement>
     ) => {
-      setAffcoID(event.target.value);
+      if(event.target.value !== ""){
+        setAffcoID(event.target.value);
+        setHasErrorId(false)
+
+      } else {
+        setAffcoID(event.target.value);
+        setHasErrorId(true)
+      }
+      
     };
 
     const handleChangeAffcoName = (
       event: React.ChangeEvent<HTMLInputElement>
     ) => {
-      setAffcoName(event.target.value);
+      if(event.target.value !== ""){
+        setAffcoName(event.target.value);
+        setHasErrorName(false)
+
+      } else {
+        setAffcoName(event.target.value);
+        setHasErrorName(true)
+      }
+      
     };
 
     const handleChangeCatAffco = (event: SelectChangeEvent) => {
-      setCatAffco(event.target.value as string);
-    };
+      if(event.target.value !== ""){
+        setCatAffco(event.target.value);
+        setHasErrorCat(false)
+      } else {
+        setCatAffco(event.target.value );
+        setHasErrorCat(true)
 
-    const handleChangeStatusAffco = (
-      event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-      setStatusAffco(event.target.value);
+      }
+      
     };
-
     const submitAddAffco = () => {
       if (affcoID !== "" && affcoName !== "" && catAffco !== "") {
         fetch(apiUrl + "api/Master/addAffco", {
@@ -806,6 +927,16 @@ export default function MstUserAffco() {
             
           }
         });
+      } else {
+        if(affcoID === ""){
+          setHasErrorId(true)
+        }
+        if(affcoName === ""){
+          setHasErrorName(true)
+        }
+        if(catAffco === ""){
+          setHasErrorCat(true)
+        }
       }
     };
 
@@ -838,27 +969,40 @@ export default function MstUserAffco() {
           >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <TextField
+                error={hasErrorId}
                 size="small"
                 label="Affco ID"
                 name="affcoID"
                 value={affcoID}
                 onChange={handleChangeAffcoId}
               />
+              {
+                hasErrorId && (<FormHelperText sx={{ color: "red" }}>
+                  This is required!
+                </FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <TextField
+                error={hasErrorName}
                 size="small"
                 label="Affco Name"
                 name="affcoName"
                 value={affcoName}
                 onChange={handleChangeAffcoName}
               />
+              {
+                hasErrorName && (<FormHelperText sx={{ color: "red" }}>
+                  This is required!
+                </FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <InputLabel >
                 Category Affiliate Company
               </InputLabel>
               <Select
+                error={hasErrorCat}
                 size="small"                
                 name="catAffco"
                 value={catAffco}
@@ -868,28 +1012,13 @@ export default function MstUserAffco() {
                 <MenuItem value="ASSO JV">ASSO JV</MenuItem>
                 <MenuItem value="SUBS">SUBS</MenuItem>
               </Select>
+              {
+                hasErrorCat && (<FormHelperText sx={{ color: "red" }}>
+                  This is required!
+                </FormHelperText>)
+              }
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <FormLabel id="statusAffco">Status Affiliate Company</FormLabel>
-              <RadioGroup
-                row
-                aria-labelledby="statusAffco"
-                name="statusAffco"
-                value={statusAffco}
-                onChange={handleChangeStatusAffco}
-              >
-                <FormControlLabel
-                  value="Active"
-                  control={<Radio />}
-                  label="Active"
-                />
-                <FormControlLabel
-                  value="Nonactive"
-                  control={<Radio />}
-                  label="Non Active"
-                />
-              </RadioGroup>
-            </FormControl>
+            
           </Box>
         </DialogContent>
         <DialogActions>
@@ -915,10 +1044,11 @@ export default function MstUserAffco() {
   }
   function EditAffcoDialog(props: IAffcoProps) {
     const { open, onClose, data } = props;
-    const [catAffco, setCatAffco] = React.useState("");
+    const [catAffco, setCatAffco] = React.useState("");    
     const [statusAffco, setStatusAffco] = React.useState("");
-    const [affcoID, setAffcoID] = React.useState("");
+    const [affcoID, setAffcoID] = React.useState("");    
     const [affcoName, setAffcoName] = React.useState("");
+    const [hasErrorName, setHasErrorName] = React.useState(false)
 
     React.useEffect(() => {
       setCatAffco(data.category)
@@ -929,40 +1059,51 @@ export default function MstUserAffco() {
 
     const submitEditAffco = () => {
 
-      fetch(apiUrl + "api/Master/editAffco", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `bearer ${getToken}`,
-          Accept: "*/*",
-        },
-        body: JSON.stringify({
-          vAffcoId: affcoID,
-          vAffcoName: affcoName,
-          vAffcoType: catAffco,
-          bActive: statusAffco === "Active" ? true : false,
-        }),
-      }).then((resp) => {
-        if (resp.ok) {
-          fetchAffco();
-          setMessage("Affco Edited Successfully.");
-          setError(false);
-          setOpenSnack(true);
-          onClose();
-        } else {
-          if(resp.status === 401){
-            navigate()
-          }
-          else{
+      if(affcoID !== "" && affcoName !== "" && catAffco !== ""){
+        fetch(apiUrl + "api/Master/editAffco", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `bearer ${getToken}`,
+            Accept: "*/*",
+          },
+          body: JSON.stringify({
+            vAffcoId: affcoID,
+            vAffcoName: affcoName,
+            vAffcoType: catAffco,
+            bActive: statusAffco === "Active" ? true : false,
+          }),
+        }).then((resp) => {
+          if (resp.ok) {
             fetchAffco();
-          setMessage("Affco Edited Failed.");
-          setError(true);
-          setOpenSnack(true);
-          onClose();
+            setMessage("Affco Edited Successfully.");
+            setError(false);
+            setOpenSnack(true);
+            onClose();
+          } else {
+            if(resp.status === 401){
+              navigate()
+            }
+            else{
+              fetchAffco();
+            setMessage("Affco Edited Failed.");
+            setError(true);
+            setOpenSnack(true);
+            onClose();
+            }
+            
           }
-          
-        }
-      })
+        })
+
+      } else {
+        
+        if(affcoName === ""){
+          setHasErrorName(true)
+        }       
+
+      }
+
+      
 
     }
 
@@ -1000,14 +1141,27 @@ export default function MstUserAffco() {
             </FormControl>
             <FormControl sx={{ m: 1 }}>
               <TextField
+                error={hasErrorName}
                 fullWidth
                 size="small"
                 label="Affco Name"
                 value={affcoName}
                 onChange={(val) => {
-                  setAffcoName(val.target.value);
+                  if(val.target.value !== ""){
+                    setAffcoName(val.target.value);
+                    setHasErrorName(false)
+                  } else {
+                    setAffcoName(val.target.value);
+                    setHasErrorName(true)
+                  }
+                  
                 }}
               />
+              {
+                hasErrorName && (<FormHelperText sx={{ color: "red" }}>
+                  This is required!
+                </FormHelperText>)
+              }
             </FormControl>
             <FormControl sx={{ m: 1}}>
             <InputLabel >

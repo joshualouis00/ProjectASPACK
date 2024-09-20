@@ -41,6 +41,8 @@ import PageContent from "./Component/PageContent";
 import ConsApprovals from "./Pages/ConsApprovals";
 import AffcoUpload from "./Pages/AffcoUpload";
 import AcordionWrapper from "./Component/AccordionWrapper";
+import EmailApprovalAspack from "./Pages/MstEmailApproval";
+import EmailAffcoSubmit from "./Pages/MstEmailAffcoSubmit";
 
 const drawerWidth: number = 250;
 
@@ -116,13 +118,12 @@ const defaultTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          overflow: 'hidden', // Disable overflow globally
+          overflow: "hidden", // Disable overflow globally
         },
       },
     },
   },
 });
-
 
 const ProtectedRoute = ({ element }) => {
   const isToken = localStorage.getItem("token");
@@ -471,6 +472,20 @@ function App() {
                       path="/emailUpdateTemp"
                       element={
                         <ProtectedRoute element={<EmailUpdateTemplate />} />
+                      }
+                    />
+
+                    <Route
+                      path="/emailApproval"
+                      element={
+                        <ProtectedRoute element={<EmailApprovalAspack />} />
+                      }
+                    />
+
+                    <Route
+                      path="/emailAffcoSubmit"
+                      element={
+                        <ProtectedRoute element={<EmailAffcoSubmit />} />
                       }
                     />
                   </>

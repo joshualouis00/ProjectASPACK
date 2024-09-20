@@ -2,7 +2,7 @@ import { Alert, Snackbar } from "@mui/material";
 import { ISnackProps } from "./Interface/DataTemplate";
 import useHandleUnauthorized from "./handleUnauthorized";
 
-export const apiUrl = "http://192.168.1.207:9030/";
+export const apiUrl = "http://192.168.1.206:9020/";
 export const getToken = localStorage.getItem('token');
 export const getRole = localStorage.getItem('Role');
 export const getUserId = localStorage.getItem('UserID');

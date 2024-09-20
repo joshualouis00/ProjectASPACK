@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 import DateTimeFormatted from "../Component/formatDateTime";
 
-const EmailUpdateTemplate: React.FC = () => {
+const EmailApprovalAspack: React.FC = () => {
   const [open, setOpen] = React.useState(true);
   const [subject, setSubject] = React.useState("");
   const [body, setBody] = React.useState("");
@@ -45,7 +45,7 @@ const EmailUpdateTemplate: React.FC = () => {
         autoComplete="off"
       >
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-          <DialogTitle>Manage Email Template</DialogTitle>
+          <DialogTitle>Manage Email Approval Template</DialogTitle>
           <DialogContent>
             <TextField
               fullWidth
@@ -71,7 +71,7 @@ const EmailUpdateTemplate: React.FC = () => {
             <Typography sx={{ mb: 1, fontSize: 12 }}>Company Name : @Company</Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Template : @Template</Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Due Date : @DueDate</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Periode : @@Periode</Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>Periode : @Periode</Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Link : @Link</Typography>
           </DialogContent>
           <DialogActions>
@@ -84,4 +84,4 @@ const EmailUpdateTemplate: React.FC = () => {
   );
 };
 
-export default EmailUpdateTemplate;
+export default EmailApprovalAspack;

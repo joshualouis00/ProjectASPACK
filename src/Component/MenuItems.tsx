@@ -251,7 +251,7 @@ const MenuItems = (props: MenuItemsProps) => {
               </ListItemButton>
               <ListItemButton
                 onClick={() => {
-                  navigate("/emailApprovalResp");
+                  navigate("/emailAffcoSubmit");
                 }}
                 sx={{ bgcolor: "#223c49", color: "white" }}
               >

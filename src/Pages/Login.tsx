@@ -38,7 +38,7 @@ const Login: React.FC = () => {
   const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [value, setValue] = React.useState('aspack');
+  const [value, setValue] = React.useState('ASP');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -63,6 +63,7 @@ const Login: React.FC = () => {
         {
           Email: userId,
           Password: hashedPassword,
+          target: value,
         }
       );
 
@@ -170,7 +171,7 @@ const Login: React.FC = () => {
                       onChange={handleChange}
                     >
                       <FormControlLabel
-                        value="capex"
+                        value="FPA" //fpa
                         id="CAPEX"
                         control={
                           <Radio
@@ -181,7 +182,7 @@ const Login: React.FC = () => {
                         label="CAPEX"
                       />
                       <FormControlLabel
-                        value="aspack"
+                        value="ASP" //asp
                         id="ASPACK"
                         control={
                           <Radio

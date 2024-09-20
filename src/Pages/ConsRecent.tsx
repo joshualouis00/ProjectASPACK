@@ -7,7 +7,6 @@ import {
   FormControl,
   IconButton,
   InputLabel,
-  Menu,
   MenuItem,
   Paper,
   Select,
@@ -19,9 +18,9 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import React from "react";
 import ButtonAddNews from "../Component/ButtonAddNews";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { apiUrl, generateMonths, generateYears, getRole, getToken } from "../Component/TemplateUrl";
 import { IConsNewsProps } from "../Component/Interface/DataTemplate";
+import { Download } from "@mui/icons-material";
 
 export default function Recent() {
   const responsive = {
@@ -52,15 +51,14 @@ export default function Recent() {
   }));
 
   const [month, setMonth] = React.useState("");
-  const [year, setYear] = React.useState("");
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [dataNews, setDataNews] = React.useState<IConsNewsProps[]>([]);
-  const openMenu = Boolean(anchorEl);
-  const handleClickMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const [year, setYear] = React.useState(""); 
+  const [dataNews, setDataNews] = React.useState<IConsNewsProps[]>([]);  
+  const handleClickMenu = () => {
+   
+    
   };
   const handleCloseMenu = () => {
-    setAnchorEl(null);
+    
   };
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -184,36 +182,12 @@ export default function Recent() {
                     action={
                       <>
                         <IconButton
-                          id="menu-button"
-                          aria-controls={openMenu ? "menu-item" : undefined}
-                          aria-haspopup="true"
-                          aria-expanded={openMenu ? "true" : undefined}
+                          id="menu-button"                          
                           onClick={handleClickMenu}
                         >
-                          <MoreVertIcon />
+                          <Download />
                         </IconButton>
-                        <Menu
-                          id="menu-item"
-                          anchorEl={anchorEl}
-                          open={openMenu}
-                          onClose={handleCloseMenu}
-                          MenuListProps={{
-                            "aria-labelledby": "menu-button",
-                          }}
-                          anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "left",
-                          }}
-                          transformOrigin={{
-                            vertical: "top",
-                            horizontal: "left",
-                          }}
-                        >
-                          <MenuItem onClick={handleCloseMenu}>
-                            Attachment
-                          </MenuItem>
-                          <MenuItem onClick={handleCloseMenu}>More</MenuItem>
-                        </Menu>
+                        
                       </>
                     }
                   />

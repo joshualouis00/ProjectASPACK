@@ -68,10 +68,11 @@ const EmailApprovalAspack: React.FC = () => {
                sx={{ mb: 1, fontSize: 12}}
             />
             <Typography sx={{ mb: 1, mt: 2, fontSize: 14, fontWeight: "Bold"}}>Placeholder Variable :</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Company Name : @Company</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Template : @Template</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Due Date : @DueDate</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Periode : @Periode</Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>Company : @Company</Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>Approved : @Approved</Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>Revised : @Revised</Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>Month : @Month</Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>Year : @Year</Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Link : @Link</Typography>
           </DialogContent>
           <DialogActions>

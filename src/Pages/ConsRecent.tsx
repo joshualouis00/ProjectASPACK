@@ -54,13 +54,6 @@ export default function Recent() {
   const [year, setYear] = React.useState(""); 
   const [dataNews, setDataNews] = React.useState<IConsNewsProps[]>([]); 
   const [recentItem, setRecentItem] = React.useState<number>(4);  
-  const handleClickMenu = () => {
-   
-    
-  };
-  const handleCloseMenu = () => {
-    
-  };
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
     setMonth(event.target.value as string);
@@ -97,6 +90,33 @@ export default function Recent() {
       });
     });
   }, []);
+
+  const handleClickDownload = (data: string) => {
+
+    fetch(apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + data,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `bearer ${getToken}`,
+        },
+      }
+    ).then((resp) =>{
+      if (resp.status === 200) {
+        resp.blob().then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "File Attachment " + data;
+          a.click();
+        });
+      } else {
+        if(resp.status === 404){
+          return alert("file not found.please contact your IT Administrator")
+        }
+      }
+    })
+
+  }
 
   return (
     <div>
@@ -187,7 +207,7 @@ export default function Recent() {
                         <>
                           <IconButton
                             id="menu-button"                          
-                            onClick={() => { const bulan = item.dCrea.split("-"); console.log(parseInt(bulan[1]))}}
+                            onClick={() => {handleClickDownload(item.uUid)}}
                           >
                             <Download />
                           </IconButton>
@@ -240,7 +260,7 @@ export default function Recent() {
                         <>
                           <IconButton
                             id="menu-button"                          
-                            onClick={() => { const bulan = item.dCrea.split("-"); console.log(parseInt(bulan[1]))}}
+                            onClick={() => {handleClickDownload(item.uUid)}}
                           >
                             <Download />
                           </IconButton>
@@ -293,7 +313,7 @@ export default function Recent() {
                         <>
                           <IconButton
                             id="menu-button"                          
-                            onClick={() => { const bulan = item.dCrea.split("-"); console.log(parseInt(bulan[1]))}}
+                            onClick={() => {handleClickDownload(item.uUid)}}
                           >
                             <Download />
                           </IconButton>
@@ -345,7 +365,7 @@ export default function Recent() {
                         <>
                           <IconButton
                             id="menu-button"                          
-                            onClick={() => { const bulan = item.dCrea.split("-"); console.log(parseInt(bulan[1]))}}
+                            onClick={() => {handleClickDownload(item.uUid)}}
                           >
                             <Download />
                           </IconButton>

@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
-import { Button, Menu, MenuItem, Fade, Dialog, DialogTitle, DialogContent, FormControl, TextField, InputLabel } from "@mui/material";
+import { Button, Menu, MenuItem, Fade, Dialog, DialogTitle, DialogContent, FormControl, TextField, InputLabel, DialogActions } from "@mui/material";
 import ConsArchived from "./Pages/ConsArchived";
 import ConsRecent from "./Pages/ConsRecent";
 import ConsKategori from "./Pages/ConsKategori";
@@ -137,12 +137,19 @@ function App() {
   const { open, setOpen } = UseToggleSidebar();
   const [openProfile, setOpenProfile] = React.useState(false);
   const [oldPassword, setOldPassword] = React.useState("");
+  const [hasErrorOld, setHasErrorOld] = React.useState(false);
   const [newPassword, setNewPassword] = React.useState("");
+  const [hasErrorNew, setHasErrorNew] = React.useState(false);
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [hasErrorConfirm, setHasErrorConfirm] = React.useState(false);
   const openMenu = Boolean(anchorEl);
   const username = localStorage.getItem("UserID");
   function ProfileDialog(props: IProfileProps){
     const {open, onClose} = props
+
+    const handleChangePassword = () => {
+
+    }
     return(
       <Dialog open={open} onClose={onClose} fullWidth>
         <DialogTitle>Change Password</DialogTitle>
@@ -192,7 +199,24 @@ function App() {
                 />
               </FormControl>
             </Box>
-        </DialogContent>        
+        </DialogContent>
+        <DialogActions>
+          <Box>
+            <Button variant="contained"
+              size="small"
+              color="primary"
+              sx={{ m: 1 }} onClick={handleChangePassword}>Change Password</Button>
+              <Button
+              onClick={onClose}
+              variant="contained"
+              size="small"
+              color="inherit"
+              sx={{ m: 1 }}
+            >
+              Cancel
+            </Button>
+          </Box>
+          </DialogActions>        
       </Dialog>
     )
 

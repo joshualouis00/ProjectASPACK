@@ -86,9 +86,12 @@ export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
     {
         header: "Action",
         Cell: ({cell}) => {
-            return (
-                <Button variant="contained" size="small" color="inherit">Preview</Button>
-            )
+            if(cell.row.original.status !== "Draft"){
+                return (
+                    <Button variant="contained" size="small" color="inherit">Preview</Button>
+                )
+            }
+            
         }
     },
     {

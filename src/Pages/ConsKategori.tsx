@@ -5,6 +5,7 @@ import {
   CardContent,
   CardHeader,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
@@ -26,6 +27,7 @@ import {
   generateCategory,
 } from "../Component/TemplateUrl";
 import { IConsNewsProps } from "../Component/Interface/DataTemplate";
+import { Download } from "@mui/icons-material";
 export default function Kategori() {
   const responsive = {
     superLargeDesktop: {
@@ -97,6 +99,33 @@ export default function Kategori() {
       });
     });
   }, []);
+
+  const handleClickDownload = (data: string) => {
+
+    fetch(apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + data,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `bearer ${getToken}`,
+        },
+      }
+    ).then((resp) =>{
+      if (resp.status === 200) {
+        resp.blob().then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "File Attachment " + data;
+          a.click();
+        });
+      } else {
+        if(resp.status === 404){
+          return alert("file not found.please contact your IT Administrator")
+        }
+      }
+    })
+
+  }
   return (
     <div>
       <Box sx={{ width: "100%" }}>
@@ -209,6 +238,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">
@@ -252,6 +292,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">
@@ -295,6 +346,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">
@@ -338,6 +400,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">
@@ -381,6 +454,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">
@@ -424,6 +508,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">
@@ -467,6 +562,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">
@@ -510,6 +616,17 @@ export default function Kategori() {
                     <CardHeader
                       title={item.vTitle}
                       subheader={item.vSubTitle}
+                      action={
+                        <>
+                          <IconButton
+                            id="menu-button"                          
+                            onClick={() => {handleClickDownload(item.uUid)}}
+                          >
+                            <Download />
+                          </IconButton>
+                          
+                        </>
+                      }
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.secondary">

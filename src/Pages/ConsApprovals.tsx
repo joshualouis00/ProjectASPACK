@@ -660,7 +660,8 @@ export default function AspackAprroval() {
                         renderBottomToolbarCustomActions={({ table }) => {
                           const countSubmitted = dataAffco.filter(
                             (v) => v.status === "Submitted" 
-                          ).length;                          
+                          ).length; 
+                          const countRevised = dataAffco.filter((v) => v.status === "Revised").length;                                                   
                           return (
                             <div style={{ display: "flex", gap: "0.5rem" }}>
                               <Button
@@ -676,7 +677,7 @@ export default function AspackAprroval() {
                               <Button
                                 color="success"
                                 variant="contained"
-                                disabled={countSubmitted === 0 && dataHeader?.vPackageId !== "" && dataAffco.length > 0 && dataHeader?.iStatus !== "A" ? false : true}
+                                disabled={countSubmitted === 0 && dataHeader?.vPackageId !== "" && dataAffco.length > 0 && dataHeader?.iStatus === "S" ? false : countSubmitted === 0 && countRevised === 0 && dataHeader?.vPackageId !== "" && dataHeader.iStatus === "PA" ? false : true}
                                 onClick={submitApprovals}
                               >
                                 Submit Approval

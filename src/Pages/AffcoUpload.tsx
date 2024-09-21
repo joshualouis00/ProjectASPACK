@@ -2,8 +2,10 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   Divider,
   FormControl,
   FormHelperText,
@@ -118,6 +120,8 @@ export default function AffcoUpload() {
   const [completed, setCompleted] = React.useState<{ [k: number]: boolean }>(
     {}
   );
+
+  const [loading, setLoading] = React.useState(false);
 
   const steps = dataStep;
 
@@ -290,6 +294,7 @@ export default function AffcoUpload() {
 
   const handleSubmitFiles = () => {
     const dataForm = new FormData();
+    setLoading(true)
 
     const packId = dataHeader?.vPackageId !== "" ? dataHeader?.vPackageId : "";
     dataForm.append("Header.vPackageId", packId);
@@ -376,6 +381,7 @@ export default function AffcoUpload() {
       body: dataForm,
     }).then((resp) => {
       if (resp.ok) {
+        setLoading(false)
         alert("berhasil");
         window.location.reload();
       } else {
@@ -635,7 +641,7 @@ export default function AffcoUpload() {
                 >
                   <input {...getInputProps()} />
                   <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
-                    { submitData.length === submitData.filter((x) => x.status === "Approved").length ? "All Aspack Approved" : stepData !== "" && !allowUpload ? "upload disabled" : "Select Step for upload"  }
+                    { dataHeader?.vPackageId  !== "" && submitData.length === submitData.filter((x) => x.status === "Approved").length ? "All Aspack Approved" : stepData !== "" && !allowUpload ? "upload disabled" : "Select Step for upload"  }
                   </Typography>
                 </Box>
               )}
@@ -707,6 +713,9 @@ export default function AffcoUpload() {
                         />
                       </Item>
                     </Stack>
+                    {
+                      loading && (<Backdrop open={loading}><CircularProgress color="inherit" /></Backdrop>)
+                    }
                   </Box>
                 )}
               </Item>

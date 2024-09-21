@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
-import { Button, Menu, MenuItem, Fade, Dialog, DialogTitle, DialogContent, FormControl, TextField, InputLabel, DialogActions } from "@mui/material";
+import { Button, Menu, MenuItem, Fade, Dialog, DialogTitle, DialogContent, FormControl, DialogActions, FormHelperText, OutlinedInput, InputLabel } from "@mui/material";
 import ConsArchived from "./Pages/ConsArchived";
 import ConsRecent from "./Pages/ConsRecent";
 import ConsKategori from "./Pages/ConsKategori";
@@ -45,6 +45,10 @@ import EmailApprovalAspack from "./Pages/MstEmailApproval";
 import EmailAffcoSubmit from "./Pages/MstEmailAffcoSubmit";
 import { IProfileProps } from "./Component/Interface/DataTemplate";
 import CloseIcon from "@mui/icons-material/Close";
+import { apiUrl, getToken, getUserId } from "./Component/TemplateUrl";
+import { genSaltSync } from "bcrypt-ts";
+import InputAdornment from '@mui/material/InputAdornment';
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const drawerWidth: number = 250;
 
@@ -136,18 +140,75 @@ function App() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { open, setOpen } = UseToggleSidebar();
   const [openProfile, setOpenProfile] = React.useState(false);
-  const [oldPassword, setOldPassword] = React.useState("");
+  
+  const openMenu = Boolean(anchorEl);
+  const username = localStorage.getItem("UserID");
+  function ProfileDialog(props: IProfileProps){
+    const {open, onClose} = props
+    const [oldPassword, setOldPassword] = React.useState("");
   const [hasErrorOld, setHasErrorOld] = React.useState(false);
   const [newPassword, setNewPassword] = React.useState("");
   const [hasErrorNew, setHasErrorNew] = React.useState(false);
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [hasErrorConfirm, setHasErrorConfirm] = React.useState(false);
-  const openMenu = Boolean(anchorEl);
-  const username = localStorage.getItem("UserID");
-  function ProfileDialog(props: IProfileProps){
-    const {open, onClose} = props
+  const [hasNotMatch, setHasNotMatch] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false)
+    const [showNewPassword, setShowNewPassword] = React.useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
+    const combine = oldPassword + getUserId;
+    const encodeString = btoa(combine)
+    const salt = genSaltSync(8)
+    const hashOldPassword = salt + encodeString
+
+    const handleChangeOldPassword = (event) => {
+      if(event.target.value !== ""){
+        setOldPassword(event.target.value)
+        setHasErrorOld(false)
+      } else {
+        setOldPassword(event.target.value)        
+      }
+
+    }
+
 
     const handleChangePassword = () => {
+
+      if(newPassword === confirmPassword && newPassword !== "" && confirmPassword !== ""){
+        setHasNotMatch(false)
+        const combineNew = newPassword + getUserId
+        const encodeStringNew = btoa(combineNew)
+        const hashNewPassword = salt + encodeStringNew
+
+        fetch(apiUrl + "api/Auth/changePassword", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `bearer ${getToken}`,
+          },
+          body: JSON.stringify({
+            Password: hashOldPassword,
+            NewPassword: hashNewPassword
+          })
+        }).then((resp) => {
+          if(resp.ok) {
+            onClose()
+            alert("success change password")
+          }
+        })
+
+      } else {
+        if(newPassword === ""){
+          setHasErrorNew(true);
+        }
+        if(confirmPassword === ""){
+          setHasErrorConfirm(true);
+        }
+        if(confirmPassword !== newPassword){
+          setHasNotMatch(true);
+          setHasErrorConfirm(true)
+
+        }
+      }
 
     }
     return(
@@ -171,32 +232,93 @@ function App() {
               flexDirection: "column",
               alignItems: "left",
             }}>
-              <FormControl fullWidth>                
-                <TextField 
+              <FormControl fullWidth> 
+                <InputLabel sx={{ m:1}}>Old Password</InputLabel>               
+                <OutlinedInput                                              
+                error={hasErrorOld}
                 sx={{ m:1}}
                 value={oldPassword}
-                onChange={(val) => { setOldPassword(val.target.value)}}
+                onChange={handleChangeOldPassword}
                 label="Old Password"
-                size="small"
+                size="medium"
+                type={ showPassword ? "text" : "password"}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                    onClick={() => { setShowPassword(!showPassword)}}
+                    >
+                      { showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                
                 />
+                {
+                  hasErrorOld && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+                }
               </FormControl>
               <FormControl fullWidth>
-                <TextField 
+              <InputLabel sx={{ m:1}}>New Password</InputLabel> 
+                <OutlinedInput                
+                error={hasErrorNew}
                 sx={{ m:1}}
                 value={newPassword}
-                onChange={(val) => { setNewPassword(val.target.value)}}
+                onChange={(val) => { 
+                  if(val.target.value !== ""){
+                    setNewPassword(val.target.value)
+                    setHasErrorNew(false)
+                  } else {
+                    setNewPassword(val.target.value)                    
+                  }
+                  }}
                 label="New Password"
-                size="small"
+                size="medium"
+                type={ showNewPassword ? "text" : "password"}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                    onClick={() => { setShowNewPassword(!showNewPassword)}}
+                    >
+                      { showNewPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+
                 />
+                {
+                  hasErrorNew && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+                }
               </FormControl>
               <FormControl fullWidth>
-                <TextField 
+              <InputLabel sx={{ m:1}}>Confirm Password</InputLabel> 
+                <OutlinedInput                 
+                error={hasErrorConfirm}
                 sx={{ m:1}}
                 value={confirmPassword}
-                onChange={(val) => { setConfirmPassword(val.target.value)}}
+                onChange={(val) => { 
+                  if(val.target.value !== ""){
+                    setConfirmPassword(val.target.value)
+                    setHasErrorConfirm(false)
+                  } else {
+                    setConfirmPassword(val.target.value)
+                  }
+                  }}
                 label="Confirm Password"
-                size="small"
+                size="medium"
+                type={ showConfirmPassword ? "text" : "password"}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                    onClick={() => { setShowConfirmPassword(!showConfirmPassword)}}
+                    >
+                      { showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
                 />
+                {
+                  hasErrorConfirm && (<FormHelperText sx={{ color: "red" }}>{ hasNotMatch ? "Confirm password not match with new password" : "This is required!"}</FormHelperText>)
+                }
               </FormControl>
             </Box>
         </DialogContent>

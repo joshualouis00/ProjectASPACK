@@ -92,8 +92,9 @@ export default function Recent() {
   }, []);
 
   const handleClickDownload = (data: string) => {
+    const encode = btoa(data)
 
-    fetch(apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + data,
+    fetch(apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + encode,
       {
         method: "GET",
         headers: {

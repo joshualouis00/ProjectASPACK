@@ -8,19 +8,15 @@ import TextField from "@mui/material/TextField";
 import WelcomePage from "./Welcome";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
-import DateTimeFormatted from "../Component/formatDateTime";
+import axios from "axios";
+import { apiUrl, getToken } from "../Component/TemplateUrl";
 
 const EmailUpdateTemplate: React.FC = () => {
   const [open, setOpen] = React.useState(true);
   const [subject, setSubject] = React.useState("");
   const [body, setBody] = React.useState("");
+  const [type, setType] = React.useState("UpdateTemplate"); // Default type
   const navigate = useNavigate();
-  const bulan = new Date();
-  const ibulan = bulan.getMonth();
-  const namaBulan = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-  ];
 
   const handleClose = () => {
     setOpen(false);
@@ -33,13 +29,38 @@ const EmailUpdateTemplate: React.FC = () => {
     setBody("");
   };
 
+  // Function to fetch email template based on type
+  const save_EmailTemplate = async () => {
+    try {
+      const encodedBody = btoa(body);
+      const response = await axios.post(apiUrl + "api/Setting/EditMail", {
+        headers: {
+          Authorization: `Bearer ` + getToken,
+          Accept: "*/*",
+        },
+        subject: subject,
+        body: encodedBody, 
+        type: type,
+      });
+      // Assuming the API returns subject and body fields
+      setSubject(response.data.subject);
+      setBody(response.data.body);
+    } catch (error) {
+      console.error("Error saving email template:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    save_EmailTemplate();
+  }, [type]);
+
   return (
     <>
       <WelcomePage />
       <Box
         component="form"
         sx={{
-          "& .MuiTextField-root": { m: 1 }
+          "& .MuiTextField-root": { m: 1 },
         }}
         noValidate
         autoComplete="off"
@@ -55,25 +76,29 @@ const EmailUpdateTemplate: React.FC = () => {
               rows={1}
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              sx={{ mb: 1, mt: 1, fontSize: 12}}
+              sx={{ mb: 1, mt: 1, fontSize: 12 }}
             />
             <TextField
-               fullWidth
-               id="outlined-body"
-               label="Body"
-               multiline
-               rows={8}
-               value={body}
-               onChange={(e) => setBody(e.target.value)}
-               sx={{ mb: 1, fontSize: 12}}
+              fullWidth
+              id="outlined-body"
+              label="Body"
+              multiline
+              rows={8}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              sx={{ mb: 1, fontSize: 12 }}
             />
-            <Typography sx={{ mb: 1, mt: 2, fontSize: 14, fontWeight: "Bold"}}>Placeholder Variable :</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Template : @Template</Typography>
+            <Typography sx={{ mb: 1, mt: 2, fontSize: 14, fontWeight: "Bold" }}>
+              Placeholder Variable :
+            </Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>
+              Template : @Template
+            </Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Link : @Link</Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button>Submit</Button>
+            <Button onClick={save_EmailTemplate}>Submit</Button>
           </DialogActions>
         </Dialog>
       </Box>

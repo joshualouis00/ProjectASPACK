@@ -1,6 +1,5 @@
 import { Alert, Snackbar } from "@mui/material";
 import { ISnackProps } from "./Interface/DataTemplate";
-import useHandleUnauthorized from "./handleUnauthorized";
 
 export const apiUrl = "http://110.138.18.1:9020/";
 export const getToken = localStorage.getItem('token');

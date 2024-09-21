@@ -35,6 +35,7 @@ import {
 } from "../Component/Interface/DataUpload";
 import { getUserId } from "../Component/TemplateUrl";
 import { format } from "date-fns";
+import dayjs, { Dayjs } from "dayjs";
 
 export default function AffcoUpload() {
   const dataMonth = new Date().getMonth();
@@ -63,6 +64,35 @@ export default function AffcoUpload() {
   const [filter, setFilter] = React.useState(false);
   const [index, setIndex] = React.useState<number>(-1);
   const [allowUpload, setAllowUpload] = React.useState(false);
+  const [pMonth, setPMonth] = React.useState("")
+  const [pYear, setPYear] = React.useState("")
+  const [pSdate, setPSdate] = React.useState<Dayjs>(dayjs())
+  const [pEdate, setPEdate] = React.useState<Dayjs>(dayjs())
+  const [isOpenPeriod, setIsOpenPeriod] = React.useState(false)
+
+
+  const fetchOpenPeriode = () => {
+    fetch(apiUrl + "api/Setting/GetOpenPeriod", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken}`
+      }
+    }).then((resp) =>{
+      if(resp.ok) {
+        resp.json().then((data) => {
+          setPMonth(data.data.iMonth)
+          setPYear(data.data.iYear)
+          setPSdate(dayjs(data.data.dStartDate))
+          setPEdate(dayjs(data.data.dEndDate))
+        })
+      }
+    })
+  }
+
+
+  React.useEffect(() => {
+    fetchOpenPeriode()
+  },[])
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
@@ -170,7 +200,23 @@ export default function AffcoUpload() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("allow upload : " , allowUpload)
+
+    if(pMonth === month && pYear === year){
+      const now = dayjs().format('YYYY-MM-DD')
+      const nowDate = dayjs(now)
+      if(nowDate > pSdate && nowDate < pEdate){
+        console.log("open period")
+        setIsOpenPeriod(true)
+      } else {
+        setIsOpenPeriod(false)
+        console.log("close period")
+      }
+
+
+    } else {
+      setIsOpenPeriod(false)
+    }
+    
     setTempData([])
     fetch(apiUrl + "api/WorkflowStep/getStep", {
       method: "GET",
@@ -585,7 +631,7 @@ export default function AffcoUpload() {
                       ))}
                 </Stepper>
               </Item>
-              {stepData !== "" && dataHeader?.vPackageId === "" ? (
+              {isOpenPeriod && stepData !== "" && dataHeader?.vPackageId === "" ? (
                 <Box
                   {...getRootProps()}
                   sx={{
@@ -605,7 +651,7 @@ export default function AffcoUpload() {
                     Drag 'n' drop some files here, or click to select files
                   </Typography>
                 </Box>
-              ) : stepData !== "" && dataHeader?.vPackageId !== "" && allowUpload ? (
+              ) : isOpenPeriod && stepData !== "" && dataHeader?.vPackageId !== "" && allowUpload ? (
                 <Box
                   {...getRootProps()}
                   sx={{
@@ -641,7 +687,7 @@ export default function AffcoUpload() {
                 >
                   <input {...getInputProps()} />
                   <Typography color="textSecondary" sx={{ fontSize: "10px" }}>
-                    { dataHeader?.vPackageId  !== "" && submitData.length === submitData.filter((x) => x.status === "Approved").length ? "All Aspack Approved" : stepData !== "" && !allowUpload ? "upload disabled" : "Select Step for upload"  }
+                    { dataHeader?.vPackageId  !== "" && submitData.length === submitData.filter((x) => x.status === "Approved").length ? "All Aspack Approved" : stepData !== "" && !allowUpload ? "upload disabled" : !isOpenPeriod ? "Close Period for upload" : "Select Step for upload"  }
                   </Typography>
                 </Box>
               )}
@@ -696,10 +742,11 @@ export default function AffcoUpload() {
                               <Button
                                 variant="contained"
                                 disabled={
+                                  isOpenPeriod &&
                                   dataHeader?.vPackageId === "" &&
                                   dataCount === countStep
                                     ? false
-                                    : dataHeader?.vPackageId !== "" &&
+                                    : isOpenPeriod && dataHeader?.vPackageId !== "" &&
                                       countRevise > 0 && countDraft > 0 && countApproved === 0
                                     ? false
                                     : true

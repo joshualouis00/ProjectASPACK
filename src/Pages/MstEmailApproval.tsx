@@ -8,19 +8,15 @@ import TextField from "@mui/material/TextField";
 import WelcomePage from "./Welcome";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
-import DateTimeFormatted from "../Component/formatDateTime";
+import axios from "axios";
+import { apiUrl, getToken } from "../Component/TemplateUrl";
 
-const EmailApprovalAspack: React.FC = () => {
+const EmailUpdateTemplate: React.FC = () => {
   const [open, setOpen] = React.useState(true);
   const [subject, setSubject] = React.useState("");
   const [body, setBody] = React.useState("");
+  const [type, setType] = React.useState("NotificationApprove"); // Default type
   const navigate = useNavigate();
-  const bulan = new Date();
-  const ibulan = bulan.getMonth();
-  const namaBulan = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-  ];
 
   const handleClose = () => {
     setOpen(false);
@@ -32,6 +28,31 @@ const EmailApprovalAspack: React.FC = () => {
     setSubject("");
     setBody("");
   };
+
+  // Function to fetch email template based on type
+  const save_EmailApproval = async () => {
+    try {
+      const encodedBody = btoa(body);
+      const response = await axios.post(apiUrl + "api/Setting/EditMail", {
+        headers: {
+          Authorization: `Bearer ` + getToken,
+          Accept: "*/*",
+        },
+        subject: subject,
+        body: encodedBody, 
+        type: type,
+      });
+      // Assuming the API returns subject and body fields
+      setSubject(response.data.subject);
+      setBody(response.data.body);
+    } catch (error) {
+      console.error("Error fetching email template:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    save_EmailApproval();
+  }, [type]); // Fetch template when the type changes
 
   return (
     <>
@@ -45,7 +66,7 @@ const EmailApprovalAspack: React.FC = () => {
         autoComplete="off"
       >
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-          <DialogTitle>Manage Email Approval Template</DialogTitle>
+          <DialogTitle>Manage Email Template</DialogTitle>
           <DialogContent>
             <TextField
               fullWidth
@@ -55,29 +76,31 @@ const EmailApprovalAspack: React.FC = () => {
               rows={1}
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              sx={{ mb: 1, mt: 1, fontSize: 12}}
+              sx={{ mb: 1, mt: 1, fontSize: 12 }}
             />
             <TextField
-               fullWidth
-               id="outlined-body"
-               label="Body"
-               multiline
-               rows={8}
-               value={body}
-               onChange={(e) => setBody(e.target.value)}
-               sx={{ mb: 1, fontSize: 12}}
+              fullWidth
+              id="outlined-body"
+              label="Body"
+              multiline
+              rows={8}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              sx={{ mb: 1, fontSize: 12 }}
             />
-            <Typography sx={{ mb: 1, mt: 2, fontSize: 14, fontWeight: "Bold"}}>Placeholder Variable :</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Company : @Company</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Approved : @Approved</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Revised : @Revised</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Month : @Month</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Year : @Year</Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Link : @Link</Typography>
+            <Typography sx={{ mb: 1, mt: 2, fontSize: 14, fontWeight: "Bold" }}>
+              Placeholder Variable :
+            </Typography>
+             <Typography sx={{ mb: 1, fontSize: 12 }}>Company : @Company</Typography>
+             <Typography sx={{ mb: 1, fontSize: 12 }}>Approved : @Approved</Typography>
+             <Typography sx={{ mb: 1, fontSize: 12 }}>Revised : @Revised</Typography>
+             <Typography sx={{ mb: 1, fontSize: 12 }}>Month : @Month</Typography>
+             <Typography sx={{ mb: 1, fontSize: 12 }}>Year : @Year</Typography>
+             <Typography sx={{ mb: 1, fontSize: 12 }}>Link : @Link</Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button>Submit</Button>
+            <Button onClick={save_EmailApproval}>Submit</Button>
           </DialogActions>
         </Dialog>
       </Box>
@@ -85,4 +108,4 @@ const EmailApprovalAspack: React.FC = () => {
   );
 };
 
-export default EmailApprovalAspack;
+export default EmailUpdateTemplate;

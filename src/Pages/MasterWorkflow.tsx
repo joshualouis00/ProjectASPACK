@@ -33,29 +33,28 @@ export const DataWorkflow: React.FC = () => {
   const [selectedStep, setselectedStep] = React.useState<Data | null>(null);
   const navigate = useHandleUnauthorized();
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const resp = await axios.get(
-          apiUrl + "api/WorkflowStep/getStep",
-          {
-            headers: {
-              Authorization: `Bearer ` + getToken,
-              Accept: "*/*",
-            },
-          }
-        );
-        
-        setRows(resp.data.data);
-      } catch (error: any) {
-        if (error.response && error.response.status === 401) {
-          navigate();
-        } else {
-          console.error("Error Get Step:", error);
+  const fetchData = async () => {
+    try {
+      const resp = await axios.get(
+        apiUrl + "api/WorkflowStep/getStep",
+        {
+          headers: {
+            Authorization: `Bearer ` + getToken,
+            Accept: "*/*",
+          },
         }
+      );
+      
+      setRows(resp.data.data);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate();
+      } else {
+        console.error("Error Get Step:", error);
       }
-    };
-
+    }
+  };
+  React.useEffect(() => {
     fetchData();
   }, [change]);
 
@@ -86,21 +85,19 @@ export const DataWorkflow: React.FC = () => {
 
   const handleSaveStep = async () => {
     const stepData = {
-      vstepid:
+      vStepId:
         editMode && selectedStep
           ? selectedStep.vStepId
           : "STEP" + (rows.length + 1).toString(),
-      vstepdesc: stepDescription,
-      vaffcocategory: category,
-      vfiletype: fileType,
-      bactive: bactive,
+      vStepDesc: stepDescription,
+      vAffcoCategory: category,
+      vfileType: fileType,
+      bActive: bactive,
     };
-
+  
     try {
       const response = await axios.post(
-        apiUrl + `api/WorkflowStep/${
-          editMode ? "editStep" : "addStep"
-        }`,
+        apiUrl + `api/WorkflowStep/${editMode ? "editStep" : "addStep"}`,
         stepData,
         {
           headers: {
@@ -109,8 +106,38 @@ export const DataWorkflow: React.FC = () => {
           },
         }
       );
-
-      if (response.status === 200) {
+  
+      // Check for status 200 (OK) or 204 (No Content)
+      if (response.status === 200 || response.status === 204) {
+        if (editMode) {
+          // If in edit mode, find and update the existing row
+          setRows((prevRows) =>
+            prevRows.map((row) =>
+              row.vStepId === stepData.vStepId
+                ? {
+                    ...row,
+                    vStepDesc: stepData.vStepDesc,
+                    vAffcoCtgry: stepData.vAffcoCategory,
+                    vAttType: stepData.vfileType,
+                    bActive: stepData.bActive,
+                  }
+                : row
+            )
+          );
+        } else {
+          // If not in edit mode, add a new row
+          setRows((prevRows) => [
+            ...prevRows,
+            {
+              vStepId: stepData.vStepId,
+              vStepDesc: stepData.vStepDesc,
+              vAffcoCtgry: stepData.vAffcoCategory,
+              vAttType: stepData.vfileType,
+              bActive: stepData.bActive,
+            },
+          ]);
+        }
+        await fetchData(); // Ensure data is refreshed from the server
         handleClose();
         setChange(true);
       }
@@ -122,6 +149,9 @@ export const DataWorkflow: React.FC = () => {
       }
     }
   };
+  
+  
+  
 
   const columns: MRT_ColumnDef<Data>[] = [
     {

@@ -68,6 +68,11 @@ export default function AspackAprroval() {
   const [index, setIndex] = React.useState<number>(0);  
   const [dataResponse, setDataResponse] = React.useState<IRespFile[]>([]);
   const [filterCategory, setFilterCategory] = React.useState("")
+  const [pMonth, setPMonth] = React.useState("")
+  const [pYear, setPYear] = React.useState("")
+  const [pSdate, setPSdate] = React.useState<Dayjs>(dayjs())
+  const [pEdate, setPEdate] = React.useState<Dayjs>(dayjs())
+  const [isOpenPeriod, setIsOpenPeriod] = React.useState(false)
 
   const navigate = useHandleUnauthorized()
 
@@ -131,10 +136,30 @@ export default function AspackAprroval() {
 
   }
 
+  const fetchOpenPeriode = () => {
+    fetch(apiUrl + "api/Setting/GetOpenPeriod", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken}`
+      }
+    }).then((resp) =>{
+      if(resp.ok) {
+        resp.json().then((data) => {
+          setPMonth(data.data.iMonth)
+          setPYear(data.data.iYear)
+          setPSdate(dayjs(data.data.dStartDate))
+          setPEdate(dayjs(data.data.dEndDate))
+        })
+      }
+    })
+
+  }
+
 
   React.useEffect(() => {
     fetchAffcoFilter()
     fetchStep()
+    fetchOpenPeriode()
   }, []);
 
   const fetchGetPackage = () => {
@@ -210,10 +235,24 @@ export default function AspackAprroval() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();  
-    console.log("submit : ", status)
-    console.log("affco : ", vAffco)  
+     
     if (year !== "" && vAffco !== undefined ) {
       console.log("masuk ke kondisi ini")
+      if(pMonth === month.toString() && pYear === year){
+        const now = dayjs().format('YYYY-MM-DD')
+        const nowDate = dayjs(now)
+        if(nowDate > pSdate && nowDate < pEdate){
+          console.log("open period")
+          setIsOpenPeriod(true)
+        } else {
+          setIsOpenPeriod(false)
+          console.log("close period")
+        }
+  
+  
+      } else {
+        setIsOpenPeriod(false)
+      }
       setStatus(true)
       fetchGetPackage()      
     } else {
@@ -677,7 +716,7 @@ export default function AspackAprroval() {
                               <Button
                                 color="success"
                                 variant="contained"
-                                disabled={countSubmitted === 0 && dataHeader?.vPackageId !== "" && dataAffco.length > 0 && dataHeader?.iStatus === "S" ? false : countSubmitted === 0 && countRevised === 0 && dataHeader?.vPackageId !== "" && dataHeader.iStatus === "PA" ? false : true}
+                                disabled={isOpenPeriod && countSubmitted === 0 && dataHeader?.vPackageId !== "" && dataAffco.length > 0 && dataHeader?.iStatus === "S" ? false : isOpenPeriod && countSubmitted === 0 && countRevised === 0 && dataHeader?.vPackageId !== "" && dataHeader.iStatus === "PA" ? false : true}
                                 onClick={submitApprovals}
                               >
                                 Submit Approval

@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 import axios from "axios";
 import { apiUrl, getToken } from "../Component/TemplateUrl";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 const EmailUpdateTemplate: React.FC = () => {
   const [open, setOpen] = React.useState(true);
@@ -17,6 +18,7 @@ const EmailUpdateTemplate: React.FC = () => {
   const [body, setBody] = React.useState("");
   const [type, setType] = React.useState("UpdateTemplate"); // Default type
   const navigate = useNavigate();
+  const navigate401 = useHandleUnauthorized();
 
   const handleClose = () => {
     setOpen(false);
@@ -30,28 +32,58 @@ const EmailUpdateTemplate: React.FC = () => {
   };
 
   // Function to fetch email template based on type
-  const save_EmailTemplate = async () => {
+  const fetchEmailTemplate = async () => {
     try {
-      const encodedBody = btoa(body);
-      const response = await axios.post(apiUrl + "api/Setting/EditMail", {
+      const response = await axios.get(apiUrl + "api/Setting/GetMailTemplate", {
+        params: { type: type },
         headers: {
           Authorization: `Bearer ` + getToken,
           Accept: "*/*",
         },
-        subject: subject,
-        body: encodedBody, 
-        type: type,
       });
-      // Assuming the API returns subject and body fields
-      setSubject(response.data.subject);
-      setBody(response.data.body);
-    } catch (error) {
-      console.error("Error saving email template:", error);
+
+      console.log("API response: ", response.data); // Debugging log
+
+      setSubject(response.data.data.subject);
+      setBody(response.data.data.body);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate401();
+      } else {
+        console.error("Error saving email template:", error);
+      }
     }
   };
 
+  const save_EmailTemplate = async () => {
+    try {
+      const encodedBody = btoa(body); // Encode body to base64 if necessary
+      await axios.post(
+        apiUrl + "api/Setting/EditMail",
+        {
+          subject: subject,
+          body: encodedBody,
+          type: type,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ` + getToken,
+            Accept: "*/*",
+          },
+        }
+      );
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        navigate401();
+      } else {
+        console.error("Error saving email template:", error);
+      }
+    }
+  };
+
+  // Fetch email template when component mounts or type changes
   React.useEffect(() => {
-    save_EmailTemplate();
+    fetchEmailTemplate();
   }, [type]);
 
   return (
@@ -66,7 +98,7 @@ const EmailUpdateTemplate: React.FC = () => {
         autoComplete="off"
       >
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-          <DialogTitle>Manage Email Template</DialogTitle>
+          <DialogTitle>Manage Update Aspack Template</DialogTitle>
           <DialogContent>
             <TextField
               fullWidth
@@ -76,7 +108,7 @@ const EmailUpdateTemplate: React.FC = () => {
               rows={1}
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              sx={{ mb: 1, mt: 1, fontSize: 12 }}
+              sx={{ mb: 1, mt: 1, fontSize: 10 }}
             />
             <TextField
               fullWidth
@@ -86,15 +118,15 @@ const EmailUpdateTemplate: React.FC = () => {
               rows={8}
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              sx={{ mb: 1, fontSize: 12 }}
+              sx={{ mb: 1, fontSize: 10 }}
             />
             <Typography sx={{ mb: 1, mt: 2, fontSize: 14, fontWeight: "Bold" }}>
               Placeholder Variable :
             </Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>
-              Template : @Template
+              Template : @TEMPLATE
             </Typography>
-            <Typography sx={{ mb: 1, fontSize: 12 }}>Link : @Link</Typography>
+            <Typography sx={{ mb: 1, fontSize: 12 }}>Link : @LINK</Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

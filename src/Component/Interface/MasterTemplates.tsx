@@ -11,6 +11,7 @@ export interface TabPanelProps {
     status: string;
     vAttchId: string;
     file: File;
+    iVersion: number;
   }
 
   export interface ITabContent {
@@ -27,6 +28,7 @@ export interface TabPanelProps {
     createDate: string;
     status: string;
     vAttchId: string;
+    iVersion: any;
   }
   
   export interface AppTableProps {

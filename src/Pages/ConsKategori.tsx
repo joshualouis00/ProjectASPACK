@@ -223,7 +223,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.map((item, index) => (
+                {dataNews?.filter((val) =>  val.bActive === true).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,
@@ -277,7 +277,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,
@@ -331,7 +331,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year))).map((item, index) => (
+                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true )).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,
@@ -385,7 +385,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,
@@ -439,7 +439,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category)).map((item, index) => (
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category && val.bActive === true )).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,
@@ -493,7 +493,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,
@@ -547,7 +547,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year))).map((item, index) => (
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true )).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,
@@ -601,7 +601,7 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[1]) === parseInt(month))).map((item, index) => (
+                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
                   <Card
                     sx={{
                       maxWidth: 300,

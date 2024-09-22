@@ -238,7 +238,7 @@ export default function AspackAprroval() {
      
     if (year !== "" && vAffco !== undefined ) {
       console.log("masuk ke kondisi ini")
-      if(pMonth === month && pYear === year){
+      if(pMonth === month.toString() && pYear === year){
         const now = dayjs().format('YYYY-MM-DD')
         const nowDate = dayjs(now)
         if(nowDate > pSdate && nowDate < pEdate){

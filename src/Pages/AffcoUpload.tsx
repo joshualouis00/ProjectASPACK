@@ -49,6 +49,7 @@ export default function AffcoUpload() {
       id: 100,
       label: "loading",
       desc: "loading",
+      fileType: "both"
     },
   ]);
   const [tempFile, setTempFile] = React.useState<ITempFile[]>([]);
@@ -189,7 +190,7 @@ export default function AffcoUpload() {
   };
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
-    setMonth(event.target.value as string);
+    setMonth(event.target.value);
     setHasErrorMonth(false);
   };
 
@@ -200,8 +201,10 @@ export default function AffcoUpload() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
 
-    if(pMonth === month && pYear === year){
+    if(pMonth === month.toString() && pYear === year){
+      
       const now = dayjs().format('YYYY-MM-DD')
       const nowDate = dayjs(now)
       if(nowDate > pSdate && nowDate < pEdate){
@@ -215,6 +218,10 @@ export default function AffcoUpload() {
 
     } else {
       setIsOpenPeriod(false)
+      console.log("pMonth : ", pMonth)
+      console.log("pYear : ", pYear)
+      console.log("month :", month)
+      console.log("yeaar : ", year)
     }
     
     setTempData([])
@@ -233,6 +240,7 @@ export default function AffcoUpload() {
                 id: index,
                 label: val.vStepId,
                 desc: val.vStepDesc,
+                fileType: val.vAttType
               };
             })
         );

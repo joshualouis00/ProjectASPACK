@@ -1,6 +1,33 @@
 import { MRT_ColumnDef } from "material-react-table";
 import {  IStepProps } from "../../Interface/DataUpload";
 import { Button } from "@mui/material";
+import { apiUrl, getToken } from "../../TemplateUrl";
+
+const handleClickPreview = (stepid: string, version: string, vAttachId: string) => {
+    fetch(apiUrl + `api/Package/DownloadPackage?vStepId=${stepid}&nVersion=${version.split("V")[1]}&vAttachId=${vAttachId}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `bearer ${getToken}`
+        }
+    } ).then((resp) => {
+        if(resp.status === 200){
+            resp.blob().then((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "File Attachment " + stepid;
+                a.click();
+              });
+
+        } else {
+            if(resp.status === 404){
+                return alert("File not found, please contact your IT Administrator.")
+            } else {
+                return alert("Something wrong, please contact your IT Administrator.")
+            }
+        }
+    })
+}
 
 export const columnWaiting: MRT_ColumnDef<(IStepProps)>[] = [
     {
@@ -88,7 +115,7 @@ export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
         Cell: ({cell}) => {
             if(cell.row.original.status !== "Draft"){
                 return (
-                    <Button variant="contained" size="small" color="inherit">Preview</Button>
+                    <Button variant="contained" size="small" color="inherit" onClick={() => {handleClickPreview(cell.row.original.stepid, cell.row.original.docVersion, cell.row.original.vAttachId)}}>Preview</Button>
                 )
             }
             

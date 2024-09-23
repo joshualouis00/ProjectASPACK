@@ -212,17 +212,12 @@ export default function AffcoUpload() {
         console.log("open period")
         setIsOpenPeriod(true)
       } else {
-        setIsOpenPeriod(false)
-        console.log("close period")
+        setIsOpenPeriod(false)        
       }
 
 
     } else {
-      setIsOpenPeriod(false)
-      console.log("pMonth : ", pMonth)
-      console.log("pYear : ", pYear)
-      console.log("month :", month)
-      console.log("yeaar : ", year)
+      setIsOpenPeriod(false)      
     }
     
     setTempData([])
@@ -285,7 +280,7 @@ export default function AffcoUpload() {
                 stepid: dtl.vStepId,
                 dApprover: dtl.dApprover,
                 dDueDate: dtl.dDueDate,
-                apprRemarks: dtl.vApprRemarks,
+                apprRemarks: fp.vRemarks,
                 userRemarks: dtl.vUsrRemarks,
                 vTempCode: dtl.vTemporalCode,
                 vAttachId: dtl.vAttchId,

@@ -7,56 +7,105 @@ import useHandleUnauthorized from "../Component/handleUnauthorized";
 import { apiUrl, getToken } from "./TemplateUrl";
 import { ITabContent, FileData } from "./Interface/MasterTemplates";
 
-const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, setFiles }) => {
+const TabContent: React.FC<ITabContent> = ({
+  label,
+  vStepId,
+  vFileType,
+  files,
+  setFiles,
+}) => {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [fileList, setFileList] = useState<FileData[]>(files);
   const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useHandleUnauthorized();
 
+  // Update file list when files prop changes
   useEffect(() => {
     setFileList(files);
   }, [files]);
 
+  // Handling file drop
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const validExtensions = vFileType === "PDF"
-        ? ["application/pdf"]
-        : vFileType === "Excel"
-        ? ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]
-        : ["application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"];
+      const validExtensions =
+        vFileType === "PDF"
+          ? ["application/pdf"]
+          : vFileType === "Excel"
+          ? [
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              "application/vnd.ms-excel",
+            ]
+          : [
+              "application/pdf",
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              "application/vnd.ms-excel",
+            ];
 
-      const newFiles = acceptedFiles.filter((file) =>
-        validExtensions.includes(file.type)
-      ).map((file) => ({
-        fileName: file.name,
-        createDate: new Date().toDateString(),
-        status: "Draft",
-        file: file,
-        vAttchId: "",
-      }));
+      const invalidFiles = acceptedFiles.filter(
+        (file) => !validExtensions.includes(file.type)
+      );
+
+      // Menampilkan pesan error jika ada file yang tidak valid
+      if (invalidFiles.length > 0) {
+        setErrorMessage(`Template yang di-upload harus berupa ${vFileType}.`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+        return;
+      }
+      
+      // Memproses file yang valid
+      const newFiles = acceptedFiles
+        .filter((file) => validExtensions.includes(file.type))
+        .map((file) => ({
+          fileName: file.name,
+          createDate: new Date().toDateString(),
+          status: "Draft",
+          file: file,
+          vAttchId: "",
+          iVersion: 1,
+        }));
 
       setFileList((prevList) => [...prevList, ...newFiles]);
       setFiles([...files, ...newFiles]); // Update the files in the parent component
+      setErrorMessage(null);
     },
     [vFileType, files, setFiles]
   );
 
+  // Handle error message timeout
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (errorMessage) {
+      timeout = setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [errorMessage]);
+
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
+  // Handling file upload
   const handleUpload = async () => {
-    setIsUploading(true);
+    setIsUploading(true); // Mencegah upload ganda dengan men-disable tombol
     try {
       const formData = new FormData();
-  
-      // Filter only files with "Draft" status for upload
-      const draftFiles = fileList.filter(file => file.status === "Draft");
-  
+      const draftFiles = fileList.filter((file) => file.status === "Draft");
+
       draftFiles.forEach((file, index) => {
         formData.append(`template[${index}].vAttchId`, "");
         formData.append(`template[${index}].vStepId`, vStepId);
         formData.append(`template[${index}].attachment[0].fFile`, file.file);
-        formData.append(`template[${index}].attachment[0].vFileName`, file.fileName);
+        formData.append(
+          `template[${index}].attachment[0].vFileName`,
+          file.fileName
+        );
       });
+
       const response = await axios.post(
         apiUrl + "api/Template/AddTemplate",
         formData,
@@ -67,10 +116,11 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
           },
         }
       );
+
       if (response.status === 200) {
         setUploadStatus("Upload successful");
-        await getTemplates(); 
-        setTimeout(() => setUploadStatus(null), 5000); 
+        await getTemplates(); // Refresh file list after successful upload
+        setTimeout(() => setUploadStatus(null), 5000);
       }
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -82,20 +132,18 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
         console.error("Error Add templates:", error);
       }
     } finally {
-      setIsUploading(false); 
+      setIsUploading(false); // Re-enable button after upload
     }
-  };  
+  };
 
+  // Fetching templates from backend
   const getTemplates = async () => {
     try {
-      const response = await axios.get(
-        apiUrl + "api/Template/GetTemplates",
-        {
-          headers: {
-            Authorization: `Bearer ` + getToken,
-          },
-        }
-      );
+      const response = await axios.get(apiUrl + "api/Template/GetTemplates", {
+        headers: {
+          Authorization: `Bearer ` + getToken,
+        },
+      });
 
       if (response.status === 200) {
         const backendData = response.data.data;
@@ -122,13 +170,13 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
       if (error.response && error.response.status === 401) {
         navigate();
       } else {
-      console.error("Error Get templates:", error);
+        console.error("Error Get templates:", error);
       }
     }
   };
 
-  const draftExists = fileList.some(file => file.status === "Draft");
-  
+  const draftExists = fileList.some((file) => file.status === "Draft");
+
   return (
     <Container
       maxWidth="xl"
@@ -138,7 +186,9 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
         {"Upload Template " + label}
       </Typography>
       <Typography component="div" sx={{ fontSize: "12px", mb: 2 }}>
-        {"A new file will automatically deactivate the previous file. The file accessible by affco will be the latest uploaded file."}
+        {
+          "A new file will automatically deactivate the previous file. The file accessible by affco will be the latest uploaded file."
+        }
       </Typography>
       <Box
         {...getRootProps()}
@@ -156,7 +206,11 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
         }}
       >
         <input {...getInputProps()} />
-        <Typography color="textSecondary" component="div" sx={{ fontSize: "10px" }}>
+        <Typography
+          color="textSecondary"
+          component="div"
+          sx={{ fontSize: "10px" }}
+        >
           Drag 'n' drop some files here, or click to select files
         </Typography>
       </Box>
@@ -164,12 +218,16 @@ const TabContent: React.FC<ITabContent> = ({ label, vStepId, vFileType, files, s
         onClick={handleUpload}
         variant="contained"
         color="info"
-        sx={{mb: 1}}
-        disabled={!draftExists || isUploading}
+        sx={{ mb: 1 }}
+        disabled={!draftExists || isUploading} // Disable if no draft exists or already uploading
       >
         Submit
       </Button>
-      <AppTable files={fileList} uploadStatus={uploadStatus}/>
+      <AppTable
+        files={fileList}
+        uploadStatus={uploadStatus}
+        errorMessage={errorMessage}
+      />
       {uploadStatus && (
         <Typography
           variant="body1"

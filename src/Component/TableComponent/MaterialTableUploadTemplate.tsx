@@ -6,20 +6,39 @@ import { format, parse } from "date-fns";
 import { apiUrl, getToken } from "../TemplateUrl";
 import { FileDataUpload, AppTableProps } from "../Interface/MasterTemplates";
 
-
-const AppTable: React.FC<AppTableProps & { uploadStatus: string | null }> = ({ files, uploadStatus }) => {
+const AppTable: React.FC<
+  AppTableProps & { uploadStatus: string | null; errorMessage: string | null }
+> = ({ files, uploadStatus, errorMessage }) => {
   const navigate = useHandleUnauthorized();
   const [showAlert, setShowAlert] = React.useState(false);
 
   const getLatestVersion = (vAttchId: string) => {
-    const filesForAttchId = files.filter((file) => file.vAttchId === vAttchId);
-    return filesForAttchId.length; // Misalnya, versi adalah panjang array
+    const filesForAttchId = files
+      .filter((file) => file.vAttchId === vAttchId && file.status === "Active");
+    return filesForAttchId.length; // Mengembalikan jumlah file yang "Active" sebagai versi terbaru
   };
+  
+  const getVersion = (iVersion: any) => {
+    const filesForAttchIds = files.filter((file) => file.iVersion === iVersion && file.status === "Inactive");
+    return filesForAttchIds.length;
+  }
 
-  const downloadFile = async (fileName: string, vAttchId: string) => {
+
+  const downloadFile = async (
+    fileName: string,
+    vAttchId: string,
+    status: string,
+    iVersion: any
+  ) => {
     const encodedFileName = btoa(fileName); // Encode filename
-    const iVersion = getLatestVersion(vAttchId).toString();
-    const url = apiUrl + `api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${iVersion}`;
+
+    // Jika statusnya "Active", gunakan versi terakhir, jika tidak gunakan versi dari row
+    const versionToUse =
+      status === "Active" ? getLatestVersion(vAttchId).toString() : getVersion(iVersion).toString();
+
+    const url =
+      apiUrl +
+      `api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${versionToUse}`;
 
     try {
       const response = await fetch(url, {
@@ -46,7 +65,7 @@ const AppTable: React.FC<AppTableProps & { uploadStatus: string | null }> = ({ f
         console.error("Error fetching templates:", error);
       }
     }
-  };
+  };  
 
   const columns: MRT_ColumnDef<FileDataUpload>[] = [
     {
@@ -106,14 +125,19 @@ const AppTable: React.FC<AppTableProps & { uploadStatus: string | null }> = ({ f
       Cell: ({ row }) => {
         const fileName = row.original.fileName;
         const vAttchId = row.original.vAttchId;
-        const fileStatus = row.original.status; 
+        const fileStatus = row.original.status;
+        const iVersion = row.original.iVersion;
         return (
           <Button
-            onClick={() => downloadFile(fileName, vAttchId)}
+            onClick={() =>
+              downloadFile(fileName, vAttchId, fileStatus, iVersion)
+            }
             variant="outlined"
             color="info"
             size="small"
-            disabled={fileStatus === "Draft" || uploadStatus === "Upload successful"}
+            disabled={
+              fileStatus === "Draft" || uploadStatus === "Upload successful"
+            }
           >
             Download
           </Button>
@@ -128,6 +152,11 @@ const AppTable: React.FC<AppTableProps & { uploadStatus: string | null }> = ({ f
       {showAlert && (
         <Alert variant="outlined" severity="error" sx={{ mb: 2 }}>
           Gagal download template. Hubungi IT Support.
+        </Alert>
+      )}
+      {errorMessage && (
+        <Alert variant="outlined" severity="error" sx={{ mb: 2 }}>
+          {errorMessage}
         </Alert>
       )}
     </Box>

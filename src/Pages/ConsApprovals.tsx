@@ -694,7 +694,7 @@ export default function AspackAprroval() {
                             v.status === "Revise" ||
                             v.status === "Approve"
                         )}
-                        enableRowSelection
+                        
                         enableRowActions
                         renderBottomToolbarCustomActions={({ table }) => {
                           const countSubmitted = dataAffco.filter(
@@ -702,17 +702,7 @@ export default function AspackAprroval() {
                           ).length; 
                           const countRevised = dataAffco.filter((v) => v.status === "Revised").length;                                                   
                           return (
-                            <div style={{ display: "flex", gap: "0.5rem" }}>
-                              <Button
-                                color="primary"
-                                disabled={
-                                  table.getSelectedRowModel().flatRows
-                                    .length === 0
-                                }
-                                variant="contained"
-                              >
-                                Download
-                              </Button>
+                            <div style={{ display: "flex", gap: "0.5rem" }}>                              
                               <Button
                                 color="success"
                                 variant="contained"
@@ -762,8 +752,7 @@ export default function AspackAprroval() {
                     <Box>
                       <MaterialReactTable
                         columns={columnRevised}
-                        data={dataAffco.filter((v) => v.status === "Revised")}
-                        enableRowSelection
+                        data={dataAffco.filter((v) => v.status === "Revised")}                        
                       />
                     </Box>
                   </CustomTabs>
@@ -771,24 +760,8 @@ export default function AspackAprroval() {
                     <Box>
                       <MaterialReactTable
                         columns={columnApproved}
-                        data={dataAffco.filter((v) => v.status === "Approved")}
-                        enableRowSelection
-                        renderBottomToolbarCustomActions={({ table }) => {
-                          return (
-                            <div style={{ display: "flex", gap: "0.5rem" }}>
-                              <Button
-                                color="primary"
-                                disabled={
-                                  table.getSelectedRowModel().flatRows
-                                    .length === 0
-                                }
-                                variant="contained"
-                              >
-                                Download
-                              </Button>
-                            </div>
-                          );
-                        }}
+                        data={dataAffco.filter((v) => v.status === "Approved")}                        
+                        
                       />
                     </Box>
                   </CustomTabs>

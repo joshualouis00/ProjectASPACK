@@ -201,6 +201,7 @@ export default function AffcoUpload() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setActiveStep(-1)
     
 
     if(pMonth === month.toString() && pYear === year){

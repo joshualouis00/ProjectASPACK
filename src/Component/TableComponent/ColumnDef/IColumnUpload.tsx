@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import { apiUrl, getToken } from "../../TemplateUrl";
 
 const handleClickPreview = (stepid: string, version: string, vAttachId: string) => {
-    fetch(apiUrl + `api/Package/DownloadPackage?vStepId=${stepid}&nVersion=${version.split("V")[1]}&vAttachId=${vAttachId}`, {
+    fetch(apiUrl + `api/Package/DownloadPackage?vStepId=${stepid}&iVersion=${version.split("V")[1]}&vAttachId=${vAttachId}`, {
         method: 'GET',
         headers: {
             Authorization: `bearer ${getToken}`
@@ -30,6 +30,10 @@ const handleClickPreview = (stepid: string, version: string, vAttachId: string) 
 }
 
 export const columnWaiting: MRT_ColumnDef<(IStepProps)>[] = [
+    { header: "#", 
+        Cell: ({ row }) => row.index + 1 ,
+        size: 50
+      },
     {
         accessorKey: "filename",
         header: "File Name"
@@ -46,10 +50,20 @@ export const columnWaiting: MRT_ColumnDef<(IStepProps)>[] = [
     {
         accessorKey: "status",
         header: "Status",        
+    },
+    {
+        header: "Download File",
+        Cell: ({cell}) => {
+            return (<Button variant="contained" size="small" color="inherit" onClick={() => {handleClickPreview(cell.row.original.stepid, cell.row.original.docVersion, cell.row.original.vAttachId)}}>Download</Button>)
+        }
     }
 ];
 
 export const columnRevised: MRT_ColumnDef<(IStepProps)>[] = [
+    { header: "#", 
+        Cell: ({ row }) => row.index + 1 ,
+        size: 50
+      },
     {
         accessorKey: "filename",
         header: "File Name"
@@ -59,7 +73,10 @@ export const columnRevised: MRT_ColumnDef<(IStepProps)>[] = [
         header: "Deadline Date"
     },
     {
-        header: "Action"
+        header: "Action",
+        Cell: ({cell}) => {
+            return (<Button variant="contained" size="small" color="inherit" onClick={() => {handleClickPreview(cell.row.original.stepid, cell.row.original.docVersion, cell.row.original.vAttachId)}}>Download</Button>)
+        }
     },
     {
         accessorKey: "status",
@@ -68,6 +85,10 @@ export const columnRevised: MRT_ColumnDef<(IStepProps)>[] = [
 ];
 
 export const columnApproved: MRT_ColumnDef<(IStepProps)>[] = [
+    { header: "#", 
+        Cell: ({ row }) => row.index + 1 ,
+        size: 50
+      },
     {
         accessorKey: "filename",
         header: "File Name"
@@ -81,7 +102,10 @@ export const columnApproved: MRT_ColumnDef<(IStepProps)>[] = [
         header: "Version"
     },
     {
-        header: "Action"
+        header: "Action",
+        Cell: ({cell}) => {
+            return (<Button variant="contained" size="small" color="inherit" onClick={() => {handleClickPreview(cell.row.original.stepid, cell.row.original.docVersion, cell.row.original.vAttachId)}}>Download</Button>)
+        }
     },
     {
         accessorKey: "status",
@@ -90,6 +114,10 @@ export const columnApproved: MRT_ColumnDef<(IStepProps)>[] = [
 ];
 
 export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
+    { header: "#", 
+        Cell: ({ row }) => row.index + 1 ,
+        size: 50
+      },
     {
         accessorKey: "filename",
         header: "File Name"
@@ -115,7 +143,7 @@ export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
         Cell: ({cell}) => {
             if(cell.row.original.status !== "Draft"){
                 return (
-                    <Button variant="contained" size="small" color="inherit" onClick={() => {handleClickPreview(cell.row.original.stepid, cell.row.original.docVersion, cell.row.original.vAttachId)}}>Preview</Button>
+                    <Button variant="contained" size="small" color="inherit" onClick={() => {handleClickPreview(cell.row.original.stepid, cell.row.original.docVersion, cell.row.original.vAttachId)}}>Download</Button>
                 )
             }
             

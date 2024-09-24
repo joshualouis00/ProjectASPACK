@@ -1,7 +1,7 @@
 import { Alert, Snackbar } from "@mui/material";
 import { ISnackProps } from "./Interface/DataTemplate";
 
-export const apiUrl = "/";
+export const apiUrl = "http://192.168.1.206:9020/";
 export const getToken = localStorage.getItem('token');
 export const getRole = localStorage.getItem('Role');
 export const getUserId = localStorage.getItem('UserID');

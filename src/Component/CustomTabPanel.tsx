@@ -28,19 +28,13 @@ const TabContent: React.FC<ITabContent> = ({
   // Handling file drop
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const validExtensions =
-        vFileType === "PDF"
-          ? ["application/pdf"]
-          : vFileType === "Excel"
-          ? [
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-              "application/vnd.ms-excel",
-            ]
-          : [
-              "application/pdf",
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-              "application/vnd.ms-excel",
-            ];
+      const validExtensions = [
+        "application/pdf", // PDF
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
+        "application/vnd.ms-excel", // Excel .xls
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
+        "application/msword", // Word .doc
+      ];
 
       const invalidFiles = acceptedFiles.filter(
         (file) => !validExtensions.includes(file.type)
@@ -54,7 +48,7 @@ const TabContent: React.FC<ITabContent> = ({
         }, 5000);
         return;
       }
-      
+
       // Memproses file yang valid
       const newFiles = acceptedFiles
         .filter((file) => validExtensions.includes(file.type))
@@ -67,8 +61,15 @@ const TabContent: React.FC<ITabContent> = ({
           iVersion: 1,
         }));
 
+      // Sort so Draft files appear at the top
+      const updatedFileList = [...files, ...newFiles].sort((a, b) => {
+        if (a.status === "Draft" && b.status !== "Draft") return -1;
+        if (a.status !== "Draft" && b.status === "Draft") return 1;
+        return 0; // Maintain order for files with same status
+      });
+
       setFileList((prevList) => [...prevList, ...newFiles]);
-      setFiles([...files, ...newFiles]); // Update the files in the parent component
+      setFiles(updatedFileList); // Update parent state with sorted files
       setErrorMessage(null);
     },
     [vFileType, files, setFiles]

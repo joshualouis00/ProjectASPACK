@@ -7,7 +7,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import WelcomePage from "./Welcome";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import axios from "axios";
 import { apiUrl, getToken } from "../Component/TemplateUrl";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
@@ -72,6 +72,8 @@ const EmailUpdateTemplate: React.FC = () => {
           },
         }
       );
+      handleClose();
+      alert("Update Aspack Template berhasil diubah!");
     } catch (error: any) {
       if (error.response && error.response.status === 401) {
         navigate401();

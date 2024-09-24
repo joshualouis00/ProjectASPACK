@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import { Container, Typography } from "@mui/material";
 import styled from "styled-components";
 import WelcomeBawah from "../assets/Home.png";
@@ -24,7 +24,7 @@ const WelcomePage: React.FC = () => {
         sx={{ pl: "2px !important", pr: "2px !important" }}
       >
         <Typography sx={{mb:"10px", fontSize: "18px"}} >
-          Welcome, Console Team! We are glad to have you here. Let's make
+          Welcome, Consol Team! We are glad to have you here. Let's make
           something amazing together.
         </Typography>
         <BgBot />

@@ -71,6 +71,10 @@ const EmailUpdateTemplate: React.FC = () => {
           },
         }
       );
+
+      handleClose();
+      alert("Affco Submit Template berhasil diubah!");
+
     } catch (error: any) {
       if (error.response && error.response.status === 401) {
         navigate401();

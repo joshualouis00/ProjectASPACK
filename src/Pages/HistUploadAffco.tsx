@@ -231,12 +231,6 @@ const HistoryUploadAffco: React.FC = () => {
     const selectedYear = row.iYear;
     const selectedMonth = row.iMonth;
 
-    // Logging untuk verifikasi
-    console.log("Affco ID:", selectedAffcoId);
-    console.log("Step ID:", selectedStepId);
-    console.log("Tahun:", selectedYear);
-    console.log("Bulan:", selectedMonth);
-
     // Lakukan sesuatu dengan nilai-nilai tersebut, seperti membuka dialog atau melakukan panggilan API
     setAffcoId(selectedAffcoId);
     setStepId(selectedStepId);
@@ -317,7 +311,12 @@ const HistoryUploadAffco: React.FC = () => {
     { accessorKey: "vAction", header: "Status", size: 150 },
     { accessorKey: "vRemarks", header: "Remarks", size: 150 },
     { accessorKey: "vUserId", header: "Approval", size: 150 },
-    { accessorKey: "dDateTime", header: "Approval Date", size: 150 },
+    {
+      accessorKey: "dDateTime",
+      header: "Approval Date",
+      size: 150,
+      Cell: ({ cell }) => format(new Date(cell.getValue() as string), 'dd/MM/yyyy HH:mm'),
+    },
   ];
 
   return (

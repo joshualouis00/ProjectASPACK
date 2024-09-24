@@ -103,8 +103,19 @@ export default function MstUserAffco() {
     const [hasErrorRole, setHasErrorRole] = React.useState(false)
     const [affcom, setAffcom] = React.useState<IDataAffco[]>([]);
     const [affco, setAffco] = React.useState("")
+    const [duplicate, setDuplicate] = React.useState(false)
     const submitAddUser = () => {
       if(userId !== "" && username !== "" && email !== "" && role !== ""){
+        let validUserId = dataUser.filter((val) => val.id === userId)
+
+        if(validUserId.length > 0){
+          
+          setHasErrorId(true)
+          setDuplicate(true)
+        } else {
+          setHasErrorId(false)
+          setDuplicate(false)
+          
         setLoading(true);
         const vUserId = userId;
       const vUserName = username;
@@ -161,6 +172,7 @@ export default function MstUserAffco() {
           
         }
       });
+        }
 
       } else {
         if(userId === ""){
@@ -202,9 +214,11 @@ export default function MstUserAffco() {
       if(event.target.value !== ""){
         setUserId(event.target.value);
         setHasErrorId(false)
+        setDuplicate(false)
       } else {
         setUserId(event.target.value);
         setHasErrorId(true)
+        setDuplicate(false)
       }
       
     };
@@ -279,7 +293,7 @@ export default function MstUserAffco() {
                 onChange={handleChangeUserId}
               />
               {
-                hasErrorId && (<FormHelperText sx={{ color: "red" }}>This is required!</FormHelperText>)
+                hasErrorId && (<FormHelperText sx={{ color: "red" }}>{ duplicate ? "User ID already registered" : "This is required!"}</FormHelperText>)
               }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
@@ -352,7 +366,7 @@ export default function MstUserAffco() {
                 label="Role"
                 onChange={handleChangeRole}
               >
-                <MenuItem value="C">Console</MenuItem>
+                <MenuItem value="C">Consol</MenuItem>
                 <MenuItem value="A">Affco</MenuItem>
               </Select>
               {
@@ -698,7 +712,7 @@ export default function MstUserAffco() {
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
               <InputLabel>Role</InputLabel>
               <Select disabled value={role} label="Role">
-                <MenuItem value="C">Console</MenuItem>
+                <MenuItem value="C">Consol</MenuItem>
                 <MenuItem value="A">Affco</MenuItem>
               </Select>
             </FormControl>
@@ -851,6 +865,7 @@ export default function MstUserAffco() {
     const [hasErrorId, setHasErrorId] = React.useState(false)
     const [affcoName, setAffcoName] = React.useState("");
     const [hasErrorName, setHasErrorName] = React.useState(false)
+    const [duplicate, setDuplicate] = React.useState(false)
 
     const handleChangeAffcoId = (
       event: React.ChangeEvent<HTMLInputElement>
@@ -858,10 +873,12 @@ export default function MstUserAffco() {
       if(event.target.value !== ""){
         setAffcoID(event.target.value);
         setHasErrorId(false)
+        setDuplicate(false)
 
       } else {
         setAffcoID(event.target.value);
         setHasErrorId(true)
+        setDuplicate(false)
       }
       
     };
@@ -893,40 +910,48 @@ export default function MstUserAffco() {
     };
     const submitAddAffco = () => {
       if (affcoID !== "" && affcoName !== "" && catAffco !== "") {
-        fetch(apiUrl + "api/Master/addAffco", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `bearer ${getToken}`,
-            Accept: "*/*",
-          },
-          body: JSON.stringify({
-            vAffcoId: affcoID,
-            vAffcoName: affcoName,
-            vAffcoType: catAffco,
-            bActive: statusAffco === "Active" ? true : false,
-          }),
-        }).then((resp) => {
-          if (resp.ok) {
-            fetchAffco();
-            setMessage("Affco Added Successfully.");
-            setError(false);
-            setOpenSnack(true);
-            onClose();
-          } else {
-            if(resp.status === 401){
-              navigate()
-            }
-            else {
+        let validAffcoId = dataAffco.filter((val) => val.id === affcoID)
+        if(validAffcoId.length > 0){
+          setDuplicate(true)
+          setHasErrorId(true)
+        } else {
+          setDuplicate(false)
+          setHasErrorId(false)
+          fetch(apiUrl + "api/Master/addAffco", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `bearer ${getToken}`,
+              Accept: "*/*",
+            },
+            body: JSON.stringify({
+              vAffcoId: affcoID,
+              vAffcoName: affcoName,
+              vAffcoType: catAffco,
+              bActive: statusAffco === "Active" ? true : false,
+            }),
+          }).then((resp) => {
+            if (resp.ok) {
               fetchAffco();
-            setMessage("Affco Added Failed.");
-            setError(true);
-            setOpenSnack(true);
-            onClose();
+              setMessage("Affco Added Successfully.");
+              setError(false);
+              setOpenSnack(true);
+              onClose();
+            } else {
+              if(resp.status === 401){
+                navigate()
+              }
+              else {
+                fetchAffco();
+              setMessage("Affco Added Failed.");
+              setError(true);
+              setOpenSnack(true);
+              onClose();
+              }
+              
             }
-            
-          }
-        });
+          });
+        }
       } else {
         if(affcoID === ""){
           setHasErrorId(true)
@@ -978,7 +1003,7 @@ export default function MstUserAffco() {
               />
               {
                 hasErrorId && (<FormHelperText sx={{ color: "red" }}>
-                  This is required!
+                  { duplicate ? "Affco ID already registered." : "This is required!"} 
                 </FormHelperText>)
               }
             </FormControl>

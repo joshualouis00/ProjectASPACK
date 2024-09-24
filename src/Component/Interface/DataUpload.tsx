@@ -46,3 +46,10 @@ export interface IDialogProps {
     onClose: () => void, 
     data: number  
 }
+
+export interface IRemarkProps {
+    open: boolean,
+    onClose: () => void,
+    remark: string,
+    dueDate: string
+}

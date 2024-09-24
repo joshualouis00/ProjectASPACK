@@ -3,8 +3,10 @@ import {
   AccordionDetails,
   AccordionSummary,
   Autocomplete,
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -33,7 +35,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
 import IDataAffco from "../Component/Interface/DataAffco";
 import IDataTemplate from "../Component/Interface/DataTemplate";
-import { apiUrl, generateMonths, generateYears, getToken, getUserId} from "../Component/TemplateUrl";
+import { apiUrl, CustomSnackBar, generateMonths, generateYears, getToken, getUserId} from "../Component/TemplateUrl";
 import { CustomTabs, a11yProps } from "../Component/CustomTab";
 import { IDialogProps, IHeaderProps, IRespFile, IStepProps } from "../Component/Interface/DataUpload";
 import { MaterialReactTable } from "material-react-table";
@@ -43,7 +45,7 @@ import {
   columnWaiting,
 } from "../Component/TableComponent/ColumnDef/IColumnUpload";
 import dayjs, { Dayjs } from "dayjs";
-import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider, MobileDatePicker, MobileDateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -73,6 +75,10 @@ export default function AspackAprroval() {
   const [pSdate, setPSdate] = React.useState<Dayjs>(dayjs())
   const [pEdate, setPEdate] = React.useState<Dayjs>(dayjs())
   const [isOpenPeriod, setIsOpenPeriod] = React.useState(false)
+  const [message, setMessage] = React.useState("")
+  const [openSnack, setOpenSnack] = React.useState(false)
+  const [error, setError] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
 
   const navigate = useHandleUnauthorized()
 
@@ -341,7 +347,7 @@ export default function AspackAprroval() {
 
     const submitRevise = (data: number) => {
       setOpen(false)
-      const updateData = {...dataAffco[data], status:"Revise", dDueDate: duedate ? duedate.format("YYYY-MM-DD") : "", apprRemarks: vRemark, dApprover: "", vApprover: ""}
+      const updateData = {...dataAffco[data], status:"Revise", dDueDate: duedate ? duedate.format("YYYY-MM-DD HH:mm:ss") : "", apprRemarks: vRemark, dApprover: "", vApprover: ""}
       const newDataAffco = [...dataAffco];
       newDataAffco[data] = updateData;
       setDataAffco(newDataAffco);
@@ -380,11 +386,14 @@ export default function AspackAprroval() {
             <FormControl fullWidth sx={{ margin: 1}}>
               <FormLabel>Due Date</FormLabel>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MobileDatePicker 
+                <MobileDateTimePicker
+                ampm={false}
+                orientation="landscape"
+                disablePast
                 value={duedate}
                 onChange={(newValue) => setDueDate(newValue)}
                 slotProps={{ textField: { fullWidth: true } }}
-                format="DD-MMM-YYYY"
+                format="DD-MMM-YYYY HH:mm:ss"
                 />
               </LocalizationProvider>
             </FormControl>
@@ -416,6 +425,7 @@ export default function AspackAprroval() {
   }
 
   const submitApprovals = () => {
+    setLoading(true)
     const dataForm = new FormData();   
 
     dataForm.append("Header.vPackageId", dataHeader.vPackageId)
@@ -461,7 +471,11 @@ export default function AspackAprroval() {
 
     }).then((resp) => {
       if(resp.ok){
-        window.location.reload()
+        setLoading(false)
+        setMessage("Approvals submitted.")
+        setError(false)
+        setOpenSnack(true)
+        fetchGetPackage()
       } else {
         navigate()
       }
@@ -602,6 +616,14 @@ export default function AspackAprroval() {
         </AccordionSummary>
         <Divider />
         <AccordionDetails>
+          {
+            message && (<CustomSnackBar open={openSnack} onClose={() => { setOpenSnack(false)}} error={error} message={message} />)
+          }
+          {
+            loading && (<Backdrop open={loading}>
+              <CircularProgress color="inherit" />
+            </Backdrop>)
+          }
           <Stack direction={"column"}>
             <Item elevation={0}>
               {status === true && vAffco !== null ? (

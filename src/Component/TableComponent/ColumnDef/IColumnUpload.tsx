@@ -1,7 +1,8 @@
 import { MRT_ColumnDef } from "material-react-table";
-import {  IStepProps } from "../../Interface/DataUpload";
-import { Button } from "@mui/material";
+import {   IRemarkProps, IStepProps } from "../../Interface/DataUpload";
+import { Box, Button, Dialog, DialogContent, DialogTitle, FormControl, IconButton, TextField } from "@mui/material";
 import { apiUrl, getToken } from "../../TemplateUrl";
+import { useState } from "react";
 
 const handleClickPreview = (stepid: string, version: string, vAttachId: string) => {
     fetch(apiUrl + `api/Package/DownloadPackage?vStepId=${stepid}&iVersion=${version.split("V")[1]}&vAttachId=${vAttachId}`, {
@@ -27,6 +28,37 @@ const handleClickPreview = (stepid: string, version: string, vAttachId: string) 
             }
         }
     })
+}
+
+function RemarkDialog(props: IRemarkProps){
+    const {open, onClose, remark, dueDate} = props
+    return(
+        <Dialog open={open} onClose={onClose} fullWidth>
+            <DialogTitle>Remark</DialogTitle>
+            <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          x
+        </IconButton>
+            <DialogContent dividers>
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "left" }}>
+                    <FormControl sx={{ m:1}} >
+                        <TextField size="small" disabled value={remark === null ? "empty" : remark} multiline rows={4} label="Remark from Consol"/>
+                    </FormControl>
+                    <FormControl sx={{ m:1}} >
+                        <TextField size="small" disabled value={dueDate} label="Duedate Revision"/>
+                    </FormControl>
+                </Box>
+            </DialogContent>
+        </Dialog>
+    )
 }
 
 export const columnWaiting: MRT_ColumnDef<(IStepProps)>[] = [
@@ -116,7 +148,7 @@ export const columnApproved: MRT_ColumnDef<(IStepProps)>[] = [
 export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
     { header: "#", 
         Cell: ({ row }) => row.index + 1 ,
-        size: 50
+        size: 50,        
       },
     {
         accessorKey: "filename",
@@ -136,7 +168,8 @@ export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
     },
     {
         accessorKey: "status",
-        header: "Status"
+        header: "Status",       
+        
     },
     {
         header: "Action",
@@ -152,10 +185,15 @@ export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
     {
         header: "Remarks",
         Cell: ({cell}) => {
+            const [open, setOpen] = useState(false)
 
             if(cell.row.original.status === "Revised"){
                 return (
-                    <Button variant="contained" size="small" color="success">{cell.row.original.filename}</Button>
+                    <>
+                    <Button variant="contained" size="small" color="success" onClick={() => {setOpen(true)}}>Remark</Button>
+                    <RemarkDialog open={open} onClose={() => { setOpen(false)}} remark={cell.row.original.apprRemarks} dueDate={cell.row.original.dDueDate}/>
+                    </>
+                    
                 
                 )
             }

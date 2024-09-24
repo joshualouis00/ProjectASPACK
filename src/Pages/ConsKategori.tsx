@@ -236,7 +236,8 @@ export default function Kategori() {
                     }}
                     key={index}
                   >
-                    <CardHeader
+                    <CardHeader                   
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}}                                     
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -291,6 +292,7 @@ export default function Kategori() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -345,6 +347,7 @@ export default function Kategori() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -399,6 +402,7 @@ export default function Kategori() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -453,6 +457,7 @@ export default function Kategori() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -507,6 +512,7 @@ export default function Kategori() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -561,6 +567,7 @@ export default function Kategori() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -615,6 +622,7 @@ export default function Kategori() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={

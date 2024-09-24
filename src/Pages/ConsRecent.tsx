@@ -202,6 +202,7 @@ export default function Recent() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -255,6 +256,7 @@ export default function Recent() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -308,6 +310,7 @@ export default function Recent() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={
@@ -360,6 +363,7 @@ export default function Recent() {
                     key={index}
                   >
                     <CardHeader
+                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
                       title={item.vTitle}
                       subheader={item.vSubTitle}
                       action={

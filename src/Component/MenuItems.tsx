@@ -22,11 +22,12 @@ const MenuItems = (props: MenuItemsProps) => {
   const [libraryAffco, setLibraryAffco] = useState(false);
   const [openUserWorkflow, setUserWorkflow] = useState(false);
   const [openEmail, setEmail] = useState(false);
+  const [openSetting, setOpenSetting] = useState(false);
   const navigate = useNavigate();
 
   const handleEmail = () => {
     setEmail(!openEmail);
-  }
+  };
 
   const handleOpenMaster = () => {
     setOpenMaster(!openMaster);
@@ -51,6 +52,10 @@ const MenuItems = (props: MenuItemsProps) => {
     setUserWorkflow(!openUserWorkflow);
   };
 
+  const handleOpenSetting = () => {
+    setOpenSetting(!openSetting);
+  };
+
   React.useEffect(() => {
     if (!props.DrawerStatus) {
       setOpenMaster(false);
@@ -59,6 +64,7 @@ const MenuItems = (props: MenuItemsProps) => {
       setAspackAffco(false);
       setLibraryAffco(false);
       setUserWorkflow(false);
+      setOpenSetting(false);
     }
   }, [props.DrawerStatus]);
 
@@ -80,10 +86,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/MstTemplate");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Master Template" />
               </ListItemButton>
@@ -91,9 +97,9 @@ const MenuItems = (props: MenuItemsProps) => {
           </Collapse>
 
           {/* Aspack Approval */}
-          <ListItemButton onClick={handleOpenApproval} >
+          <ListItemButton onClick={handleOpenApproval}>
             <ListItemIcon>
-              <DatasetIcon color="inherit" sx={{mb: "5px"}}/>
+              <DatasetIcon color="inherit" sx={{ mb: "5px" }} />
             </ListItemIcon>
             <ListItemText primary="Aspack Approval" />
             {openApproval ? <ExpandLess /> : <ExpandMore />}
@@ -104,10 +110,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/Approval");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Aspack Approval" />
               </ListItemButton>
@@ -115,9 +121,9 @@ const MenuItems = (props: MenuItemsProps) => {
           </Collapse>
 
           {/* Aspack Approval */}
-          <ListItemButton onClick={handleOpenLibrary} >
+          <ListItemButton onClick={handleOpenLibrary}>
             <ListItemIcon>
-              <DatasetIcon color="inherit" sx={{mb: "5px"}}/>
+              <DatasetIcon color="inherit" sx={{ mb: "5px" }} />
             </ListItemIcon>
             <ListItemText primary="Consolidation Library" />
             {openLibrary ? <ExpandLess /> : <ExpandMore />}
@@ -128,10 +134,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/Archived");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Archived News" />
               </ListItemButton>
@@ -139,10 +145,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/Recent");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "10px"}} />
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "10px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Recent News" />
               </ListItemButton>
@@ -150,20 +156,32 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/Kategori");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Category News" />
               </ListItemButton>
             </List>
           </Collapse>
 
-          {/* Master User & Workflow */}
-          <ListItemButton onClick={handleUserWorkflow} >
+          {/* History Upload AFFCO */}
+          <ListItemButton
+            onClick={() => {
+              navigate("/hisUploadAffco");
+            }}
+          >
             <ListItemIcon>
-              <DatasetIcon color="inherit" sx={{mb: "5px"}}/>
+              <LayersIcon color="inherit" sx={{ mb: "5px" }} />
+            </ListItemIcon>
+            <ListItemText primary="History Upload AFFCO" />
+          </ListItemButton>
+
+          {/* Master User & Workflow */}
+          <ListItemButton onClick={handleUserWorkflow}>
+            <ListItemIcon>
+              <DatasetIcon color="inherit" sx={{ mb: "5px" }} />
             </ListItemIcon>
             <ListItemText primary="Master User & Workflow" />
             {openUserWorkflow ? <ExpandLess /> : <ExpandMore />}
@@ -174,10 +192,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/MstUserAffco");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Master User & Affco" />
               </ListItemButton>
@@ -185,42 +203,55 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/MasterWorkflow");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Master Workflow" />
               </ListItemButton>
             </List>
           </Collapse>
 
-          <ListItemButton
-            onClick={() => {
-              navigate("/hisUploadAffco");
-            }}
-          >
+          {/* Master Settings */}
+          <ListItemButton onClick={handleOpenSetting}>
             <ListItemIcon>
-              <LayersIcon color="inherit" sx={{mb: "5px"}}/>
+              <DatasetIcon color="inherit" sx={{ mb: "5px" }} />
             </ListItemIcon>
-            <ListItemText primary="History Upload AFFCO" />
+            <ListItemText primary="Master Settings" />
+            {openSetting ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
-
-          <ListItemButton
-            onClick={() => {
-              navigate("/oPeriode");
-            }}
-          >
-            <ListItemIcon>
-              <LayersIcon color="inherit" sx={{mb: "5px"}}/>
-            </ListItemIcon>
-            <ListItemText primary="Open Period Settings" />
-          </ListItemButton>
+          <Collapse in={openSetting} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding className="subMenus">
+              <ListItemButton
+                onClick={() => {
+                  navigate("/oPeriode");
+                }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
+              >
+                <ListItemIcon>
+                  <LayersIcon color="inherit" sx={{ mb: "5px" }} />
+                </ListItemIcon>
+                <ListItemText primary="Open Period Settings" />
+              </ListItemButton>
+              <ListItemButton
+                onClick={() => {
+                  navigate("/categorySettings");
+                }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}                
+              >
+                <ListItemIcon>
+                  <LayersIcon color="inherit" sx={{ mb: "5px" }} />
+                </ListItemIcon>
+                <ListItemText primary="Category Settings" />
+              </ListItemButton>
+            </List>
+          </Collapse>
 
           {/* Manage Email Template */}
-          <ListItemButton onClick={handleEmail} >
+          <ListItemButton onClick={handleEmail}>
             <ListItemIcon>
-              <DatasetIcon color="inherit" sx={{mb: "5px"}}/>
+              <DatasetIcon color="inherit" sx={{ mb: "5px" }} />
             </ListItemIcon>
             <ListItemText primary="Manage Email Template" />
             {openEmail ? <ExpandLess /> : <ExpandMore />}
@@ -231,10 +262,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/emailUpdateTemp");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Update Aspack Template" />
               </ListItemButton>
@@ -242,10 +273,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/emailApproval");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Approval Aspack" />
               </ListItemButton>
@@ -253,10 +284,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/emailAffcoSubmit");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Affco Submit" />
               </ListItemButton>
@@ -268,9 +299,9 @@ const MenuItems = (props: MenuItemsProps) => {
       {/* User Affco Aspack */}
       {getRole === "A" && (
         <>
-          <ListItemButton onClick={handleOpenAspackAffco} >
+          <ListItemButton onClick={handleOpenAspackAffco}>
             <ListItemIcon>
-              <DatasetIcon color="inherit" sx={{mb: "5px"}}/>
+              <DatasetIcon color="inherit" sx={{ mb: "5px" }} />
             </ListItemIcon>
             <ListItemText primary="Aspack" />
             {aspackAffco ? <ExpandLess /> : <ExpandMore />}
@@ -281,10 +312,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/AffcoUpload");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Aspack Upload Form" />
               </ListItemButton>
@@ -292,9 +323,9 @@ const MenuItems = (props: MenuItemsProps) => {
           </Collapse>
 
           {/* User Affco Aspack - Library */}
-          <ListItemButton onClick={handleOpenLibraryAffco} >
+          <ListItemButton onClick={handleOpenLibraryAffco}>
             <ListItemIcon>
-              <DatasetIcon color="inherit" sx={{mb: "5px"}}/>
+              <DatasetIcon color="inherit" sx={{ mb: "5px" }} />
             </ListItemIcon>
             <ListItemText primary="Library" />
             {libraryAffco ? <ExpandLess /> : <ExpandMore />}
@@ -305,10 +336,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/Recent");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Recent News" />
               </ListItemButton>
@@ -316,10 +347,10 @@ const MenuItems = (props: MenuItemsProps) => {
                 onClick={() => {
                   navigate("/Kategori");
                 }}
-                sx={{ bgcolor: "#223c49", color: "white", ml: "10px" }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
               >
                 <ListItemIcon>
-                  <FolderOpenOutlinedIcon color="inherit" sx={{mb: "5px"}}/>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Category News" />
               </ListItemButton>

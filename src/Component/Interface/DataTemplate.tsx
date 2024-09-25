@@ -35,3 +35,21 @@ export interface IProfileProps {
     open: boolean,
     onClose: () => void
 }
+
+export interface ICategoryProps {
+    open: boolean,
+    onClose: () => void
+}
+
+export interface ICatEditProps {
+    open: boolean,
+    onClose: () => void,
+    data: ICategory
+}
+export interface ICategory {
+    vCode: string,
+    vType: string,
+    vValue1: string,
+    vValue2: string,
+    bActive: boolean
+}

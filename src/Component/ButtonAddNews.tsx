@@ -21,7 +21,9 @@ import {
   TextField,
 } from "@mui/material";
 import React from "react";
-import { apiUrl, CustomSnackBar, generateCategory, getToken } from "./TemplateUrl";
+import { apiUrl, CustomSnackBar, getToken } from "./TemplateUrl";
+import { ICategory } from "./Interface/DataTemplate";
+import useHandleUnauthorized from "./handleUnauthorized";
 
 interface AddNewsProps {
   open: boolean;
@@ -55,6 +57,39 @@ export default function ButtonAddNews() {
     const [hasErrorFile, setHasErrorFile] = React.useState(false);
     const [hasErrorCat, setHasErrorCat] = React.useState(false);  
     const [btnCreate, setBtnCreate] = React.useState(false);  
+    const [dataCategory, setDataCategory] = React.useState<ICategory[]>([])
+    const navigate = useHandleUnauthorized();
+
+    const fetchCategory = () => {
+      fetch(apiUrl + "api/Setting/GetSettingValue?types=CATEGORY", {
+        method: "GET",
+        headers: {
+          Authorization: `bearer ${getToken}`,
+        },
+      }).then((resp) => {
+        if (resp.ok) {
+          resp.json().then((valData) => {
+            setDataCategory(
+              valData.data.map((val) => {
+                return {
+                  vCode: val.vCode,
+                  vType: val.vType,
+                  vValue1: val.vValue1,
+                  vValue2: val.vValue2,
+                  bActive: val.bActive,
+                };
+              })
+            );
+          });
+        } else {
+          navigate();
+        }
+      });
+    }
+
+    React.useEffect(() => {
+      fetchCategory();
+    },[])
   
     const handleChangeCategory = (event: SelectChangeEvent) => {
       if(event.target.value === ""){
@@ -272,9 +307,9 @@ export default function ButtonAddNews() {
                 error={hasErrorCat}
               >
                 {
-                  generateCategory.map((val,index) => {
+                  dataCategory.filter((val) => val.bActive === true).map((val,index) => {
                     return (
-                      <MenuItem key={index} value={val.id}>{val.name}</MenuItem>
+                      <MenuItem key={index} value={val.vCode}>{val.vValue1}</MenuItem>
                     )
                   })
                 }

@@ -1,7 +1,7 @@
 import { MRT_ColumnDef } from "material-react-table";
 import IDataUser from "../../Interface/DataUser";
 import IDataAffco from "../../Interface/DataAffco";
-import { IConsNewsProps } from "../../Interface/DataTemplate";
+import { ICategory, IConsNewsProps } from "../../Interface/DataTemplate";
 
 export const columnMasterUser: MRT_ColumnDef<IDataUser>[] = [
   { header: "#", 
@@ -80,6 +80,27 @@ export const columnConsNews: MRT_ColumnDef<IConsNewsProps>[] = [
   {
     accessorKey: "vConsolidateCategory",
     header: "Category"
+  },
+  {
+    accessorKey: "bActive",
+    header: "Status",
+    Cell: ({ row }) => row.original.bActive ? "Active" : "Non Active"
+  }
+]
+
+export const columnCategory: MRT_ColumnDef<ICategory>[] = [
+  {
+    header: "#", 
+    Cell: ({ row }) => row.index + 1 ,
+    size: 50
+  },
+  {
+    accessorKey: "vCode",
+    header: "Code"
+  },
+  {
+    accessorKey: "vValue1",
+    header: "Description"
   },
   {
     accessorKey: "bActive",

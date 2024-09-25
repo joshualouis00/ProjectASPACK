@@ -106,7 +106,7 @@ export default function MstUserAffco() {
     const [duplicate, setDuplicate] = React.useState(false)
     const submitAddUser = () => {
       if(userId !== "" && username !== "" && email !== "" && role !== ""){
-        let validUserId = dataUser.filter((val) => val.id === userId)
+        let validUserId = dataUser.filter((val) => val.id.toLowerCase() === userId.toLowerCase())
 
         if(validUserId.length > 0){
           
@@ -910,7 +910,7 @@ export default function MstUserAffco() {
     };
     const submitAddAffco = () => {
       if (affcoID !== "" && affcoName !== "" && catAffco !== "") {
-        let validAffcoId = dataAffco.filter((val) => val.id === affcoID)
+        let validAffcoId = dataAffco.filter((val) => val.id.toLowerCase() === affcoID.toLowerCase())
         if(validAffcoId.length > 0){
           setDuplicate(true)
           setHasErrorId(true)
@@ -1192,7 +1192,7 @@ export default function MstUserAffco() {
             <InputLabel >
                 Category Affiliate Company
               </InputLabel>
-              <Select size="small" disabled value={catAffco} label="Category Affiliate Company" fullWidth>
+              <Select size="small" value={catAffco} label="Category Affiliate Company" onChange={(val) => { setCatAffco(val.target.value)}}fullWidth>
                 <MenuItem value="ASSO JV">ASSO JV</MenuItem>
                 <MenuItem value="SUBS">SUBS</MenuItem>
               </Select>

@@ -49,6 +49,7 @@ import { apiUrl, getToken, getUserId } from "./Component/TemplateUrl";
 import { genSaltSync } from "bcrypt-ts";
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import CategorySettings from "./Pages/CategorySettings";
 
 const drawerWidth: number = 250;
 
@@ -675,6 +676,20 @@ function App() {
                     <Route
                       path="/oPeriode"
                       element={<ProtectedRoute element={<OpenPeriod />} />}
+                    />
+
+<Route
+                      path="/categorySettings"
+                      element={
+                        <ProtectedRoute
+                          element={
+                            <AccordionWrapper
+                              content={<CategorySettings />}
+                              headerTitle="Category Settings"
+                            />
+                          }
+                        />
+                      }
                     />
 
                     <Route

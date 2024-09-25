@@ -31,9 +31,7 @@ const TabContent: React.FC<ITabContent> = ({
       const validExtensions = [
         "application/pdf", // PDF
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-        "application/vnd.ms-excel", // Excel .xls
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word .docx
-        "application/msword", // Word .doc
+        "application/vnd.ms-excel"// Word .doc
       ];
 
       const invalidFiles = acceptedFiles.filter(

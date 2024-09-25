@@ -18,6 +18,7 @@ import {
 import ButtonAddNews from "../Component/ButtonAddNews";
 import { MaterialReactTable } from "material-react-table";
 import {
+  ICategory,
   IConsNewsProps,
   IConsProps,
 } from "../Component/Interface/DataTemplate";
@@ -25,6 +26,7 @@ import React from "react";
 import { columnConsNews } from "../Component/TableComponent/ColumnDef/IColumnMaster";
 import { apiUrl, CustomSnackBar, generateCategory, getToken } from "../Component/TemplateUrl";
 import CloseIcon from "@mui/icons-material/Close";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 
 export default function Archived() {
@@ -44,6 +46,39 @@ export default function Archived() {
   const [message, setMessage] = React.useState("");
     const [openSnack, setOpenSnack] = React.useState(false);
     const [error, setError] = React.useState(false); 
+    const [dataCategory, setDataCategory] = React.useState<ICategory[]>([])
+    const navigate = useHandleUnauthorized();
+
+    const fetchCategory = () => {
+      fetch(apiUrl + "api/Setting/GetSettingValue?types=CATEGORY", {
+        method: "GET",
+        headers: {
+          Authorization: `bearer ${getToken}`,
+        },
+      }).then((resp) => {
+        if (resp.ok) {
+          resp.json().then((valData) => {
+            setDataCategory(
+              valData.data.map((val) => {
+                return {
+                  vCode: val.vCode,
+                  vType: val.vType,
+                  vValue1: val.vValue1,
+                  vValue2: val.vValue2,
+                  bActive: val.bActive,
+                };
+              })
+            );
+          });
+        } else {
+          navigate();
+        }
+      });
+    }
+
+    React.useEffect(() => {
+      fetchCategory()
+    },[])
 
   function EditConsNews(props: IConsProps) {
     const { open, onClose, data } = props;
@@ -55,8 +90,13 @@ export default function Archived() {
     const [vId, setVId] = React.useState(""); 
     
     
+
+    
+    
+    
   
     React.useEffect(() => {
+      
       setVTitle(data.vTitle);
       setVSubTitle(data.vSubTitle);
       setVDesc(data.vDescription);
@@ -156,8 +196,8 @@ export default function Archived() {
                 setVCategory(val.target.value);
               }}
             >
-              {generateCategory.map((val, index) => {
-                return <MenuItem key={index} value={val.id}>{val.name}</MenuItem>;
+              {dataCategory.filter((val) => val.bActive === true).map((val, index) => {
+                return <MenuItem key={val.vCode} value={val.vCode}>{val.vValue1}</MenuItem>;
               })}
             </Select>
           </FormControl>

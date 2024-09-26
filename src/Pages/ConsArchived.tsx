@@ -24,7 +24,7 @@ import {
 } from "../Component/Interface/DataTemplate";
 import React from "react";
 import { columnConsNews } from "../Component/TableComponent/ColumnDef/IColumnMaster";
-import { apiUrl, CustomSnackBar, generateCategory, getToken } from "../Component/TemplateUrl";
+import { apiUrl, CustomSnackBar, getToken } from "../Component/TemplateUrl";
 import CloseIcon from "@mui/icons-material/Close";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 

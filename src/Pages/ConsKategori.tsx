@@ -2,8 +2,14 @@ import { styled } from "@mui/material/styles";
 import {
   Box,
   Card,
+  CardActionArea,
+  CardActions,
   CardContent,
   CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
@@ -26,8 +32,9 @@ import {
   generateMonths,
   generateCategory,
 } from "../Component/TemplateUrl";
-import { IConsNewsProps } from "../Component/Interface/DataTemplate";
+import { ICategory, IConsNewsProps, IConsProps } from "../Component/Interface/DataTemplate";
 import { Download } from "@mui/icons-material";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 export default function Kategori() {
   const responsive = {
     superLargeDesktop: {
@@ -60,6 +67,20 @@ export default function Kategori() {
   const [year, setYear] = React.useState("");
   const [category, setCategory] = React.useState("ALL");
   const [dataNews, setDataNews] = React.useState<IConsNewsProps[]>([]);
+  const [dataCategory, setDataCategory] = React.useState<ICategory[]>([])
+  const navigate = useHandleUnauthorized();
+  const [openFull, setOpenFull] = React.useState(false);
+  const [detailNews, setDetailNews] = React.useState<IConsNewsProps>({
+    uUid: "",
+    vTitle: "",
+    vSubTitle: "",
+    vDescription: "",
+    vConsolidateCategory: "",
+    vAttachment: "",
+    dCrea: "",
+    vCrea: "",
+    bActive: false,
+  });
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
     setMonth(event.target.value as string);
@@ -72,6 +93,33 @@ export default function Kategori() {
   const handleChangeCategory = (event: SelectChangeEvent) => {
     setCategory(event.target.value as string);
   };
+
+  const fetchCategory = () => {
+    fetch(apiUrl + "api/Setting/GetSettingValue?types=CATEGORY", {
+      method: "GET",
+      headers: {
+        Authorization: `bearer ${getToken}`,
+      },
+    }).then((resp) => {
+      if (resp.ok) {
+        resp.json().then((valData) => {
+          setDataCategory(
+            valData.data.map((val) => {
+              return {
+                vCode: val.vCode,
+                vType: val.vType,
+                vValue1: val.vValue1,
+                vValue2: val.vValue2,
+                bActive: val.bActive,
+              };
+            })
+          );
+        });
+      } else {
+        navigate();
+      }
+    });
+  }
 
   React.useEffect(() => {
     fetch(apiUrl + "api/Consolidate/GetConsolidateNews", {
@@ -98,6 +146,7 @@ export default function Kategori() {
         );
       });
     });
+    fetchCategory()
   }, []);
 
   const handleClickDownload = (data: string) => {
@@ -127,6 +176,55 @@ export default function Kategori() {
     })
 
   }
+
+  const handleClickFull = (data: IConsNewsProps) => {
+    setOpenFull(true);
+    setDetailNews(data);
+  };
+
+  function ExpandNews(props: IConsProps) {
+    const { open, onClose, data } = props;
+
+    return (
+      <Dialog open={open} onClose={onClose} fullWidth>
+        <DialogTitle sx={{ backgroundColor: "seagreen", color: "white" }}>
+          <Typography>Detail News {data.vTitle}</Typography>
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          x
+        </IconButton>
+        <DialogContent dividers>
+          <Typography variant="body1" color="black">
+            {data.vSubTitle}
+          </Typography>
+          <br />
+          <Typography variant="body2">{data.vDescription}</Typography>
+        </DialogContent>
+        <DialogActions sx={{ backgroundColor: "seagreen", color: "white" }}>
+          <IconButton
+            id="menu-button"
+            onClick={() => {
+              handleClickDownload(data.uUid);
+            }}
+          >
+            <Download color="inherit" />{" "}
+            <Typography variant="body2" color="inherit">
+              Download
+            </Typography>
+          </IconButton>
+        </DialogActions>
+      </Dialog>
+    );
+  }
   return (
     <div>
       <Box sx={{ width: "100%" }}>
@@ -150,10 +248,10 @@ export default function Kategori() {
                     onChange={handleChangeCategory}
                   >
                     <MenuItem value="ALL">All</MenuItem>
-                    {generateCategory.map((val, index) => {
+                    {dataCategory.map((val, index) => {
                       return (
-                        <MenuItem key={index} value={val.id}>
-                          {val.name}
+                        <MenuItem key={index} value={val.vCode}>
+                          {val.vValue1}
                         </MenuItem>
                       );
                     })}
@@ -205,8 +303,14 @@ export default function Kategori() {
             </Stack>
           </Item>
           <Item elevation={0}>
-            {category === "ALL" && year === "" && month === "" ? (
-              <Carousel
+          <ExpandNews
+              open={openFull}
+              onClose={() => {
+                setOpenFull(false);
+              }}
+              data={detailNews}
+            />
+          <Carousel
                 swipeable={true}
                 draggable={true}
                 showDots={true}
@@ -223,429 +327,84 @@ export default function Kategori() {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                {dataNews?.filter((val) =>  val.bActive === true).map((item, index) => (
+                {dataNews?.filter((val) =>  {
+                  if(category === "ALL" && year === "" && month === "" ){
+                    return val.bActive === true
+                  }
+                  if(category === "ALL" && year !== "" && month !== ""){
+                    return parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  }
+                  if(category === "ALL" && year !== "" && month === ""){
+                    return parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true
+                  }
+                  if(category === "ALL" && year === "" && month !== ""){
+                    return parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  }
+                  if(category !== "ALL" && year === "" && month === ""){
+                    return val.vConsolidateCategory === category && val.bActive === true
+                  }
+                  if(category !== "ALL" && year !== "" && month !== ""){
+                    return val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  }
+                  if(category !== "ALL" && year !== "" && month === ""){
+                    return val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true
+                  }
+                  if(category !== "ALL" && year === "" && month !== ""){
+                    return val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  }
+                }).map((item, index) => (
                   <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader                   
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}}                                     
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
+                        sx={{
+                          maxWidth: 300,
+                          maxHeight: 300,
+                          marginBottom: 5,
+                          borderRadius: 3,
+                          marginTop: 1,
+                          marginLeft: 1,
+                          marginRight: 1,
+                        }}
+                        key={index}
+                      >
+                        <CardHeader
+                          sx={{
+                            "& .MuiCardHeader-title": { color: "white" },
+                            "& .MuiCardHeader-subheader": { color: "white" },
+                            backgroundColor: "seagreen",
+                          }}
+                          title={item.vTitle}
+                          subheader={item.vSubTitle}
+                        />
+                        <CardActionArea
+                          onClick={() => {
+                            handleClickFull(item);
+                          }}
+                        >
+                          <CardContent sx={{ minHeight: 100 }}>
+                            <Typography
+                              variant="body1"
+                              color="text.secondary"
+                              noWrap
+                            >
+                              {item.vDescription}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                        <CardActions sx={{ backgroundColor: "seagreen" }}>                          
                           <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
+                            id="menu-button"
+                            onClick={() => {
+                              handleClickDownload(item.uUid);
+                            }}
                           >
-                            <Download />
+                            <Download color="inherit" />
+                            <Typography variant="body2" color="white">
+                              Download
+                            </Typography>
                           </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
+                        </CardActions>
+                      </Card>
                 ))}
               </Carousel>
-            ) : category === "ALL" && year !== "" && month !== "" ? (
-              <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
-                  <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
-                          <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
-                          >
-                            <Download />
-                          </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Carousel>
-            ) : category === "ALL" && year !== "" && month === "" ? (
-              <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true )).map((item, index) => (
-                  <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
-                          <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
-                          >
-                            <Download />
-                          </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Carousel>
-            ) : category === "ALL" && year === "" && month !== "" ? (
-              <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) => (parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
-                  <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
-                          <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
-                          >
-                            <Download />
-                          </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Carousel>
-            ) : category !== "ALL" && year === "" && month === "" ? (
-              <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category && val.bActive === true )).map((item, index) => (
-                  <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
-                          <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
-                          >
-                            <Download />
-                          </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Carousel>
-            ) : category !== "ALL" && year !== "" && month !== "" ? (
-              <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
-                  <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
-                          <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
-                          >
-                            <Download />
-                          </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Carousel>
-            ) : category !== "ALL" && year !== "" && month === "" ? (
-              <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true )).map((item, index) => (
-                  <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
-                          <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
-                          >
-                            <Download />
-                          </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Carousel>
-            ) : category !== "ALL" && year === "" && month !== "" ? (
-              <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) => (val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true )).map((item, index) => (
-                  <Card
-                    sx={{
-                      maxWidth: 300,
-                      maxHeight: 300,
-                      marginBottom: 5,
-                      borderRadius: 3,
-                      marginTop: 1,
-                      marginLeft: 1,
-                      marginRight: 1,
-                    }}
-                    key={index}
-                  >
-                    <CardHeader
-                    sx={{ "& .MuiCardHeader-title" : { color: "green"}, "& .MuiCardHeader-subheader" : { color: "green"}}} 
-                      title={item.vTitle}
-                      subheader={item.vSubTitle}
-                      action={
-                        <>
-                          <IconButton
-                            id="menu-button"                          
-                            onClick={() => {handleClickDownload(item.uUid)}}
-                          >
-                            <Download />
-                          </IconButton>
-                          
-                        </>
-                      }
-                    />
-                    <CardContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.vDescription}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Carousel>
-            ) : null}
           </Item>
         </Stack>
       </Box>

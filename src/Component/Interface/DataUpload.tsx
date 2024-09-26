@@ -51,5 +51,7 @@ export interface IRemarkProps {
     open: boolean,
     onClose: () => void,
     remark: string,
-    dueDate: string
+    dueDate: string,
+    version: string,
+    attachId: string
 }

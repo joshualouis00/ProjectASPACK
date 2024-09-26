@@ -1,8 +1,9 @@
 import { MRT_ColumnDef } from "material-react-table";
 import {   IRemarkProps, IStepProps } from "../../Interface/DataUpload";
-import { Box, Button, Dialog, DialogContent, DialogTitle, FormControl, IconButton, TextField } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, TextField } from "@mui/material";
 import { apiUrl, getToken } from "../../TemplateUrl";
 import { useState } from "react";
+import { Download } from "@mui/icons-material";
 
 const handleClickPreview = (stepid: string, version: string, vAttachId: string) => {
     fetch(apiUrl + `api/Package/DownloadPackage?vStepId=${stepid}&iVersion=${version.split("V")[1]}&vAttachId=${vAttachId}`, {
@@ -30,8 +31,36 @@ const handleClickPreview = (stepid: string, version: string, vAttachId: string) 
     })
 }
 
+const fetchDownloadResponse = (types: string, version: string, attachId: string) => {
+    fetch(apiUrl + `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`,{
+        method: 'GET',
+        headers: {
+            Authorization: `bearer ${getToken}`
+        }
+    }).then((resp) => {
+        if(resp.status === 200){
+            resp.blob().then((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "File Attachment " + attachId;
+                a.click();
+              });
+
+        } else {
+            if(resp.status === 404){
+                return alert("File not found, please contact your IT Administrator.")
+            } else {
+                return alert("Something wrong, please contact your IT Administrator.")
+            }
+        }
+    })
+}
+
 function RemarkDialog(props: IRemarkProps){
-    const {open, onClose, remark, dueDate} = props
+    const {open, onClose, remark, dueDate, version, attachId} = props
+
+    let iVersion = version.split("V")[1]
     return(
         <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>Remark</DialogTitle>
@@ -57,6 +86,9 @@ function RemarkDialog(props: IRemarkProps){
                     </FormControl>
                 </Box>
             </DialogContent>
+            <DialogActions>
+                <Button sx={{ m:1}} size="small" variant="contained" color="inherit" onClick={() => { fetchDownloadResponse("RESPCONS", iVersion, attachId)}}><Download /> Download</Button>
+            </DialogActions>
         </Dialog>
     )
 }
@@ -191,7 +223,7 @@ export const columnHistoryUpload: MRT_ColumnDef<(IStepProps)>[] = [
                 return (
                     <>
                     <Button variant="contained" size="small" color="success" onClick={() => {setOpen(true)}}>Remark</Button>
-                    <RemarkDialog open={open} onClose={() => { setOpen(false)}} remark={cell.row.original.apprRemarks} dueDate={cell.row.original.dDueDate}/>
+                    <RemarkDialog open={open} onClose={() => { setOpen(false)}} remark={cell.row.original.apprRemarks} dueDate={cell.row.original.dDueDate} version={cell.row.original.docVersion} attachId={cell.row.original.vAttachId}/>
                     </>
                     
                 

@@ -255,7 +255,7 @@ export default function Recent() {
               data={detailNews}
             />
 
-            {month !== "" && year !== "" ? (
+{month !== "" && year !== "" ? (
               <Carousel
                 swipeable={true}
                 draggable={true}
@@ -282,54 +282,55 @@ export default function Recent() {
                   )
                   .map((item, index) => (
                     <Card
-                      sx={{
-                        maxWidth: 300,
-                        maxHeight: 300,
-                        marginBottom: 5,
-                        borderRadius: 3,
-                        marginTop: 1,
-                        marginLeft: 1,
-                        marginRight: 1,
-                      }}
-                      key={index}
-                    >
-                      <CardHeader
                         sx={{
-                          "& .MuiCardHeader-title": { color: "green" },
-                          "& .MuiCardHeader-subheader": { color: "green" },
+                          maxWidth: 300,
+                          maxHeight: 300,
+                          marginBottom: 5,
+                          borderRadius: 3,
+                          marginTop: 1,
+                          marginLeft: 1,
+                          marginRight: 1,
                         }}
-                        title={item.vTitle}
-                        subheader={item.vSubTitle}
-                      />
-                      <CardActionArea
-                        onClick={() => {
-                          handleClickFull(item);
-                        }}
+                        key={index}
                       >
-                        <CardContent>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            noWrap
-                          >
-                            {item.vDescription}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                      <CardActions sx={{ backgroundColor: "seagreen" }}>
-                        <IconButton
-                          id="menu-button"
+                        <CardHeader
+                          sx={{
+                            "& .MuiCardHeader-title": { color: "white" },
+                            "& .MuiCardHeader-subheader": { color: "white" },
+                            backgroundColor: "seagreen",
+                          }}
+                          title={item.vTitle}
+                          subheader={item.vSubTitle}
+                        />
+                        <CardActionArea
                           onClick={() => {
-                            handleClickDownload(item.uUid);
+                            handleClickFull(item);
                           }}
                         >
-                          <Download color="inherit" />
-                          <Typography variant="body2" color="white">
-                            Download
-                          </Typography>
-                        </IconButton>
-                      </CardActions>
-                    </Card>
+                          <CardContent sx={{ minHeight: 100 }}>
+                            <Typography
+                              variant="body1"
+                              color="text.secondary"
+                              noWrap
+                            >
+                              {item.vDescription}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                        <CardActions sx={{ backgroundColor: "seagreen" }}>                          
+                          <IconButton
+                            id="menu-button"
+                            onClick={() => {
+                              handleClickDownload(item.uUid);
+                            }}
+                          >
+                            <Download color="inherit" />
+                            <Typography variant="body2" color="white">
+                              Download
+                            </Typography>
+                          </IconButton>
+                        </CardActions>
+                      </Card>
                   ))}
               </Carousel>
             ) : month === "" && year === "" ? (
@@ -433,54 +434,55 @@ export default function Recent() {
                   )
                   .map((item, index) => (
                     <Card
-                      sx={{
-                        maxWidth: 300,
-                        maxHeight: 300,
-                        marginBottom: 5,
-                        borderRadius: 3,
-                        marginTop: 1,
-                        marginLeft: 1,
-                        marginRight: 1,
-                      }}
-                      key={index}
-                    >
-                      <CardHeader
                         sx={{
-                          "& .MuiCardHeader-title": { color: "green" },
-                          "& .MuiCardHeader-subheader": { color: "green" },
+                          maxWidth: 300,
+                          maxHeight: 300,
+                          marginBottom: 5,
+                          borderRadius: 3,
+                          marginTop: 1,
+                          marginLeft: 1,
+                          marginRight: 1,
                         }}
-                        title={item.vTitle}
-                        subheader={item.vSubTitle}
-                      />
-                      <CardActionArea
-                        onClick={() => {
-                          handleClickFull(item);
-                        }}
+                        key={index}
                       >
-                        <CardContent>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            noWrap
-                          >
-                            {item.vDescription}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                      <CardActions sx={{ backgroundColor: "seagreen" }}>
-                        <IconButton
-                          id="menu-button"
+                        <CardHeader
+                          sx={{
+                            "& .MuiCardHeader-title": { color: "white" },
+                            "& .MuiCardHeader-subheader": { color: "white" },
+                            backgroundColor: "seagreen",
+                          }}
+                          title={item.vTitle}
+                          subheader={item.vSubTitle}
+                        />
+                        <CardActionArea
                           onClick={() => {
-                            handleClickDownload(item.uUid);
+                            handleClickFull(item);
                           }}
                         >
-                          <Download color="inherit" />
-                          <Typography variant="body2" color="white">
-                            Download
-                          </Typography>
-                        </IconButton>
-                      </CardActions>
-                    </Card>
+                          <CardContent sx={{ minHeight: 100 }}>
+                            <Typography
+                              variant="body1"
+                              color="text.secondary"
+                              noWrap
+                            >
+                              {item.vDescription}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                        <CardActions sx={{ backgroundColor: "seagreen" }}>                          
+                          <IconButton
+                            id="menu-button"
+                            onClick={() => {
+                              handleClickDownload(item.uUid);
+                            }}
+                          >
+                            <Download color="inherit" />
+                            <Typography variant="body2" color="white">
+                              Download
+                            </Typography>
+                          </IconButton>
+                        </CardActions>
+                      </Card>
                   ))}
               </Carousel>
             ) : year !== "" ? (
@@ -509,54 +511,55 @@ export default function Recent() {
                   )
                   .map((item, index) => (
                     <Card
-                      sx={{
-                        maxWidth: 300,
-                        maxHeight: 300,
-                        marginBottom: 5,
-                        borderRadius: 3,
-                        marginTop: 1,
-                        marginLeft: 1,
-                        marginRight: 1,
-                      }}
-                      key={index}
-                    >
-                      <CardHeader
                         sx={{
-                          "& .MuiCardHeader-title": { color: "green" },
-                          "& .MuiCardHeader-subheader": { color: "green" },
+                          maxWidth: 300,
+                          maxHeight: 300,
+                          marginBottom: 5,
+                          borderRadius: 3,
+                          marginTop: 1,
+                          marginLeft: 1,
+                          marginRight: 1,
                         }}
-                        title={item.vTitle}
-                        subheader={item.vSubTitle}
-                      />
-                      <CardActionArea
-                        onClick={() => {
-                          handleClickFull(item);
-                        }}
+                        key={index}
                       >
-                        <CardContent>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            noWrap
-                          >
-                            {item.vDescription}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                      <CardActions sx={{ backgroundColor: "seagreen" }}>
-                        <IconButton                        
-                          id="menu-button"
+                        <CardHeader
+                          sx={{
+                            "& .MuiCardHeader-title": { color: "white" },
+                            "& .MuiCardHeader-subheader": { color: "white" },
+                            backgroundColor: "seagreen",
+                          }}
+                          title={item.vTitle}
+                          subheader={item.vSubTitle}
+                        />
+                        <CardActionArea
                           onClick={() => {
-                            handleClickDownload(item.uUid);
+                            handleClickFull(item);
                           }}
                         >
-                          <Download color="inherit" />
-                          <Typography variant="body2" color="white">
-                            Download
-                          </Typography>
-                        </IconButton>
-                      </CardActions>
-                    </Card>
+                          <CardContent sx={{ minHeight: 100 }}>
+                            <Typography
+                              variant="body1"
+                              color="text.secondary"
+                              noWrap
+                            >
+                              {item.vDescription}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                        <CardActions sx={{ backgroundColor: "seagreen" }}>                          
+                          <IconButton
+                            id="menu-button"
+                            onClick={() => {
+                              handleClickDownload(item.uUid);
+                            }}
+                          >
+                            <Download color="inherit" />
+                            <Typography variant="body2" color="white">
+                              Download
+                            </Typography>
+                          </IconButton>
+                        </CardActions>
+                      </Card>
                   ))}
               </Carousel>
             ) : null}

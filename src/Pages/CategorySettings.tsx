@@ -354,7 +354,7 @@ export default function CategorySettings() {
               )}
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <FormLabel>Status Affiliate Company</FormLabel>
+              <FormLabel>Status</FormLabel>
               <RadioGroup
                 row
                 value={status}

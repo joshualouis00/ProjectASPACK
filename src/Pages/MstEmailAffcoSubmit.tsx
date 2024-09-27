@@ -127,7 +127,7 @@ const EmailUpdateTemplate: React.FC = () => {
               Placeholder Variable :
             </Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>
-              Company : @Company
+              Company : @COMPANY
             </Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Month : @MONTH</Typography>
             <Typography sx={{ mb: 1, fontSize: 12 }}>Year : @YEAR</Typography>

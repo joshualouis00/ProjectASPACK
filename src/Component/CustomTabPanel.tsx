@@ -31,7 +31,7 @@ const TabContent: React.FC<ITabContent> = ({
       const validExtensions = [
         "application/pdf", // PDF
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-        "application/vnd.ms-excel"// Word .doc
+        "application/vnd.ms-excel", // Word .doc
       ];
 
       const invalidFiles = acceptedFiles.filter(
@@ -120,6 +120,7 @@ const TabContent: React.FC<ITabContent> = ({
         setUploadStatus("Upload successful");
         await getTemplates(); // Refresh file list after successful upload
         setTimeout(() => setUploadStatus(null), 5000);
+        window.location.reload();
       }
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -154,14 +155,14 @@ const TabContent: React.FC<ITabContent> = ({
               item.attachment.map((element: any) => ({
                 fileName: element?.vFileName || "",
                 createDate: element?.dCrea,
+                iVersion: element?.iVersion,
                 status: element?.vStatus === "1" ? "Active" : "Inactive",
                 file: new File([], element?.vFileName || ""),
               }))
             );
-
           setFileList(updatedFiles);
           setFiles(updatedFiles);
-        } else {
+          } else {
           console.error("Expected array but got:", backendData);
         }
       }

@@ -12,33 +12,18 @@ const AppTable: React.FC<
   const navigate = useHandleUnauthorized();
   const [showAlert, setShowAlert] = React.useState(false);
 
-  const getLatestVersion = (vAttchId: string) => {
-    const filesForAttchId = files
-      .filter((file) => file.vAttchId === vAttchId && file.status === "Active");
-    return filesForAttchId.length; // Mengembalikan jumlah file yang "Active" sebagai versi terbaru
-  };
-  
-  const getVersion = (iVersion: any) => {
-    const filesForAttchIds = files.filter((file) => file.iVersion === iVersion && file.status === "Inactive");
-    return filesForAttchIds.length;
-  }
-
-
   const downloadFile = async (
     fileName: string,
     vAttchId: string,
     status: string,
-    iVersion: any
+    iVersion: any // Pastikan iVersion diterima sebagai parameter
   ) => {
     const encodedFileName = btoa(fileName); // Encode filename
 
-    // Jika statusnya "Active", gunakan versi terakhir, jika tidak gunakan versi dari row
-    const versionToUse =
-      status === "Active" ? getLatestVersion(vAttchId).toString() : getVersion(iVersion).toString();
-
+    // Gunakan iVersion yang diterima dari parameter
     const url =
       apiUrl +
-      `api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${versionToUse}`;
+      `api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${iVersion}`;
 
     try {
       const response = await fetch(url, {
@@ -57,6 +42,7 @@ const AppTable: React.FC<
       link.download = fileName;
       link.click();
     } catch (error: any) {
+      
       if (error.response && error.response.status === 401) {
         navigate();
       } else {
@@ -65,7 +51,7 @@ const AppTable: React.FC<
         console.error("Error fetching templates:", error);
       }
     }
-  };  
+  };
 
   const columns: MRT_ColumnDef<FileDataUpload>[] = [
     {
@@ -129,8 +115,8 @@ const AppTable: React.FC<
         const iVersion = row.original.iVersion;
         return (
           <Button
-            onClick={() =>
-              downloadFile(fileName, vAttchId, fileStatus, iVersion)
+            onClick={
+              () => downloadFile(fileName, vAttchId, fileStatus, iVersion) // Meneruskan iVersion yang diambil dari file
             }
             variant="outlined"
             color="info"

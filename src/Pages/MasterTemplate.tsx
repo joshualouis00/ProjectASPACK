@@ -79,19 +79,20 @@ const MasterTemplate = () => {
   const getTemplates = async () => {
     try {
       const response = await axios.get(
-       apiUrl + "api/Template/GetTemplates",
+        apiUrl + "api/Template/GetTemplates",
         {
           headers: {
             Authorization: `Bearer ` + getToken,
           },
         }
       );
-
+  
       if (response.status === 200) {
+        console.log("API Response:", response.data); // Lihat data asli dari API
         const backendData = response.data.data;
         
         const updatedFiles: { [key: string]: FileData[] } = {};
-
+  
         backendData.forEach((item: any) => {
           if (item.vAttchId !== "") {
             const filesForStep = item.attachment.map((element: any) => ({
@@ -100,12 +101,13 @@ const MasterTemplate = () => {
               status: element?.vStatus === "1" ? "Active" : "Inactive",
               file: new File([], element?.vFileName || ""),
               vAttchId: item.vAttchId,
+              iVersion: element.iVersion,
             }));
-
+  
             updatedFiles[item.vStepId] = filesForStep;
           }
         });
-
+  
         setFiles(updatedFiles);
       }
     } catch (error: any) {
@@ -115,10 +117,10 @@ const MasterTemplate = () => {
         console.error("Error fetching templates:", error);
       }
     }
-  };
+  };  
 
   useEffect(() => {
-    getTemplates();
+  getTemplates();
   }, []);
 
   const activeSteps = data.filter((item) => item.bActive);

@@ -40,18 +40,18 @@ const HistoryUploadAffco: React.FC = () => {
   const handleError401 = useHandleUnauthorized();
 
   const monthNames = [
-    "Januari",
-    "Februari",
-    "Maret",
+    "January",
+    "February",
+    "March",
     "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
+    "May",
+    "June",
+    "July",
+    "August",
     "September",
-    "Oktober",
+    "October",
     "November",
-    "Desember",
+    "December",
   ];
 
   React.useEffect(() => {
@@ -249,14 +249,6 @@ const HistoryUploadAffco: React.FC = () => {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
-  };
-
-  const handleViewHistoryClick = () => {
-    setViewHistoryOpen(true);
-  };
-
-  const handleBackClick = () => {
-    setViewHistoryOpen(false);
   };
 
   const handleResetClick = () => {

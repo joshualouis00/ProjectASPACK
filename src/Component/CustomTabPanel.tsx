@@ -28,36 +28,44 @@ const TabContent: React.FC<ITabContent> = ({
   // Handling file drop
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const validExtensions = [
-        "application/pdf", // PDF
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel .xlsx
-        "application/vnd.ms-excel"// Word .doc
-      ];
+      // Map file types to step id (example: pdf, xlsx, etc.)
+      const fileTypeMap: { [key: string]: string } = {
+        PDF: "application/pdf",
+        Excel: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        // Tambahkan tipe file lainnya jika diperlukan
+      };
 
+      // Check for valid file type based on step's vFileType
+      const validExtension = fileTypeMap[vFileType];
+
+      // Filter files based on the valid extension for the current step
       const invalidFiles = acceptedFiles.filter(
-        (file) => !validExtensions.includes(file.type)
+        (file) => file.type !== validExtension
       );
 
       // Menampilkan pesan error jika ada file yang tidak valid
-      if (invalidFiles.length > 0) {
-        setErrorMessage(`Template yang di-upload harus berupa ${vFileType}.`);
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-        return;
+    if (invalidFiles.length > 0) {
+      if (vFileType === "Both") {
+        setErrorMessage("Uploaded files must be Excel and PDF.");
+      } else {
+        setErrorMessage(`The uploaded template must be ${vFileType}.`);
       }
 
-      // Memproses file yang valid
-      const newFiles = acceptedFiles
-        .filter((file) => validExtensions.includes(file.type))
-        .map((file) => ({
-          fileName: file.name,
-          createDate: new Date().toDateString(),
-          status: "Draft",
-          file: file,
-          vAttchId: "",
-          iVersion: 1,
-        }));
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+      return;
+    }
+
+      // Jika semua file valid, lanjutkan proses
+      const newFiles = acceptedFiles.map((file) => ({
+        fileName: file.name,
+        createDate: new Date().toDateString(),
+        status: "Draft",
+        file: file,
+        vAttchId: "",
+        iVersion: 1,
+      }));
 
       // Sort so Draft files appear at the top
       const updatedFileList = [...files, ...newFiles].sort((a, b) => {
@@ -68,7 +76,7 @@ const TabContent: React.FC<ITabContent> = ({
 
       setFileList((prevList) => [...prevList, ...newFiles]);
       setFiles(updatedFileList); // Update parent state with sorted files
-      setErrorMessage(null);
+      setErrorMessage(null); // Clear error message after valid upload
     },
     [vFileType, files, setFiles]
   );
@@ -120,6 +128,7 @@ const TabContent: React.FC<ITabContent> = ({
         setUploadStatus("Upload successful");
         await getTemplates(); // Refresh file list after successful upload
         setTimeout(() => setUploadStatus(null), 5000);
+        window.location.reload();
       }
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -154,11 +163,11 @@ const TabContent: React.FC<ITabContent> = ({
               item.attachment.map((element: any) => ({
                 fileName: element?.vFileName || "",
                 createDate: element?.dCrea,
+                iVersion: element?.iVersion,
                 status: element?.vStatus === "1" ? "Active" : "Inactive",
                 file: new File([], element?.vFileName || ""),
               }))
             );
-
           setFileList(updatedFiles);
           setFiles(updatedFiles);
         } else {

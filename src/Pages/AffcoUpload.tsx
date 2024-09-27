@@ -32,7 +32,7 @@ import {
   generateYears,
   getToken,
 } from "../Component/TemplateUrl";
-import { columnHistoryUpload } from "../Component/TableComponent/ColumnDef/IColumnUpload";
+import { columnHistoryUpload, respsAffco } from "../Component/TableComponent/ColumnDef/IColumnUpload";
 import {
   IStepProps,
   ITempFile,
@@ -192,6 +192,8 @@ export default function AffcoUpload() {
 
           setDataFile((prev) => [ ...files, ...prev]);
           setTempFile((prevFile) => [...prevFile, ...temFiles]);
+          setRespFile(respsAffco)
+          
 
           }
           
@@ -212,6 +214,8 @@ export default function AffcoUpload() {
   );
 
   const [loading, setLoading] = React.useState(false);
+  const [respDataCons, setRespDataCons] = React.useState<IRespFile[]>([])
+  const [respDataAffco, setRespDataAffco] = React.useState<IRespFile[]>([])
 
   const steps = dataStep;
 
@@ -274,7 +278,7 @@ export default function AffcoUpload() {
   };
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault();    
     setActiveStep(-1);
 
     if (pMonth === month.toString() && pYear === year) {
@@ -328,34 +332,61 @@ export default function AffcoUpload() {
     ).then((resp) => {
       resp.json().then((valData) => {
         if (valData.header.vPackageId !== "") {
+
+          setRespDataCons(valData.responseFile.filter((val) => val.vAttType === "RESPCONS").map((val) => {
+            return {
+              vStepId: val.vStepId,
+              vAttchName: val.vAttchName,
+              vAttType: val.vAttType,
+              vRemarks: val.vRemarks,
+              fAttchContent: val.fAttchContent
+            }
+
+          }))
+
+          setRespDataAffco(valData.responseFile.filter((val) => val.vAttType === "RESPAFFCO").map((val) => {
+            return {
+              vStepId: val.vStepId,
+              vAttchName: val.vAttchName,
+              vAttType: val.vAttType,
+              vRemarks: val.vRemarks,
+              fAttchContent: val.fAttchContent
+            }
+
+          }))
           valData.detail.map((dtl) =>
-            dtl.fPackageFile.map((fp, index) =>
-              tempData.push({
-                filename: fp.vAttchName,
-                createDate: fp.dCrea,
-                createBy: fp.vCrea,
-                docVersion: "V" + (dtl.fPackageFile.length - index),
-                status:
-                  dtl.vStatus === "S" && index === 0
-                    ? "Submitted"
-                    : dtl.vStatus === "S" && index !== 0
-                    ? "Revised"
-                    : dtl.vStatus === "A" && index === 0
-                    ? "Approved"
-                    : dtl.vStatus === "A" && index !== 0
-                    ? "Revised"
-                    : dtl.vStatus === "R"
-                    ? "Revised"
-                    : "",
-                stepid: dtl.vStepId,
-                dApprover: dtl.dApprover,
-                dDueDate: dtl.dDueDate,
-                apprRemarks: fp.vRemarks,
-                userRemarks: dtl.vUsrRemarks,
-                vTempCode: dtl.vTemporalCode,
-                vAttachId: dtl.vAttchId,
-              } as IStepProps)
+          {
+            
+            return (
+              dtl.fPackageFile.map((fp, index) =>
+                tempData.push({
+                  filename: fp.vAttchName,
+                  createDate: fp.dCrea,
+                  createBy: fp.vCrea,
+                  docVersion: "V" + (dtl.fPackageFile.length - index),
+                  status:
+                    dtl.vStatus === "S" && index === 0
+                      ? "Submitted"
+                      : dtl.vStatus === "S" && index !== 0
+                      ? "Revised"
+                      : dtl.vStatus === "A" && index === 0
+                      ? "Approved"
+                      : dtl.vStatus === "A" && index !== 0
+                      ? "Revised"
+                      : dtl.vStatus === "R"
+                      ? "Revised"
+                      : "",
+                  stepid: dtl.vStepId,
+                  dApprover: dtl.dApprover,
+                  dDueDate: dtl.dDueDate,
+                  apprRemarks: fp.vRemarks,
+                  userRemarks: dtl.vUsrRemarks,
+                  vTempCode: dtl.vTemporalCode,
+                  vAttachId: dtl.vAttchId,
+                } as IStepProps)
+              )
             )
+          }
           );
 
           setDataFile(tempData);
@@ -413,6 +444,8 @@ export default function AffcoUpload() {
     const dataForm = new FormData();
     setLoading(true);
 
+    
+
     const packId = dataHeader?.vPackageId !== "" ? dataHeader?.vPackageId : "";
     dataForm.append("Header.vPackageId", packId);
     dataForm.append("Header.iYear", year);
@@ -437,6 +470,7 @@ export default function AffcoUpload() {
           dataForm.append(`Detail[${index}].vTemporalCode`, val.vTempCode)
         );
       });
+      
     } else {
       dataFile
         .filter((x) => x.status === "Draft")
@@ -473,7 +507,7 @@ export default function AffcoUpload() {
       });
     }
 
-    if (respFile.length > 0) {
+    if (respFile.length > 0) {      
       respFile.map((val, index) => {
         return (
           dataForm.append(`Response[${index}].vStepId`, val.vStepId),
@@ -484,6 +518,7 @@ export default function AffcoUpload() {
         );
       });
     }
+    
     fetch(apiUrl + "api/Package/SubmitPackage", {
       method: "POST",
       headers: {
@@ -494,7 +529,7 @@ export default function AffcoUpload() {
     }).then((resp) => {
       if (resp.ok) {
         setLoading(false);
-        alert("berhasil");
+        alert("success submit approvals");        
         window.location.reload();
       } else {
         alert("something wrong : " + resp.status);

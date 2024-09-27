@@ -347,7 +347,7 @@ export default function AspackAprroval() {
 
     const submitRevise = (data: number) => {
       setOpen(false)
-      const updateData = {...dataAffco[data], status:"Revise", dDueDate: duedate ? duedate.format("YYYY-MM-DD HH:mm:ss") : "", apprRemarks: vRemark, dApprover: "", vApprover: ""}
+      const updateData = {...dataAffco[data], status:"Revise", dDueDate: duedate ? duedate.format("YYYY-MM-DD HH:mm:ss") : "", apprRemarks: remark, dApprover: "", vApprover: ""}
       const newDataAffco = [...dataAffco];
       newDataAffco[data] = updateData;
       setDataAffco(newDataAffco);

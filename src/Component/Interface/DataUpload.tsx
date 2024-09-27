@@ -53,5 +53,8 @@ export interface IRemarkProps {
     remark: string,
     dueDate: string,
     version: string,
-    attachId: string
+    attachId: string,
+    stepId: string,
+    respAffco: string,
+    status: string
 }

@@ -297,11 +297,66 @@ const HistoryUploadAffco: React.FC = () => {
     { accessorKey: "vRemarks", header: "Remarks", size: 150 },
   ];
 
+  const downloadFile = async (
+    // fileName: string,
+    // vAttchId: string,
+    // status: string,
+  ) => {
+    // const encodedFileName = btoa(fileName); 
+
+    // Gunakan iVersion yang diterima dari parameter
+    // const url =
+    //   apiUrl +
+    //   `api/Template/DownloadTemplate?vName=${encodedFileName}&vAttachId=${vAttchId}&iVersion=${iVersion}`;
+
+    // try {
+    //   const response = await fetch(url, {
+    //     headers: {
+    //       Authorization: `Bearer ` + getToken,
+    //     },
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error("Network response was not ok");
+    //   }
+
+    //   const blob = await response.blob();
+    //   const link = document.createElement("a");
+    //   link.href = URL.createObjectURL(blob);
+    //   link.download = fileName;
+    //   link.click();
+    // } catch (error: any) {
+      
+    //   if (error.response && error.response.status === 401) {
+    //     navigate();
+    //   } else {
+    //     setShowAlert(true);
+    //     setTimeout(() => setShowAlert(false), 5000);
+    //     console.error("Error fetching templates:", error);
+    //   }
+    // }
+  };
+
   //Revision History Table :
   const revisionHistoryColumns: MRT_ColumnDef<any>[] = [
     { header: "#", size: 50, Cell: ({ row }) => row.index + 1 },
     { accessorKey: "vAction", header: "Status", size: 150 },
     { accessorKey: "vRemarks", header: "Remarks", size: 150 },
+    { accessorKey: "vResponses", header: "Responses", size: 150 },
+    { accessorKey: "vResponsesFile", header: "Responses File", size: 150, Cell: ({ row }) => {
+      return (
+        <Button
+          onClick={
+            () => downloadFile() // Meneruskan iVersion yang diambil dari file
+          }
+          variant="outlined"
+          color="info"
+          size="small"
+        >
+          Download
+        </Button>
+      ); },
+    },
     { accessorKey: "vUserId", header: "Approval", size: 150 },
     {
       accessorKey: "dDateTime",

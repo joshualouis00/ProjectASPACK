@@ -28,36 +28,50 @@ const TabContent: React.FC<ITabContent> = ({
   // Handling file drop
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      // Map file types to step id (example: pdf, xlsx, etc.)
-      const fileTypeMap: { [key: string]: string } = {
-        PDF: "application/pdf",
-        Excel: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        // Tambahkan tipe file lainnya jika diperlukan
+      const fileTypeMap: { [key: string]: string[] } = {
+        PDF: ["application/pdf"],
+        Excel: [
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+          "application/vnd.ms-excel", // .xls
+        ],
+        Both: [
+          "application/pdf",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "application/vnd.ms-excel",
+        ],
       };
-
-      // Check for valid file type based on step's vFileType
-      const validExtension = fileTypeMap[vFileType];
-
-      // Filter files based on the valid extension for the current step
-      const invalidFiles = acceptedFiles.filter(
-        (file) => file.type !== validExtension
-      );
-
-      // Menampilkan pesan error jika ada file yang tidak valid
-    if (invalidFiles.length > 0) {
+  
+      console.log("File Type : ", vFileType);
+  
+      // Jika vFileType adalah "Both", izinkan semua file
       if (vFileType === "Both") {
-        setErrorMessage("Uploaded files must be Excel and PDF.");
+        const invalidFiles = acceptedFiles.filter(
+          (file) => !fileTypeMap["Both"].includes(file.type)
+        );
+        if (invalidFiles.length > 0) {
+          setErrorMessage("Uploaded files must be either PDF or Excel.");
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+          return;
+        }
       } else {
-        setErrorMessage(`The uploaded template must be ${vFileType}.`);
+        // Jika bukan "Both", periksa apakah file yang diunggah sesuai dengan tipe file yang diharapkan
+        const validExtension = fileTypeMap[vFileType] || [];
+        const invalidFiles = acceptedFiles.filter(
+          (file) => !validExtension.includes(file.type)
+        );
+  
+        if (invalidFiles.length > 0) {
+          setErrorMessage(`The uploaded template must be ${vFileType}.`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+          return;
+        }
       }
-
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-      return;
-    }
-
-      // Jika semua file valid, lanjutkan proses
+  
+      // Jika semua file valid (termasuk untuk "Both"), lanjutkan proses upload
       const newFiles = acceptedFiles.map((file) => ({
         fileName: file.name,
         createDate: new Date().toDateString(),
@@ -66,20 +80,21 @@ const TabContent: React.FC<ITabContent> = ({
         vAttchId: "",
         iVersion: 1,
       }));
-
-      // Sort so Draft files appear at the top
+  
+      // Update daftar file dan sorting file draft
       const updatedFileList = [...files, ...newFiles].sort((a, b) => {
         if (a.status === "Draft" && b.status !== "Draft") return -1;
         if (a.status !== "Draft" && b.status === "Draft") return 1;
-        return 0; // Maintain order for files with same status
+        return 0;
       });
-
-      setFileList((prevList) => [...prevList, ...newFiles]);
-      setFiles(updatedFileList); // Update parent state with sorted files
-      setErrorMessage(null); // Clear error message after valid upload
+  
+      setFileList(updatedFileList);
+      setFiles(updatedFileList);
+      setErrorMessage(null); // Bersihkan pesan error jika file valid
     },
     [vFileType, files, setFiles]
   );
+  
 
   // Handle error message timeout
   useEffect(() => {
@@ -104,6 +119,7 @@ const TabContent: React.FC<ITabContent> = ({
       const draftFiles = fileList.filter((file) => file.status === "Draft");
 
       draftFiles.forEach((file, index) => {
+        console.log(`Uploading file: ${file.fileName}, type: ${file.file.type}`);
         formData.append(`template[${index}].vAttchId`, "");
         formData.append(`template[${index}].vStepId`, vStepId);
         formData.append(`template[${index}].attachment[0].fFile`, file.file);

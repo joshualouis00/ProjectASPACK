@@ -100,11 +100,45 @@ const HistoryUploadAffco: React.FC = () => {
             header: "#",
             size: 50,
             Cell: ({ row }) => row.index + 1,
+            // Sticky to the left (fixed column)
+            muiTableHeadCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 0,
+                zIndex: 2, // Set zIndex to ensure it's above other columns
+                backgroundColor: 'white', // Give it a background color
+              },
+            },
+            muiTableBodyCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 0,
+                zIndex: 1,
+                backgroundColor: 'white',
+              },
+            },
           },
           {
             accessorKey: "vAffcoName",
             header: "Affco",
-            size: 300,
+            size: 150,
+            // Sticky to the left (fixed column)
+            muiTableHeadCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 50, // Shift it after the # column
+                zIndex: 2, // Make sure it's above other columns
+                backgroundColor: 'white',
+              },
+            },
+            muiTableBodyCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 50,
+                zIndex: 1,
+                backgroundColor: 'white',
+              },
+            },
           },
           {
             accessorKey: "iMonth",
@@ -471,6 +505,14 @@ const HistoryUploadAffco: React.FC = () => {
           pagination: { pageIndex: 0, pageSize: 10 },
         }}
         enableSorting
+        muiTableHeadProps={{
+          sx: {
+            position: 'sticky',
+            top: 0,
+            zIndex: 3, // Ensure the header is above the rest of the table content
+            backgroundColor: 'white',
+          },
+        }}
       />
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">

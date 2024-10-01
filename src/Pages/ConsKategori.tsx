@@ -165,7 +165,7 @@ export default function Kategori() {
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = "File Attachment " + data;
+          // a.download = "File Attachment " + data;
           a.click();
         });
       } else {

@@ -43,6 +43,9 @@ import { getUserId } from "../Component/TemplateUrl";
 import { format } from "date-fns";
 import dayjs, { Dayjs } from "dayjs";
 
+export let dataRespAffco: IRespFile[] = []
+export let dataCountRevise: IStepProps[] = []
+
 export default function AffcoUpload() {
   const dataMonth = new Date().getMonth();
   const dataYear = new Date().getFullYear();
@@ -50,6 +53,7 @@ export default function AffcoUpload() {
   const [tempData, setTempData] = React.useState<IStepProps[]>([]);
   const [submitData, setSubmitData] = React.useState<IStepProps[]>([]);
   const [stepData, setStepData] = React.useState("");
+  const [stepDesc, setStepDesc] = React.useState<string | undefined>("")
   const [dataStep, setDataStep] = React.useState([
     {
       id: 100,
@@ -59,8 +63,7 @@ export default function AffcoUpload() {
     },
   ]);
   const [tempFile, setTempFile] = React.useState<ITempFile[]>([]);
-  const [respFile, setRespFile] = React.useState<IRespFile[]>([]);
-  const [vRespName, setVRespName] = React.useState("");
+  const [respFile, setRespFile] = React.useState<IRespFile[]>([]);  
   const [dataHeader, setDataHeader] = React.useState<IHeaderProps>({
     iMonth: "",
     iYear: "",
@@ -142,6 +145,7 @@ export default function AffcoUpload() {
           setError(true);
 
           } else {
+            
             var randomstring = require("randomstring");
 
           const tempCode = randomstring.generate({
@@ -214,8 +218,6 @@ export default function AffcoUpload() {
   );
 
   const [loading, setLoading] = React.useState(false);
-  const [respDataCons, setRespDataCons] = React.useState<IRespFile[]>([])
-  const [respDataAffco, setRespDataAffco] = React.useState<IRespFile[]>([])
 
   const steps = dataStep;
 
@@ -231,9 +233,10 @@ export default function AffcoUpload() {
     return completedSteps() === totalSteps();
   };
 
-  const handleStep = (step: number, stepName: string) => () => {
+  const handleStep = (step: number, stepName: string, stepDescription: string | undefined) => () => {
     setActiveStep(step);
     setStepData(stepName);
+    setStepDesc(stepDescription)
 
     const testindex = submitData.filter(
       (c) => c.status === "Revised" && c.stepid === stepName
@@ -280,12 +283,12 @@ export default function AffcoUpload() {
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();    
     setActiveStep(-1);
+    setStepData("")
 
     if (pMonth === month.toString() && pYear === year) {
       const now = dayjs().format("YYYY-MM-DD");
       const nowDate = dayjs(now);
-      if (nowDate > pSdate && nowDate < pEdate) {
-        console.log("open period");
+      if (nowDate >= pSdate && nowDate <= pEdate) {        
         setIsOpenPeriod(true);
       } else {
         setIsOpenPeriod(false);
@@ -331,29 +334,18 @@ export default function AffcoUpload() {
       }
     ).then((resp) => {
       resp.json().then((valData) => {
+        
+        dataRespAffco = valData.responseFile.filter((val) => val.vAttType === "RESPAFFCO").map((val) => ({
+          vStepId: val.vStepId,
+          vAttchName: val.vAttchName,
+          vAttType: val.vAttType,
+          vRemark: val.vRemarks,
+          fAttchContent: val.fAttchContent,
+          version: val.iVersion
+        }))
+
+        
         if (valData.header.vPackageId !== "") {
-
-          setRespDataCons(valData.responseFile.filter((val) => val.vAttType === "RESPCONS").map((val) => {
-            return {
-              vStepId: val.vStepId,
-              vAttchName: val.vAttchName,
-              vAttType: val.vAttType,
-              vRemarks: val.vRemarks,
-              fAttchContent: val.fAttchContent
-            }
-
-          }))
-
-          setRespDataAffco(valData.responseFile.filter((val) => val.vAttType === "RESPAFFCO").map((val) => {
-            return {
-              vStepId: val.vStepId,
-              vAttchName: val.vAttchName,
-              vAttType: val.vAttType,
-              vRemarks: val.vRemarks,
-              fAttchContent: val.fAttchContent
-            }
-
-          }))
           valData.detail.map((dtl) =>
           {
             
@@ -383,6 +375,7 @@ export default function AffcoUpload() {
                   userRemarks: dtl.vUsrRemarks,
                   vTempCode: dtl.vTemporalCode,
                   vAttachId: dtl.vAttchId,
+                  stepName: dtl.vStepName
                 } as IStepProps)
               )
             )
@@ -420,9 +413,43 @@ export default function AffcoUpload() {
                 userRemarks: dtl.vUsrRemarks,
                 vTempCode: dtl.vTemporalCode,
                 vAttachId: dtl.vAttchId,
+                stepName: dtl.vStepName
               };
             })
           );
+
+          dataCountRevise = valData.detail.map((dtl) => {
+            return {
+              filename:
+                dtl.fPackageFile.length > 0
+                  ? dtl.fPackageFile[0].vAttchName
+                  : "",
+              createDate:
+                dtl.fPackageFile.length > 0 ? dtl.fPackageFile[0].dCrea : "",
+              createBy:
+                dtl.fPackageFile.length > 0 ? dtl.fPackageFile[0].vCrea : "",
+              docVersion:
+                dtl.fPackageFile.length > 0
+                  ? "V" + dtl.fPackageFile.length
+                  : "",
+              status:
+                dtl.vStatus === "S"
+                  ? "Submitted"
+                  : dtl.vStatus === "A"
+                  ? "Approved"
+                  : dtl.vStatus === "R"
+                  ? "Revised"
+                  : "",
+              stepid: dtl.vStepId,
+              dApprover: dtl.dApprover,
+              dDueDate: dtl.dDueDate,
+              apprRemarks: dtl.vApprRemarks,
+              userRemarks: dtl.vUsrRemarks,
+              vTempCode: dtl.vTemporalCode,
+              vAttachId: dtl.vAttchId,
+              stepName: dtl.vStepName
+            };
+          })
         } else {
           setDataFile([]);
         }
@@ -433,11 +460,15 @@ export default function AffcoUpload() {
           iYear: valData.header.iYear,
           iStatus: valData.header.iStatus,
           vAffcoId: valData.header.vAffcoId,
-        });
+        });        
       });
     });
 
     setFilter(true);
+    
+    
+
+    
   };
 
   const handleSubmitFiles = () => {
@@ -509,6 +540,7 @@ export default function AffcoUpload() {
 
     if (respFile.length > 0) {      
       respFile.map((val, index) => {
+        
         return (
           dataForm.append(`Response[${index}].vStepId`, val.vStepId),
           dataForm.append(`Response[${index}].vAttchName`, val.vAttchName),
@@ -517,6 +549,20 @@ export default function AffcoUpload() {
           dataForm.append(`Response[${index}].fAttchContent`, val.fAttchContent)
         );
       });
+    } else {
+      const countRevised = dataCountRevise.filter((val) => val.status === "Revised")
+
+      countRevised.map((val,index) => {
+        return (
+          dataForm.append(`Response[${index}].vStepId`, val.stepid),
+          dataForm.append(`Response[${index}].vAttchName`, "no file attachment"),
+          dataForm.append(`Response[${index}].vRemarks`, "no response from affco"),
+          dataForm.append(`Response[${index}].vAttchId`, val.vAttachId),
+          dataForm.append(`Response[${index}].fAttchContent`, "no file attachment")
+
+        )
+      })
+
     }
     
     fetch(apiUrl + "api/Package/SubmitPackage", {
@@ -731,10 +777,10 @@ export default function AffcoUpload() {
                             >
                               <StepButton
                                 color="inherit"
-                                onClick={handleStep(index, val.stepid)}
+                                onClick={handleStep(index, val.stepid, val.stepName)}
                                 {...labelProps}
                               >
-                                {val.stepid}
+                                {val.stepName}
                               </StepButton>
                             </Step>
                           );
@@ -743,7 +789,7 @@ export default function AffcoUpload() {
                         <Step key={label.id} completed={completed[index]}>
                           <StepButton
                             color="inherit"
-                            onClick={handleStep(index, label.label)}
+                            onClick={handleStep(index, label.label, label.desc)}
                           >
                             {label.desc}
                           </StepButton>
@@ -844,7 +890,7 @@ export default function AffcoUpload() {
                     <Stack direction={"column"}>
                       <Item elevation={0}>
                         <Typography sx={{ marginBottom: 1 }}>
-                          {stepData !== "" ? "History " + stepData : null}
+                          {stepData !== "" ? "History " + stepDesc : null}
                         </Typography>
                         <MaterialReactTable                        
                           columns={columnHistoryUpload}

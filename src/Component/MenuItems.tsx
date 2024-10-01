@@ -139,9 +139,9 @@ const MenuItems = (props: MenuItemsProps) => {
                 <ListItemIcon>
                   <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
-                <ListItemText primary="Archived News" />
+                <ListItemText primary="Master Library" />
               </ListItemButton>
-              <ListItemButton
+              {/* <ListItemButton
                 onClick={() => {
                   navigate("/Recent");
                 }}
@@ -151,7 +151,7 @@ const MenuItems = (props: MenuItemsProps) => {
                   <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "10px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Recent News" />
-              </ListItemButton>
+              </ListItemButton> */}
               <ListItemButton
                 onClick={() => {
                   navigate("/Kategori");
@@ -161,7 +161,7 @@ const MenuItems = (props: MenuItemsProps) => {
                 <ListItemIcon>
                   <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
-                <ListItemText primary="Category News" />
+                <ListItemText primary="Highlights" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -332,7 +332,7 @@ const MenuItems = (props: MenuItemsProps) => {
           </ListItemButton>
           <Collapse in={libraryAffco} timeout="auto" unmountOnExit>
             <List component="div" disablePadding className="subMenus">
-              <ListItemButton
+              {/* <ListItemButton
                 onClick={() => {
                   navigate("/Recent");
                 }}
@@ -342,7 +342,7 @@ const MenuItems = (props: MenuItemsProps) => {
                   <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
                 <ListItemText primary="Recent News" />
-              </ListItemButton>
+              </ListItemButton> */}
               <ListItemButton
                 onClick={() => {
                   navigate("/Kategori");
@@ -352,7 +352,7 @@ const MenuItems = (props: MenuItemsProps) => {
                 <ListItemIcon>
                   <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
                 </ListItemIcon>
-                <ListItemText primary="Category News" />
+                <ListItemText primary="Highlights" />
               </ListItemButton>
             </List>
           </Collapse>

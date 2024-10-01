@@ -1256,7 +1256,7 @@ export default function MstUserAffco() {
                 id: val.vUserId,
                 name: val.vUserName,
                 email: val.vEmail,
-                role: val.vRole === "C" ? "Console" : "Affco",
+                role: val.vRole === "C" ? "Consol" : "Affco",
                 status: val.bActive === true ? "Active" : "Nonactive",
                 ldapLogin: val.nUserLdap,
                 affcoId: val.vAffcoId,

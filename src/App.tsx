@@ -622,11 +622,11 @@ function App() {
                       element={
                         <AcordionWrapper
                           content={<ConsArchived />}
-                          headerTitle="Archived News"
+                          headerTitle="Master Library"
                         />
                       }
                     />
-                    <Route
+                    {/* <Route
                       path="/Recent"
                       element={
                         <AcordionWrapper
@@ -634,13 +634,13 @@ function App() {
                           headerTitle="Recent News"
                         />
                       }
-                    />
+                    /> */}
                     <Route
                       path="/Kategori"
                       element={
                         <AccordionWrapper
                           content={<ConsKategori />}
-                          headerTitle="Category News"
+                          headerTitle="Highlights"
                         />
                       }
                     />

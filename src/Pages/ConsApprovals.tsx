@@ -51,6 +51,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 
+export let dataRespAffcoCons: IRespFile[] = []
+
 export default function AspackAprroval() {
   const dataMonth = new Date().getMonth();
   const dataYear = new Date().getFullYear();
@@ -190,6 +192,14 @@ export default function AspackAprroval() {
             });
   
             if (valData.header.vPackageId !== "") {
+              dataRespAffcoCons = valData.responseFile.filter((val) => val.vAttType === "RESPAFFCO").map((val) => ({
+                vStepId: val.vStepId,
+                vAttchName: val.vAttchName,
+                vAttType: val.vAttType,
+                vRemark: val.vRemarks,
+                fAttchContent: val.fAttchContent,
+                version: val.iVersion
+              }))
               setDataAffco(
                 valData.detail.map((dtl) => {
                   return {
@@ -223,7 +233,8 @@ export default function AspackAprroval() {
                     apprRemarks: dtl.vApprRemarks,
                     userRemarks: dtl.vUsrRemarks,
                     vTempCode: dtl.vTemporalCode,
-                    vAttachId: dtl.vAttchId
+                    vAttachId: dtl.vAttchId,
+                    stepName: dtl.vStepName
                   };
                 })
               );
@@ -247,12 +258,12 @@ export default function AspackAprroval() {
       if(pMonth === month.toString() && pYear === year){
         const now = dayjs().format('YYYY-MM-DD')
         const nowDate = dayjs(now)
-        if(nowDate > pSdate && nowDate < pEdate){
-          console.log("open period")
+        if(nowDate >= pSdate && nowDate <= pEdate){
+          
           setIsOpenPeriod(true)
         } else {
           setIsOpenPeriod(false)
-          console.log("close period")
+          
         }
   
   
@@ -477,7 +488,17 @@ export default function AspackAprroval() {
         setOpenSnack(true)
         fetchGetPackage()
       } else {
-        navigate()
+        if(resp.status === 404){
+          navigate()
+
+        } else {
+          setLoading(false)
+        setMessage("Error Server! please contact your IT Administrator")
+        setError(true)
+        setOpenSnack(true)
+        fetchGetPackage()
+        }
+        
       }
     })
 
@@ -690,7 +711,7 @@ export default function AspackAprroval() {
                                 },
                               }}
                             >
-                              {value.stepid}
+                              {value.stepName}
                             </StepLabel>
                           </Step>
                         )

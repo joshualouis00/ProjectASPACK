@@ -13,7 +13,8 @@ export interface IStepProps {
     userRemarks: string ,
     vTempCode: string ,
     vApprover: string ,
-    vAttachId: string
+    vAttachId: string,
+    stepName?: string
 }
 
 export interface ITempFile {
@@ -38,7 +39,8 @@ export interface IRespFile {
     vAttType: string,
     vRemark: string,
     vAttchId: string,
-    fAttchContent: string | File 
+    fAttchContent: string | File ,
+    version?: string
 }
 
 export interface IDialogProps {
@@ -57,4 +59,19 @@ export interface IRemarkProps {
     stepId: string,
     respAffco: string,
     status: string
+}
+
+export interface IResponseProps {
+    open: boolean,
+    onClose: () => void,
+    stepId: string,
+    version: string,
+    attachId: string
+}
+
+export interface ITempResponse {
+    vRespAffco: string,
+    vStepId: string,
+    vFile: string | File,
+    vAttachName: string
 }

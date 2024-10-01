@@ -174,7 +174,7 @@ export const DataWorkflow: React.FC = () => {
     {
       accessorKey: "vStepDesc",
       header: "Step Description",
-      size: 200,
+      size: 230,
       sortingFn: (a, b) => {
         const nameA = a.original.vStepDesc.toLowerCase();
         const nameB = b.original.vStepDesc.toLowerCase();
@@ -184,7 +184,7 @@ export const DataWorkflow: React.FC = () => {
         <span
           style={{
             display: "block",
-            width: "150px",
+            width: "230px",
             overflow: "hidden",
             textOverflow: "ellipsis",
           }}
@@ -196,7 +196,7 @@ export const DataWorkflow: React.FC = () => {
     {
       accessorKey: "vAffcoCtgry",
       header: "Category",
-      size: 170,
+      size: 100,
       sortingFn: (a, b) => {
         const CategoryA = a.original.vAffcoCtgry.toLowerCase();
         const CategoryB = b.original.vAffcoCtgry.toLowerCase();
@@ -240,7 +240,7 @@ export const DataWorkflow: React.FC = () => {
     {
       accessorKey: "bActive",
       header: "Active",
-      size: 100,
+      size: 50,
       Cell: ({ cell }) => (
         <span
         style={{
@@ -256,10 +256,11 @@ export const DataWorkflow: React.FC = () => {
     },
     {
       header: "Action",
+      size: 50,
       Cell: ({ row }) => (
         <Button
           variant="contained"
-          sx={{ backgroundColor: "#808080" }}
+          sx={{ backgroundColor: "#808080", mr: "10px" }}
           size="small"
           onClick={() => handleOpenEditDialog(row.original)}
         >

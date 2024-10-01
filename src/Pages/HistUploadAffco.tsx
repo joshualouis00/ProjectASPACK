@@ -100,11 +100,45 @@ const HistoryUploadAffco: React.FC = () => {
             header: "#",
             size: 50,
             Cell: ({ row }) => row.index + 1,
+            // Sticky to the left (fixed column)
+            muiTableHeadCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 0,
+                zIndex: 2, // Set zIndex to ensure it's above other columns
+                backgroundColor: 'white', // Give it a background color
+              },
+            },
+            muiTableBodyCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 0,
+                zIndex: 1,
+                backgroundColor: 'white',
+              },
+            },
           },
           {
             accessorKey: "vAffcoName",
             header: "Affco",
-            size: 300,
+            size: 150,
+            // Sticky to the left (fixed column)
+            muiTableHeadCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 50, // Shift it after the # column
+                zIndex: 2, // Make sure it's above other columns
+                backgroundColor: 'white',
+              },
+            },
+            muiTableBodyCellProps: {
+              sx: {
+                position: 'sticky',
+                left: 50,
+                zIndex: 1,
+                backgroundColor: 'white',
+              },
+            },
           },
           {
             accessorKey: "iMonth",
@@ -180,8 +214,8 @@ const HistoryUploadAffco: React.FC = () => {
     };
 
     const fetchRevisionHistoryData = async () => {
+      const bulan = monthNames.indexOf(month) + 1;
       if (affcoId && stepId && month && year) {
-        const bulan = monthNames.indexOf(month) + 1;
         try {
           const response = await axios.get(
             apiUrl + `api/Package/GetActivity?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
@@ -297,11 +331,114 @@ const HistoryUploadAffco: React.FC = () => {
     { accessorKey: "vRemarks", header: "Remarks", size: 150 },
   ];
 
+  //Bagian Download Responses File : 
+  const downloadFile = async (row: any) => {
+    try {
+      // Tentukan types dan dapatkan iVersion serta vAttachId dari response
+      const response = await axios.get(
+        apiUrl + `api/Package/GetActivity?nYear=${row.iYear}&nMonth=${row.iMonth}&vAffcoId=${row.vAffcoId}&vStepId=${row.vStepId}`,
+        {
+          headers: {
+            Authorization: `Bearer ` + getToken,
+          },
+        }
+      );
+  
+      const fileData = response.data.data[0]?.responseFiles[0]; // Ambil file pertama dari responseFiles
+  
+      if (fileData) {
+        const iVersion = fileData.iVersion; // Ambil versi dari response
+        const vAttachId = fileData.vAttchId; // Ambil attachment ID
+        const types = fileData.vAttType;
+  
+        fetchDownloadResponse(types, iVersion, vAttachId); // Panggil fungsi untuk download file
+      } else {
+        alert("File tidak ditemukan, silakan periksa data yang Anda masukkan.");
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        handleError401();
+      } else {
+        console.error("Error Revision History Data :", error);
+      }
+    }
+  };
+  
+  const fetchDownloadResponse = (
+    types: string,
+    version: string,
+    attachId: string
+  ) => {
+    fetch(
+      apiUrl +
+        `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ` + getToken,
+        },
+      }
+    ).then((resp) => {
+      if (resp.status === 200) {
+        resp.blob().then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "File Attachment " + attachId;
+          a.click();
+        });
+      } else if (resp.status === 404) {
+        alert("File not found, please contact your IT Administrator.");
+      } else if (resp && resp.status === 401) {
+        handleError401();
+      } else {
+        console.error("Error Revision History Data :", resp);
+      }
+    }).catch(error => {
+      console.error("Error downloading file:", error);
+      alert("Terjadi kesalahan saat mengunduh file.");
+    });
+  };
+  
+
   //Revision History Table :
   const revisionHistoryColumns: MRT_ColumnDef<any>[] = [
     { header: "#", size: 50, Cell: ({ row }) => row.index + 1 },
     { accessorKey: "vAction", header: "Status", size: 150 },
     { accessorKey: "vRemarks", header: "Remarks", size: 150 },
+    {
+      accessorKey: "responseFiles",
+      header: "Responses",
+      size: 150,
+      Cell: ({ row }) => {
+        const remarks = row.original.responseFiles[0]?.vAttchName || " "; // Mengambil vRemarks dari responseFiles
+        //const remarks = row.original.responseFiles[0]?.vRemarks || " "; // Mengambil vRemarks dari responseFiles
+        return <span>{remarks}</span>;
+      },
+    },
+    {
+      accessorKey: "vResponsesFile",
+      header: "Responses File",
+      size: 150,
+      Cell: ({ row }) => {
+        const status = row.original.vAction; // Ambil nilai Status dari baris
+        console.log("Statusnya : ",status);
+        return (
+          <>
+            {status === "Revised" ? ( // Cek apakah Status adalah "Revised"
+              <Button
+                onClick={() => downloadFile(row.original)}
+                variant="outlined"
+                color="info"
+                size="small"
+              >
+                Download
+              </Button>
+            ): null}
+          </>
+        );
+      },
+    },
     { accessorKey: "vUserId", header: "Approval", size: 150 },
     {
       accessorKey: "dDateTime",
@@ -368,6 +505,14 @@ const HistoryUploadAffco: React.FC = () => {
           pagination: { pageIndex: 0, pageSize: 10 },
         }}
         enableSorting
+        muiTableHeadProps={{
+          sx: {
+            position: 'sticky',
+            top: 0,
+            zIndex: 3, // Ensure the header is above the rest of the table content
+            backgroundColor: 'white',
+          },
+        }}
       />
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">

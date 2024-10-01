@@ -1,7 +1,7 @@
 import React from "react";
 import { type MRT_ColumnDef, MaterialReactTable } from "material-react-table";
 import useHandleUnauthorized from "../handleUnauthorized";
-import { Button, Box, Alert } from "@mui/material";
+import { Button, Box, Alert, Snackbar } from "@mui/material";
 import { format, parse } from "date-fns";
 import { apiUrl, getToken } from "../TemplateUrl";
 import { FileDataUpload, AppTableProps } from "../Interface/MasterTemplates";
@@ -42,7 +42,6 @@ const AppTable: React.FC<
       link.download = fileName;
       link.click();
     } catch (error: any) {
-      
       if (error.response && error.response.status === 401) {
         navigate();
       } else {
@@ -134,18 +133,30 @@ const AppTable: React.FC<
 
   return (
     <Box>
-      <MaterialReactTable columns={columns} data={files} />
-      {showAlert && (
-        <Alert variant="outlined" severity="error" sx={{ mb: 2 }}>
-          Gagal download template. Hubungi IT Support.
-        </Alert>
-      )}
-      {errorMessage && (
-        <Alert variant="outlined" severity="error" sx={{ mb: 2 }}>
-          {errorMessage}
-        </Alert>
-      )}
-    </Box>
+    <MaterialReactTable columns={columns} data={files} />
+
+    <Snackbar
+      open={showAlert}
+      onClose={() => setShowAlert(false)}
+      autoHideDuration={5000}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }} // Posisi atas tengah
+    >
+      <Alert onClose={() => setShowAlert(false)} severity="error" sx={{ width: '100%' }}>
+        Gagal download template. Hubungi IT Support.
+      </Alert>
+    </Snackbar>
+
+    <Snackbar
+      open={Boolean(errorMessage)}
+      onClose={() => {}}
+      autoHideDuration={5000}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }} // Posisi atas tengah
+    >
+      <Alert severity="error" sx={{ width: '100%' }}>
+        {errorMessage}
+      </Alert>
+    </Snackbar>
+  </Box>
   );
 };
 

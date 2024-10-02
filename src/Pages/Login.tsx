@@ -14,6 +14,10 @@ import {
   FormControl,
   FormControlLabel,
   RadioGroup,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -22,6 +26,7 @@ import axios from "axios";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { genSaltSync } from "bcrypt-ts";
 import { apiUrl } from "../Component/TemplateUrl";
+import {ForgetPassword, forgetToken } from "./ForgetPassword";
 
 const theme = createTheme();
 
@@ -39,6 +44,38 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [value, setValue] = React.useState('ASP');
+  const [openForgetDialog, setOpenForgetDialog] = useState(false);
+  const [openChangePassDialog, setOpenChangePassDialog] = useState(false);
+  const [userIdForForget, setUserIDForForget] = useState("");
+  const [resetError, setResetError] = useState<string>("");
+
+
+  React.useEffect(() => {
+
+    if (forgetToken !== "") {
+      setOpenChangePassDialog(true)
+    } else {
+      setOpenChangePassDialog(false)
+    }
+
+    console.log("Token Forget", forgetToken);
+
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 5000); // 5000ms = 5 detik
+
+      return () => clearTimeout(timer);
+    }
+
+    if (resetError) {
+      const timer = setTimeout(() => {
+        setResetError("");
+      }, 5000); // 5000ms = 5 detik
+
+      return () => clearTimeout(timer);
+    }
+  }, [error, resetError]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -88,6 +125,37 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleSendResetEmail = async () => {
+    if (!userIdForForget) {
+       setResetError("User ID is required");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        apiUrl + `api/Auth/requestForgetPassword?vUserId=${userIdForForget}`
+      );
+
+      if (response.data.success) {
+        alert("Please check your email for reset link.");
+        setOpenForgetDialog(false);
+      } else {
+        setResetError(response.data.message);
+      }
+    } catch (error) {
+      setResetError("Error sending reset email.");
+    }
+  };
+
+  const handleForgetPassword = () => {
+    setOpenForgetDialog(true);
+  };
+
+  const handleCancel = () => {
+    setUserIDForForget(""); // Reset nilai TextField
+    setOpenForgetDialog(false); // Tutup dialog
+  };
+
   const { open, setOpen } = UseToggleSidebar();
   const toggleDrawer = () => {
     setOpen(true);
@@ -95,7 +163,7 @@ const Login: React.FC = () => {
 
   const paperStyle = {
     padding: "10px",
-    height: "58vh",
+    height: "61vh",
     width: 350,
     margin: "50px auto",
   };
@@ -208,6 +276,12 @@ const Login: React.FC = () => {
               >
                 Sign In
               </Button>
+              <Typography
+                sx={{ mb: 1, color: "blue", fontSize: "12px", fontWeight: "Bold", cursor: 'pointer' }}
+                onClick={handleForgetPassword}
+              >
+                Forget Password ?
+              </Typography>
               {error && (
                 <Alert severity="error" sx={{ width: "100%", mt: 5 }}>
                   {error}
@@ -216,6 +290,39 @@ const Login: React.FC = () => {
             </Box>
           </Box>
         </Paper>
+
+        {/* Dialog for forget password */}
+        <ForgetPassword open={openChangePassDialog} onClose={() => {setOpenChangePassDialog(false)}} />
+        <Dialog 
+          open={openForgetDialog} 
+          onClose={(event, reason) => {
+            if (reason !== 'backdropClick') {
+              setOpenForgetDialog(false);
+            }
+          }}
+          disableEscapeKeyDown
+        >
+          <DialogTitle>Reset Password</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="reset-userid"
+              label="Enter your user id"
+              type="userid"
+              fullWidth
+              variant="standard"
+              value={userIdForForget}
+              onChange={(e) => setUserIDForForget(e.target.value)}
+            />
+            {resetError && <Alert severity="error">{resetError}</Alert>}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancel}>Cancel</Button>
+            <Button onClick={handleSendResetEmail}>Submit</Button>
+          </DialogActions>
+        </Dialog>
+
       </Container>
     </ThemeProvider>
   );

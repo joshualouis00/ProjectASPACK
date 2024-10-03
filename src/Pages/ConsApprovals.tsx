@@ -45,11 +45,12 @@ import {
   columnWaiting,
 } from "../Component/TableComponent/ColumnDef/IColumnUpload";
 import dayjs, { Dayjs } from "dayjs";
-import { LocalizationProvider, MobileDatePicker, MobileDateTimePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider, MobileDateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export let dataRespAffcoCons: IRespFile[] = []
 
@@ -83,9 +84,16 @@ export default function AspackAprroval() {
   const [loading, setLoading] = React.useState(false)
 
   const navigate = useHandleUnauthorized()
+  const handleNavigate = useNavigate()
 
-  const fetchAffcoFilter = () => {
-    fetch(apiUrl + "api/Package/GeneratePICAffcoFilter", {
+  const location = useLocation()
+  const parameter = new URLSearchParams(location.search)
+
+  const [urlAffcoId, setUrlAffcoId] = React.useState("")
+  
+
+  const fetchAffcoFilter = async () => {
+   await fetch(apiUrl + "api/Package/GeneratePICAffcoFilter", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken}`,
@@ -168,6 +176,27 @@ export default function AspackAprroval() {
     fetchAffcoFilter()
     fetchStep()
     fetchOpenPeriode()
+
+    if(parameter.get("magnet") !== null){
+      
+    try{
+      const urlParam = (parameter.get("magnet") || '').toString()
+    const decode = atob(urlParam)
+    const newParam = decode.split(",")
+
+    setYear(newParam[0])
+    setMonth(newParam[1])
+    setUrlAffcoId(newParam[2])
+    } catch(error){
+      alert("url not found / invalid!")
+      handleNavigate("/Approval")
+    } 
+
+    } else {
+      handleNavigate("/Approval")
+    }
+
+    
   }, []);
 
   const fetchGetPackage = () => {
@@ -182,6 +211,7 @@ export default function AspackAprroval() {
         }
       ).then((resp) => {
         if(resp.ok){
+          setUrlAffcoId("")
           resp.json().then((valData) => {
             setDataHeader({
               vPackageId: valData.header.vPackageId,
@@ -252,9 +282,7 @@ export default function AspackAprroval() {
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();  
-     
-    if (year !== "" && vAffco !== undefined ) {
-      console.log("masuk ke kondisi ini")
+    if(urlAffcoId !== ""){
       if(pMonth === month.toString() && pYear === year){
         const now = dayjs().format('YYYY-MM-DD')
         const nowDate = dayjs(now)
@@ -271,17 +299,41 @@ export default function AspackAprroval() {
         setIsOpenPeriod(false)
       }
       setStatus(true)
-      fetchGetPackage()      
+      fetchGetPackage()
+      
     } else {
-      if (year === "") {
-        setHasErrorYear(true);
-        setStatus(false);
+      if (year !== "" && vAffco !== undefined ) {
+        console.log("masuk ke kondisi ini")
+        if(pMonth === month.toString() && pYear === year){
+          const now = dayjs().format('YYYY-MM-DD')
+          const nowDate = dayjs(now)
+          if(nowDate >= pSdate && nowDate <= pEdate){
+            
+            setIsOpenPeriod(true)
+          } else {
+            setIsOpenPeriod(false)
+            
+          }
+    
+    
+        } else {
+          setIsOpenPeriod(false)
+        }
+        setStatus(true)
+        fetchGetPackage()      
+      } else {
+        if (year === "") {
+          setHasErrorYear(true);
+          setStatus(false);
+        }
+        if (vAffco === undefined) {        
+          setHasErrorAffco(true);
+          setStatus(false);
+        } 
       }
-      if (vAffco === undefined) {        
-        setHasErrorAffco(true);
-        setStatus(false);
-      } 
     }
+     
+    
   };
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -503,6 +555,14 @@ export default function AspackAprroval() {
     })
 
   }
+  React.useEffect(() => {
+    if(urlAffcoId !== ""){
+      console.log("bisa ke load")
+      setVAffco(affco.filter((val) => val.id === urlAffcoId)[0])
+  
+    }
+  },[urlAffcoId, affco])
+  
   return (
     <Box
       sx={{
@@ -512,10 +572,12 @@ export default function AspackAprroval() {
         alignItems: "left",
       }}
     >
+      
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          Filter Periode
-        </AccordionSummary>
+          Filter Periode          
+        </AccordionSummary>    
+           
         <Divider />
         <AccordionDetails>
           <Box component="form" onSubmit={handleSubmitFilter}>
@@ -572,11 +634,11 @@ export default function AspackAprroval() {
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <Autocomplete
                     id="vAffco-autocomplete"
-                    size="small"
+                    size="small"                    
                     isOptionEqualToValue={(option, value) => true}
-                    value={vAffco}
+                    value={urlAffcoId === "" ? vAffco : affco.filter((val) => val.id === urlAffcoId)[0]}
                     onChange={(event, newValue) => {
-                      console.log("change : ", newValue);
+                      setUrlAffcoId("")
                       
                       if(newValue === null){
                         console.log("masuk ke null : ", status)
@@ -595,7 +657,7 @@ export default function AspackAprroval() {
                     options={affco}
                     getOptionLabel={(option) => option.name}
                     renderOption={(props, option) => {
-                      const { key, ...optionProps } = props;
+                      const { key, ...optionProps } = props;                      
                       return (
                         <Box key={key} component="li" {...optionProps}>
                           {option.name}
@@ -647,10 +709,10 @@ export default function AspackAprroval() {
           }
           <Stack direction={"column"}>
             <Item elevation={0}>
-              {status === true && vAffco !== null ? (
+              {status === true && vAffco !== undefined ? (
                 <Box sx={{ width: "100%" }}>
                   <Stepper alternativeLabel activeStep={-1}>
-                    { dataHeader.vPackageId !== "" ? dataAffco.map((value,index) => {
+                    { dataHeader?.vPackageId !== "" ? dataAffco.map((value,index) => {
                       const iconProps: {
                           active?: boolean;
                           completed?: boolean;

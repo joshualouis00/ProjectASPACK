@@ -42,6 +42,7 @@ import {
 import { getUserId } from "../Component/TemplateUrl";
 import { format } from "date-fns";
 import dayjs, { Dayjs } from "dayjs";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export let dataRespAffco: IRespFile[] = []
 export let dataCountRevise: IStepProps[] = []
@@ -83,6 +84,11 @@ export default function AffcoUpload() {
   const [openSnack, setOpenSnack] = React.useState(false);
   const [error, setError] = React.useState(false);
 
+  const location = useLocation()
+  const parameter = new URLSearchParams(location.search)
+
+  const handleNavigate = useNavigate()
+
   const fetchOpenPeriode = () => {
     fetch(apiUrl + "api/Setting/GetOpenPeriod", {
       method: "GET",
@@ -103,6 +109,25 @@ export default function AffcoUpload() {
 
   React.useEffect(() => {
     fetchOpenPeriode();
+    if(parameter.get("magnet") !== null){
+      
+      try{
+        const urlParam = (parameter.get("magnet") || '').toString()
+      const decode = atob(urlParam)
+      const newParam = decode.split(",")
+  
+      setYear(newParam[0])
+      setMonth(newParam[1])
+      
+      } catch(error){
+        alert("url not found / invalid!")
+        handleNavigate("/AffcoUpload")
+      } 
+  
+      } else {
+        handleNavigate("/AffcoUpload")
+      }
+
   }, []);
 
   const onDrop = React.useCallback(

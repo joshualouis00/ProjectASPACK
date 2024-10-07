@@ -332,9 +332,8 @@ const HistoryUploadAffco: React.FC = () => {
   ];
 
   //Bagian Download Responses File : 
-  const downloadFile = async (row: any) => {
+  const downloadFile = async (row: any, index: number) => {
     try {
-      // Tentukan types dan dapatkan iVersion serta vAttachId dari response
       const response = await axios.get(
         apiUrl + `api/Package/GetActivity?nYear=${row.iYear}&nMonth=${row.iMonth}&vAffcoId=${row.vAffcoId}&vStepId=${row.vStepId}`,
         {
@@ -344,14 +343,25 @@ const HistoryUploadAffco: React.FC = () => {
         }
       );
   
-      const fileData = response.data.data[0]?.responseFiles[0]; // Ambil file pertama dari responseFiles
+      const responseFiles = response.data.data[0].responseFiles; // Ambil semua responseFiles
   
-      if (fileData) {
-        const iVersion = fileData.iVersion; // Ambil versi dari response
-        const vAttachId = fileData.vAttchId; // Ambil attachment ID
-        const types = fileData.vAttType;
+      // Cek apakah ada responseFiles dan ambil berdasarkan index
+      if (responseFiles && responseFiles.length > 0) {
+        const indexToDownload = index; // Gunakan index dari parameter
+        const fileData = responseFiles[indexToDownload]; // Ambil file berdasarkan index
   
-        fetchDownloadResponse(types, iVersion, vAttachId); // Panggil fungsi untuk download file
+        if (fileData) {
+          const iVersion = fileData.iVersion; // Ambil versi dari response
+          const vAttachId = fileData.vAttchId; // Ambil attachment ID
+          const types = fileData.vAttType;
+  
+          console.log("atttype : ", types);
+          console.log("filedata : ", fileData);
+          
+          fetchDownloadResponse(types, iVersion, vAttachId); // Panggil fungsi untuk download file
+        } else {
+          alert("File tidak ditemukan pada index yang dipilih.");
+        }
       } else {
         alert("File tidak ditemukan, silakan periksa data yang Anda masukkan.");
       }
@@ -369,35 +379,11 @@ const HistoryUploadAffco: React.FC = () => {
     version: string,
     attachId: string
   ) => {
-    fetch(
-      apiUrl +
-        `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ` + getToken,
-        },
-      }
-    ).then((resp) => {
-      if (resp.status === 200) {
-        resp.blob().then((blob) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "File Attachment " + attachId;
-          a.click();
-        });
-      } else if (resp.status === 404) {
-        alert("File not found, please contact your IT Administrator.");
-      } else if (resp && resp.status === 401) {
-        handleError401();
-      } else {
-        console.error("Error Revision History Data :", resp);
-      }
-    }).catch(error => {
-      console.error("Error downloading file:", error);
-      alert("Terjadi kesalahan saat mengunduh file.");
-    });
+    console.log("APInya : ", apiUrl +
+      `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`)
+    window.open(apiUrl +
+      `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`)
+      
   };
   
 
@@ -411,8 +397,8 @@ const HistoryUploadAffco: React.FC = () => {
       header: "Responses",
       size: 150,
       Cell: ({ row }) => {
-        const remarks = row.original.responseFiles[0]?.vAttchName || " "; // Mengambil vRemarks dari responseFiles
-        //const remarks = row.original.responseFiles[0]?.vRemarks || " "; // Mengambil vRemarks dari responseFiles
+        //const remarks = row.original.responseFiles[0]?.vAttchName || " "; // Mengambil vRemarks dari responseFiles
+        const remarks = row.original.responseFiles[0]?.vRemarks || " "; // Mengambil vRemarks dari responseFiles
         return <span>{remarks}</span>;
       },
     },
@@ -427,7 +413,7 @@ const HistoryUploadAffco: React.FC = () => {
           <>
             {status === "Revised" ? ( // Cek apakah Status adalah "Revised"
               <Button
-                onClick={() => downloadFile(row.original)}
+                onClick={() => downloadFile(row.original, row.index)}
                 variant="outlined"
                 color="info"
                 size="small"

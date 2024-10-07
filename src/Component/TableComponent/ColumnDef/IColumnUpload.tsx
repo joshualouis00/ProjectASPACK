@@ -46,34 +46,11 @@ const handleClickPreview = (
   version: string,
   vAttachId: string
 ) => {
-  fetch(
-    apiUrl +
-      `api/Package/DownloadPackage?vStepId=${stepid}&iVersion=${
-        version.split("V")[1]
-      }&vAttachId=${vAttachId}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `bearer ${getToken}`,
-      },
-    }
-  ).then((resp) => {
-    if (resp.status === 200) {
-      resp.blob().then((blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "File Attachment " + stepid;
-        a.click();
-      });
-    } else {
-      if (resp.status === 404) {
-        return alert("File not found, please contact your IT Administrator.");
-      } else {
-        return alert("Something wrong, please contact your IT Administrator.");
-      }
-    }
-  });
+  window.open(apiUrl +
+    `api/Package/DownloadPackage?vStepId=${stepid}&iVersion=${
+      version.split("V")[1]
+    }&vAttachId=${vAttachId}`)
+  
 };
 
 const fetchDownloadResponse = (
@@ -206,8 +183,9 @@ function RemarkDialog(props: IRemarkProps) {
   
   const [vResponse, setVResponse] = useState("");
 
-  let iVersion = version.split("V")[1];
-  console.log(tempResp)
+  let iVersion = version.split("V")[1];  
+  console.log(dataRespAffco.filter((val) => val.vStepId === stepId && val.version === iVersion))
+  
 
   const handleUploadResponse = (event) => {
     setFileAffco(event.target.files[0]);
@@ -329,10 +307,7 @@ function RemarkDialog(props: IRemarkProps) {
               }
               size="small"              
               value={
-                vResponse !== "" ? vResponse : dataRespAffco.length !== 0 ? dataRespAffco.filter(
-                  (val) =>
-                    val.vStepId === stepId && val.version === iVersion
-                )[0].vRemark : ""
+                vResponse !== "" ? vResponse : dataRespAffco.filter((val) => val.vStepId === stepId && val.version === iVersion).length !== 0 ? dataRespAffco.filter((val) => val.vStepId === stepId && val.version === iVersion)[0].vRemark : "" 
               }
               multiline
               rows={4}

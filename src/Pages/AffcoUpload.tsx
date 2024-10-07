@@ -617,28 +617,7 @@ export default function AffcoUpload() {
   }));
 
   const handleDownloadTemplate = (stepid: string) => () => {
-    fetch(apiUrl + "api/Package/DownloadTemplate?vStepId=" + stepid, {
-      method: "GET",
-      headers: {
-        Authorization: `bearer ${getToken}`,
-      },
-    }).then((resp) => {
-      if (resp.status === 404) {
-        return alert("Template tidak tersedia");
-      } else {
-        if (resp.status === 200) {
-          resp.blob().then((blob) => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "Template " + stepid;
-            a.click();
-          });
-        } else {
-          return alert("Server Error : " + resp.status);
-        }
-      }
-    });
+    window.open(apiUrl + "api/Package/DownloadTemplate?vStepId=" + stepid)
   };
 
   return (

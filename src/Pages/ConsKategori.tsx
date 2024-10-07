@@ -152,28 +152,7 @@ export default function Kategori() {
   const handleClickDownload = (data: string) => {
     const encode = btoa(data)
 
-    fetch(apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + encode,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `bearer ${getToken}`,
-        },
-      }
-    ).then((resp) =>{
-      if (resp.status === 200) {
-        resp.blob().then((blob) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          // a.download = "File Attachment " + data;
-          a.click();
-        });
-      } else {
-        if(resp.status === 404){
-          return alert("file not found.please contact your IT Administrator")
-        }
-      }
-    })
+    window.open(apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + encode)
 
   }
 

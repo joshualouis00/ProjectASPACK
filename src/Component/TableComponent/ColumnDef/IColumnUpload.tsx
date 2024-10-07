@@ -58,31 +58,8 @@ const fetchDownloadResponse = (
   version: string,
   attachId: string
 ) => {
-  fetch(
-    apiUrl +
-      `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `bearer ${getToken}`,
-      },
-    }
-  ).then((resp) => {
-    if (resp.status === 200) {
-      resp.blob().then((blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.click();
-      });
-    } else {
-      if (resp.status === 404) {
-        return alert("File not found, please contact your IT Administrator.");
-      } else {
-        return alert("Something wrong, please contact your IT Administrator.");
-      }
-    }
-  });
+  window.open(apiUrl +
+    `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`)
 };
 
 let tempResp: ITempResponse[] = []

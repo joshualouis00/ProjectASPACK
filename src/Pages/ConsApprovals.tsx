@@ -398,6 +398,8 @@ export default function AspackAprroval() {
   const [fRemark, setFRemark] = React.useState<string | File>("");
   const [vRemark, setVRemark] = React.useState("");
 
+  console.log("data response : ",dataResponse)
+
     const handleFRemarkUpload = (event) => {
       setFRemark(event.target.files[0])
       setVRemark(event.target.files[0].name)
@@ -409,20 +411,32 @@ export default function AspackAprroval() {
     }    
 
     const submitRevise = (data: number) => {
-      setOpen(false)
+      if(remark !== "" && duedate !== null){
+        setOpen(false)
       const updateData = {...dataAffco[data], status:"Revise", dDueDate: duedate ? duedate.format("YYYY-MM-DD HH:mm:ss") : "", apprRemarks: remark, dApprover: "", vApprover: ""}
       const newDataAffco = [...dataAffco];
       newDataAffco[data] = updateData;
       setDataAffco(newDataAffco);
       const resData = {
         vStepId : dataAffco[data].stepid,
-        vAttchName : vRemark,
+        vAttchName : vRemark !== "" ? vRemark : "no file attach",
         vAttType : "",
         vRemark : remark,
         vAttchId : dataAffco[data].vAttachId,
         fAttchContent : fRemark
       }
       setDataResponse((resp) => [...resp , resData])
+
+      } else {
+        if(remark === ""){
+          alert("remark must be filled!")
+        }
+        if(duedate === null){
+          alert("duedate must be filled!")
+        }
+        
+      }
+      
     }
 
     return (

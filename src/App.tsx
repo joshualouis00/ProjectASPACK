@@ -58,7 +58,7 @@ import EmailApprovalAspack from "./Pages/MstEmailApproval";
 import EmailAffcoSubmit from "./Pages/MstEmailAffcoSubmit";
 import { IProfileProps } from "./Component/Interface/DataTemplate";
 import CloseIcon from "@mui/icons-material/Close";
-import { apiUrl, getToken, getUserId } from "./Component/TemplateUrl";
+import { apiUrl, getRole, getToken, getUserId } from "./Component/TemplateUrl";
 import { genSaltSync } from "bcrypt-ts";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -520,7 +520,7 @@ function App() {
                         noWrap
                         sx={{ flexGrow: 1, fontWeight: "600" }}
                       >
-                        {"Astra-Package"}
+                        {"Consolidation Portal"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12}>
@@ -529,7 +529,7 @@ function App() {
                         noWrap
                         sx={{ flexGrow: 1, fontSize: "10px" }}
                       >
-                        {"by Astra-Otoparts Tbk"}
+                        {"by Accounting Consolidation Dept"}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -542,7 +542,7 @@ function App() {
                         alt="Profile Picture"
                         sx={{ width: 40, height: 40 }}
                       >
-                        {"C"}
+                        {getRole}
                       </Avatar>
                     </Grid>
                     <Grid

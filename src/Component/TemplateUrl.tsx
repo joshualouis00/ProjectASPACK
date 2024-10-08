@@ -26,7 +26,8 @@ export const generateMonths = [
   { id: 9, name: "September" },
   { id: 10, name: "October" },
   { id: 11, name: "November" },
-  { id: 12, name: "December" }
+  { id: 12, name: "December" },
+  { id: 13, name: "December (Audited)"}
 ];
 
 export const generateCategory = [  

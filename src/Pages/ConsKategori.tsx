@@ -269,7 +269,7 @@ export default function Kategori() {
                     onChange={handleChangeMonth}
                   >
                     <MenuItem value="">Select Periode Month</MenuItem>
-                    {generateMonths.map((val) => {
+                    {generateMonths.filter((val) => val.id !== 13).map((val) => {
                       return (
                         <MenuItem key={val.id} value={val.id}>
                           {val.name}

@@ -407,11 +407,11 @@ const HistoryUploadAffco: React.FC = () => {
       header: "Responses File",
       size: 150,
       Cell: ({ row }) => {
-        const status = row.original.vAction; // Ambil nilai Status dari baris
+        const status = row.original.responseFiles[0]; // Ambil nilai Status dari baris
         console.log("Statusnya : ",status);
         return (
           <>
-            {status === "Revised" ? ( // Cek apakah Status adalah "Revised"
+            {status !== undefined ? ( // Cek apakah Status adalah "Revised"
               <Button
                 onClick={() => downloadFile(row.original, row.index)}
                 variant="outlined"

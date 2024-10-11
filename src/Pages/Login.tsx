@@ -26,7 +26,9 @@ import axios from "axios";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { genSaltSync } from "bcrypt-ts";
 import { apiUrl } from "../Component/TemplateUrl";
-import {ForgetPassword, forgetToken } from "./ForgetPassword";
+import { ForgetPassword, forgetToken } from "./ForgetPassword";
+import LoginPage from "../Component/BgLogin";
+import BackGroundLogin from "../assets/BgLogin.png";
 
 const theme = createTheme();
 
@@ -43,19 +45,17 @@ const Login: React.FC = () => {
   const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [value, setValue] = React.useState('ASP');
+  const [value, setValue] = React.useState("ASP");
   const [openForgetDialog, setOpenForgetDialog] = useState(false);
   const [openChangePassDialog, setOpenChangePassDialog] = useState(false);
   const [userIdForForget, setUserIDForForget] = useState("");
   const [resetError, setResetError] = useState<string>("");
 
-
   React.useEffect(() => {
-
     if (forgetToken !== "") {
-      setOpenChangePassDialog(true)
+      setOpenChangePassDialog(true);
     } else {
-      setOpenChangePassDialog(false)
+      setOpenChangePassDialog(false);
     }
 
     console.log("Token Forget", forgetToken);
@@ -95,19 +95,16 @@ const Login: React.FC = () => {
     }
 
     try {
-      const resp = await axios.post(
-        apiUrl + "api/Auth/Login",
-        {
-          Email: userId,
-          Password: hashedPassword,
-          target: value,
-        }
-      );
+      const resp = await axios.post(apiUrl + "api/Auth/Login", {
+        Email: userId,
+        Password: hashedPassword,
+        target: value,
+      });
 
       const { token } = resp.data;
       const decode = jwtDecode<CustomJwtPayload>(token);
 
-      if (token) {  
+      if (token) {
         localStorage.setItem("token", token);
         localStorage.setItem("UserID", decode.UserID);
         localStorage.setItem("UserName", decode.UserName);
@@ -127,7 +124,7 @@ const Login: React.FC = () => {
 
   const handleSendResetEmail = async () => {
     if (!userIdForForget) {
-       setResetError("User ID is required");
+      setResetError("User ID is required");
       return;
     }
 
@@ -170,13 +167,28 @@ const Login: React.FC = () => {
   const btnstyle = { margin: "8px 0" };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+    // <ThemeProvider theme={theme}>
+    <Box
+      sx={{
+        backgroundImage: `url(${require("../assets/Login.png")})`,
+        backgroundSize: "cover", // or "contain" if you want to fit the image
+        backgroundRepeat: "no-repeat", // prevent tiling
+        width: "215vh",
+        height: "98vh",
+        mt: 1,
+        ml: -1,
+        mr: -2,
+        display: "flex", // Tambahkan ini
+        alignItems: "center", // Tambahkan ini
+      }}
+    >
+      <Container component="main" maxWidth="xs" sx={{mb: 1}}>
+        {/* <LoginPage /> */}
         <CssBaseline />
         <Paper elevation={15} style={paperStyle}>
           <Box
             sx={{
-              marginTop: 3,
+              marginTop: "1rem",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -185,19 +197,19 @@ const Login: React.FC = () => {
             <Avatar
               src={require("../assets/logoAOP.png")}
               variant="square"
-              sx={{ height: "45px", width: "200px", ml: "5px" }}
-            ></Avatar>
-            <Typography component="h5" variant="h5" sx={{ mt: "1px" }}>
+              sx={{ height: "3rem", width: "12.5rem", ml: "0.5rem" }}
+            />
+            <Typography component="h5" variant="h5" sx={{ mt: "0.5rem" }}>
               Login
             </Typography>
+
             <Box
               component="form"
               onSubmit={handleSubmit}
               noValidate
-              sx={{ mt: 0.5 }}
+              sx={{ mt: "0.5rem" }}
             >
               <TextField
-                margin="dense"
                 fullWidth
                 id="username"
                 label="Username"
@@ -208,6 +220,7 @@ const Login: React.FC = () => {
                 onChange={(e) => setUserID(e.target.value)}
                 size="medium"
               />
+
               <TextField
                 margin="dense"
                 fullWidth
@@ -219,16 +232,22 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+
               <Grid container direction="row" alignItems="center">
                 <Grid item>
                   <Typography
                     component="h2"
                     variant="body2"
-                    sx={{ mr: "10px", fontSize: "14px", fontWeight: "bold" }}
+                    sx={{
+                      mr: "1rem",
+                      fontSize: "0.875rem",
+                      fontWeight: "bold",
+                    }}
                   >
                     Portal
                   </Typography>
                 </Grid>
+
                 <Grid item>
                   <FormControl>
                     <RadioGroup
@@ -239,51 +258,65 @@ const Login: React.FC = () => {
                       onChange={handleChange}
                     >
                       <FormControlLabel
-                        value="FPA" //fpa
+                        value="FPA"
                         id="CAPEX"
                         control={
                           <Radio
                             size="small"
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                            sx={{
+                              "& .MuiSvgIcon-root": { fontSize: "0.75rem" },
+                            }}
                           />
                         }
                         label="CAPEX"
                       />
+
                       <FormControlLabel
-                        value="ASP" //asp
+                        value="ASP"
                         id="ASPACK"
                         control={
                           <Radio
                             size="medium"
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
+                            sx={{
+                              "& .MuiSvgIcon-root": { fontSize: "0.75rem" },
+                            }}
                             inputProps={{ "aria-label": "FACT" }}
                           />
                         }
-                        label="ASPACK"
+                        label="CONSOLIDATION"
                       />
                     </RadioGroup>
                   </FormControl>
                 </Grid>
               </Grid>
+
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 onClick={toggleDrawer}
-                sx={{ mt: 1, mb: 1 }}
+                sx={{ mt: "1rem", mb: "1rem" }}
                 style={btnstyle}
                 size="medium"
               >
                 Sign In
               </Button>
+
               <Typography
-                sx={{ mb: 1, color: "blue", fontSize: "12px", fontWeight: "Bold", cursor: 'pointer' }}
+                sx={{
+                  mb: "1rem",
+                  color: "blue",
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
                 onClick={handleForgetPassword}
               >
-                Forget Password ?
+                Forget Password?
               </Typography>
+
               {error && (
-                <Alert severity="error" sx={{ width: "100%", mt: 5 }}>
+                <Alert severity="error" sx={{ width: "100%", mt: "2rem" }}>
                   {error}
                 </Alert>
               )}
@@ -292,11 +325,16 @@ const Login: React.FC = () => {
         </Paper>
 
         {/* Dialog for forget password */}
-        <ForgetPassword open={openChangePassDialog} onClose={() => {setOpenChangePassDialog(false)}} />
-        <Dialog 
-          open={openForgetDialog} 
+        <ForgetPassword
+          open={openChangePassDialog}
+          onClose={() => {
+            setOpenChangePassDialog(false);
+          }}
+        />
+        <Dialog
+          open={openForgetDialog}
           onClose={(event, reason) => {
-            if (reason !== 'backdropClick') {
+            if (reason !== "backdropClick") {
               setOpenForgetDialog(false);
             }
           }}
@@ -322,9 +360,8 @@ const Login: React.FC = () => {
             <Button onClick={handleSendResetEmail}>Submit</Button>
           </DialogActions>
         </Dialog>
-
       </Container>
-    </ThemeProvider>
+    </Box>
   );
 };
 

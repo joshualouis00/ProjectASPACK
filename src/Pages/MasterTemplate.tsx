@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert,
   useTheme,
+  Stack,
 } from "@mui/material";
 import React, { useEffect, useState, useCallback } from "react";
 import CustomTheme from "../Theme/CustomTheme";
@@ -101,6 +102,16 @@ const MasterTemplate = () => {
 
     fetchData();
   }, []);
+
+  React.useEffect(() => {
+    if (uploadStatus) {
+      const timer = setTimeout(() => {
+        setUploadStatus(""); // Clear the error after 5 seconds
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [uploadStatus]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -201,7 +212,7 @@ const MasterTemplate = () => {
 
       if (response.status === 200) {
         setUploadStatus("success");
-        await getTemplates()
+        await getTemplates();
         setTimeout(() => {
           setUploadStatus(null);
         }, 5000);
@@ -266,16 +277,18 @@ const MasterTemplate = () => {
             />
           </TabPanel>
         ))}
-         <Button
+        <Button
           variant="contained"
           sx={{ mt: 1, mb: 1 }}
           onClick={handleUploadAll}
+          color="info"
           disabled={
-            gatherAllDraftFiles().filter((file) => file.status === "Draft").length === 0 || 
-            gatherAllDraftFiles().length === 0
+            gatherAllDraftFiles().filter((file) => file.status === "Draft")
+              .length === 0 || gatherAllDraftFiles().length === 0
           }
         >
-          {gatherAllDraftFiles().filter((val) => val.status === "Draft").length > 1
+          {gatherAllDraftFiles().filter((val) => val.status === "Draft")
+            .length > 1
             ? "Submit All"
             : "Submit"}
         </Button>
@@ -314,6 +327,16 @@ const TabContent: React.FC<ITabContent> = ({
     }
   };
 
+  React.useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage(""); // Clear the error after 5 seconds
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   useEffect(() => {
     setFileList(files);
   }, [files]);
@@ -329,11 +352,13 @@ const TabContent: React.FC<ITabContent> = ({
         Excel: [
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "application/vnd.ms-excel",
+          "application/vnd.ms-excel.sheet.macroEnabled.12", 
         ],
         Both: [
           "application/pdf",
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "application/vnd.ms-excel",
+          "application/vnd.ms-excel.sheet.macroEnabled.12",
         ],
       };
 
@@ -430,17 +455,43 @@ const TabContent: React.FC<ITabContent> = ({
           errorMessage={errorMessage}
         />
         {errorMessage && (
-          <Typography color="error" sx={{ mt: 2 }}>
-            {errorMessage}
-          </Typography>
+          <Stack
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 9999, // memastikan berada di atas elemen lain
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            mt: 2,
+          }}
+          >
+            <Typography color="error" sx={{ mt: 2 }}>
+              <Alert severity="error">{errorMessage}</Alert>
+            </Typography>
+          </Stack>
         )}
         {uploadStatus && (
-          <Snackbar open={uploadStatus === "success"} autoHideDuration={5000}>
+          <Stack 
+          sx={{
+            position: "fixed",
+            top: errorMessage ? 60 : 0, // Jika ada error, beri jarak dari error message
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            mt: 2,
+          }}
+          >
             <Alert
-              severity={uploadStatus === "success" ? "success" : "error"}
+              severity="success"
               sx={{ width: "100%" }}
-            />
-          </Snackbar>
+            >{uploadStatus}</Alert>
+          </Stack>
         )}
       </Container>
     </Box>
@@ -560,8 +611,8 @@ const AppTable: React.FC<
                 downloadFile(fileName, vAttchId, fileStatus, iVersion)
               }
               variant="outlined"
-              color="info"
               size="small"
+              color="info"
               disabled={
                 fileStatus === "Draft" || uploadStatus === "Upload successful"
               }

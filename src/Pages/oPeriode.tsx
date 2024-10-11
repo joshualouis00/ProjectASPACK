@@ -14,14 +14,25 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 import dayjs, { Dayjs } from "dayjs";
-import { apiUrl, getToken } from "../Component/TemplateUrl";
+import {
+  apiUrl,
+  generateMonths,
+  generateYears,
+  getToken,
+} from "../Component/TemplateUrl";
+import { Alert, Stack } from "@mui/material";
 
 const OpenPeriod: React.FC = () => {
   const [open, setOpen] = React.useState(true);
-  const [year, setYear] = React.useState<string>("");
-  const [month, setMonth] = React.useState<string>("");
-  const [startDate, setStartDate] = React.useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = React.useState<Dayjs | null>(null);
+  const dataMonth = new Date().getMonth();
+  const dataYear = new Date().getFullYear();
+  const [month, setMonth] = React.useState((dataMonth + 1).toString());
+  const [year, setYear] = React.useState(dataYear.toString());
+  const [hasErrorMonth, setHasErrorMonth] = React.useState(false);
+  const [hasErrorYear, setHasErrorYear] = React.useState(false);
+  const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs());
+  const [endDate, setEndDate] = React.useState<Dayjs | null>(dayjs());
+  const [dateError, setDateError] = React.useState("");
   const navigate = useNavigate();
   const handle401 = useHandleUnauthorized();
 
@@ -48,6 +59,26 @@ const OpenPeriod: React.FC = () => {
       });
   }, []);
 
+  React.useEffect(() => {
+    if (dateError) {
+      const timer = setTimeout(() => {
+        setDateError(""); // Clear the error after 5 seconds
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [dateError]);
+
+  const handleChangeMonth = (event) => {
+    setMonth(event.target.value);
+    setHasErrorMonth(false);
+  };
+
+  const handleChangeYear = (event) => {
+    setYear(event.target.value as string);
+    setHasErrorYear(false);
+  };
+
   const handleClose = () => {
     setOpen(false);
     resetDialogFields();
@@ -59,9 +90,18 @@ const OpenPeriod: React.FC = () => {
     setMonth("");
     setStartDate(null);
     setEndDate(null);
+    setDateError("");
   };
 
   const handleSubmit = () => {
+
+    if (startDate && endDate && startDate.isAfter(endDate)) {
+      setDateError("Start Date cannot be later than End Date.")
+      return;
+    } else {
+      setDateError("");
+    }
+
     const data = {
       iYear: year,
       iMonth: month,
@@ -69,40 +109,23 @@ const OpenPeriod: React.FC = () => {
       dEndDate: endDate ? endDate.format("YYYY-MM-DD") : null,
     };
 
-    axios.post( apiUrl + "api/Setting/EditOpenPeriod",data,{
-      headers: {
-        Authorization: `Bearer ` + getToken,
-      },
-    }).then((response) => {
-      handleClose();
-    }).catch((error) => {
-      if (error.response && error.response.status === 401) {
-        handle401();
-      } else {
-        console.error("Error submitting data:", error);
-      }
-    });
+    axios
+      .post(apiUrl + "api/Setting/EditOpenPeriod", data, {
+        headers: {
+          Authorization: `Bearer ` + getToken,
+        },
+      })
+      .then((response) => {
+        handleClose();
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          handle401();
+        } else {
+          console.error("Error submitting data:", error);
+        }
+      });
   };
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, index) =>
-    (currentYear + index).toString()
-  );
-
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
 
   return (
     <>
@@ -110,6 +133,11 @@ const OpenPeriod: React.FC = () => {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Open Period Settings</DialogTitle>
         <DialogContent>
+        {dateError && (
+          <Stack>
+            <Alert severity="error">{dateError}</Alert>
+          </Stack>
+          )}
           <TextField
             select
             margin="dense"
@@ -118,14 +146,17 @@ const OpenPeriod: React.FC = () => {
             fullWidth
             variant="standard"
             value={year}
-            onChange={(e) => setYear(e.target.value)}
+            error={hasErrorYear}
+            onChange={handleChangeYear}
             required
           >
-            {years.map((yr) => (
-              <MenuItem key={yr} value={yr}>
-                {yr}
-              </MenuItem>
-            ))}
+            {generateYears().map((val, index) => {
+              return (
+                <MenuItem key={index} value={val}>
+                  {val}
+                </MenuItem>
+              );
+            })}
           </TextField>
           <TextField
             select
@@ -135,7 +166,8 @@ const OpenPeriod: React.FC = () => {
             fullWidth
             variant="standard"
             value={month}
-            onChange={(e) => setMonth(e.target.value.toString())}
+            error={hasErrorMonth}
+            onChange={handleChangeMonth}
             SelectProps={{
               MenuProps: {
                 PaperProps: {
@@ -147,11 +179,13 @@ const OpenPeriod: React.FC = () => {
             }}
             required
           >
-            {months.map((mnth, index) => (
-              <MenuItem key={index} value={index + 1}>
-                {mnth}
-              </MenuItem>
-            ))}
+            {generateMonths.map((val) => {
+              return (
+                <MenuItem key={val.id} value={val.id}>
+                  {val.name}
+                </MenuItem>
+              );
+            })}
           </TextField>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <MobileDatePicker
@@ -160,7 +194,7 @@ const OpenPeriod: React.FC = () => {
               onChange={(newValue) => setStartDate(newValue)}
               slotProps={{ textField: { fullWidth: true } }}
               format="DD/MM/YYYY"
-              sx={{mt:"10px", mb: "10px"}}
+              sx={{ mt: "10px", mb: "10px" }}
             />
           </LocalizationProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>

@@ -302,7 +302,7 @@ const HistoryUploadAffco: React.FC = () => {
     { accessorKey: "vCrea", header: "Created By", size: 100 },
     {
       accessorKey: "dCrea",
-      header: "Created Date",
+      header: "Submitted Date",
       size: 100,
       Cell: ({ cell }) => {
         const dateStr = cell.getValue<string>();

@@ -304,32 +304,6 @@ const HistoryUploadAffco: React.FC = () => {
       accessorKey: "dCrea",
       header: "Submitted Date",
       size: 100,
-      Cell: ({ cell }) => {
-        const dateStr = cell.getValue<string>();
-        let formattedDate = " ";
-
-        try {
-          const date = parse(dateStr, "dd-MM-yyyy", new Date());
-          if (!isNaN(date.getTime())) {
-            formattedDate = format(date, "dd/MM/yyyy");
-          }
-        } catch (error) {
-          console.error("Error parsing or formatting date:", error);
-        }
-
-        return (
-          <span
-            style={{
-              display: "block",
-              width: "120px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {formattedDate}
-          </span>
-        );
-      },
     },
     { accessorKey: "vStatus", header: "Status", size: 150 },
     { accessorKey: "vRemarks", header: "Remarks", size: 150 },

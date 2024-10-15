@@ -104,7 +104,7 @@ const OpenPeriod: React.FC = () => {
 
     const data = {
       iYear: year,
-      iMonth: month,
+      iMonth: month.toString(),
       dStartDate: startDate ? startDate.format("YYYY-MM-DD") : null,
       dEndDate: endDate ? endDate.format("YYYY-MM-DD") : null,
     };

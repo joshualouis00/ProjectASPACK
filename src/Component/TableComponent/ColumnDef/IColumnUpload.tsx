@@ -25,6 +25,7 @@ import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { dataRespAffco, dataCountRevise } from "../../../Pages/AffcoUpload";
 import { dataRespAffcoCons } from "../../../Pages/ConsApprovals";
+import { format } from "date-fns";
 
 export let respsAffco: IRespFile[] = [];
 
@@ -403,6 +404,8 @@ export const columnWaiting: MRT_ColumnDef<IStepProps>[] = [
   {
     accessorKey: "createDate",
     header: "Created Date",
+    Cell: ({ cell }) =>
+      format(new Date(cell.getValue() as string), "dd/MM/yyyy")
   },
   {
     accessorKey: "docVersion",
@@ -500,7 +503,8 @@ export const columnApproved: MRT_ColumnDef<IStepProps>[] = [
   },
   {
     accessorKey: "dApprover",
-    header: "Date of Approval",
+    header: "Date of Approval",   
+    
   },
   {
     accessorKey: "docVersion",
@@ -542,6 +546,8 @@ export const columnHistoryUpload: MRT_ColumnDef<IStepProps>[] = [
   {
     accessorKey: "createDate",
     header: "Create Date",
+    Cell: ({ cell }) =>
+      format(new Date(cell.getValue() as string), "dd/MM/yyyy")
   },
   {
     accessorKey: "createBy",

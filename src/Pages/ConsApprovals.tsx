@@ -52,6 +52,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 import { useLocation, useNavigate } from "react-router-dom";
 
+
 export let dataRespAffcoCons: IRespFile[] = []
 
 export default function AspackAprroval() {
@@ -457,11 +458,18 @@ export default function AspackAprroval() {
         <DialogContent dividers>
           <Box >
             <FormControl fullWidth sx={{ margin: 1}}>
-              <FormLabel>What needs to be revised from this document?</FormLabel>
+              <Box >
+              <FormLabel>What needs to be revised from this document? </FormLabel>
+              <FormLabel sx={{ color: "red"}}>*</FormLabel>
+              </Box>
+              
               <TextField multiline rows={5} value={remark} onChange={handleChangeRemark}/>
             </FormControl>
             <FormControl fullWidth sx={{ margin: 1}}>
-              <FormLabel>Due Date</FormLabel>
+            <Box >
+              <FormLabel>Due Date </FormLabel>
+              <FormLabel sx={{ color: "red"}}>*</FormLabel>
+              </Box>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileDateTimePicker
                 ampm={false}

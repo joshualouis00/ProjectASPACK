@@ -373,15 +373,28 @@ const HistoryUploadAffco: React.FC = () => {
   const revisionHistoryColumns: MRT_ColumnDef<any>[] = [
     { header: "#", size: 50, Cell: ({ row }) => row.index + 1 },
     { accessorKey: "vAction", header: "Status", size: 150 },
-    { accessorKey: "vRemarks", header: "Remarks", size: 150 },
+    {
+      accessorKey: "vRemarks",
+      header: "Remarks",
+      size: 150,
+      Cell: ({ row }) => {
+        const type = row.original.responseFiles[0]?.vAttType;
+        if (type === "RESPCONS") {
+          const remarks = row.original.responseFiles[0]?.vRemarks || " ";
+          return <span>{remarks}</span>;
+        }
+      },
+    },
     {
       accessorKey: "responseFiles",
       header: "Responses",
       size: 150,
       Cell: ({ row }) => {
-        //const remarks = row.original.responseFiles[0]?.vAttchName || " "; // Mengambil vRemarks dari responseFiles
-        const remarks = row.original.responseFiles[0]?.vRemarks || " "; // Mengambil vRemarks dari responseFiles
-        return <span>{remarks}</span>;
+        const type = row.original.responseFiles[0]?.vAttType;
+        if (type === "RESPAFFCO") {
+          const remarks = row.original.responseFiles[0]?.vRemarks || " ";
+          return <span>{remarks}</span>;
+        }
       },
     },
     {

@@ -268,7 +268,7 @@ const Login: React.FC = () => {
                             }}
                           />
                         }
-                        label="CAPEX"
+                        label="FPA"
                       />
 
                       <FormControlLabel

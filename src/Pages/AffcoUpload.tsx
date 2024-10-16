@@ -66,8 +66,7 @@ export default function AffcoUpload() {
       fileType: "both",
     },
   ]);
-  const [tempFile, setTempFile] = React.useState<ITempFile[]>([]);
-  const [respFile, setRespFile] = React.useState<IRespFile[]>([]);
+  const [tempFile, setTempFile] = React.useState<ITempFile[]>([]);  
   const [dataHeader, setDataHeader] = React.useState<IHeaderProps>({
     iMonth: "",
     iYear: "",
@@ -218,8 +217,7 @@ export default function AffcoUpload() {
             }
 
             setDataFile((prev) => [...files, ...prev]);
-            setTempFile((prevFile) => [...prevFile, ...temFiles]);
-            setRespFile(respsAffco);
+            setTempFile((prevFile) => [...prevFile, ...temFiles]);            
           }
         }
       }
@@ -484,7 +482,7 @@ export default function AffcoUpload() {
     setFilter(true);
   };
 
-  const handleSubmitFiles = () => {
+  const handleSubmitFiles = () => {    
     const dataForm = new FormData();
     setLoading(true);
 
@@ -548,8 +546,8 @@ export default function AffcoUpload() {
       });
     }
 
-    if (respFile.length > 0) {
-      respFile.map((val, index) => {
+    if (respsAffco.length > 0) {
+      respsAffco.map((val, index) => {
         return (
           dataForm.append(`Response[${index}].vStepId`, val.vStepId),
           dataForm.append(`Response[${index}].vAttchName`, val.vAttchName),
@@ -610,7 +608,17 @@ export default function AffcoUpload() {
   }));
 
   const handleDownloadTemplate = (stepid: string) => () => {
-    window.open(apiUrl + "api/Package/DownloadTemplate?vStepId=" + stepid);
+    fetch(apiUrl + "api/Package/DownloadTemplate?vStepId=" + stepid,{
+      'method': 'GET'
+    }).then((resp) => {
+      if(resp.status === 404){
+        alert("no attachment file")
+      } else {
+        window.open(apiUrl + "api/Package/DownloadTemplate?vStepId=" + stepid);
+
+      }
+    })
+    
   };
 
   return (
@@ -941,10 +949,6 @@ export default function AffcoUpload() {
                               (v) =>
                                 v.status === "Approved" && v.stepid === stepData
                             ).length;
-
-                            console.log("count revise: ", countRevise);
-                            console.log("count draft : ", countDraft);
-                            
 
                             return (
                               <Button

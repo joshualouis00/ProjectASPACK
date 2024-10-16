@@ -13,13 +13,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  FormHelperText,
+  FormControl,  
   FormLabel,
   IconButton,
   TextField,
 } from "@mui/material";
-import { apiUrl, getToken } from "../../TemplateUrl";
+import { apiUrl } from "../../TemplateUrl";
 import {  useState } from "react";
 import { Download } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -46,10 +45,23 @@ const handleClickPreview = (
   version: string,
   vAttachId: string
 ) => {
-  window.open(apiUrl +
+  fetch(apiUrl +
     `api/Package/DownloadPackage?vStepId=${stepid}&iVersion=${
       version.split("V")[1]
-    }&vAttachId=${vAttachId}`)
+    }&vAttachId=${vAttachId}`,{
+      'method':'GET'
+    }).then((resp) => {
+      if(resp.status === 404){
+        alert("no attachment file")
+      } else {
+        window.open(apiUrl +
+          `api/Package/DownloadPackage?vStepId=${stepid}&iVersion=${
+            version.split("V")[1]
+          }&vAttachId=${vAttachId}`)
+
+      }
+    })
+  
   
 };
 
@@ -58,8 +70,19 @@ const fetchDownloadResponse = (
   version: string,
   attachId: string
 ) => {
-  window.open(apiUrl +
-    `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`)
+  fetch(apiUrl +
+    `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`, {
+      'method': 'GET',      
+    }).then((resp) => {
+      if(resp.status === 404){
+        alert("no attachment file")
+      } else {
+        window.open(apiUrl +
+          `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`)
+
+      }
+    })
+  
 };
 
 let tempResp: ITempResponse[] = []
@@ -73,8 +96,7 @@ function ResponseDialog(props: IResponseProps){
     (val) =>
       val.vStepId === stepId && val.version === curVersion.toString()
   ).map((val) => { return val.vRemark}) : ""
-
-  console.log("vResponse : ", vResponse)
+  
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
@@ -160,9 +182,7 @@ function RemarkDialog(props: IRemarkProps) {
   
   const [vResponse, setVResponse] = useState("");
 
-  let iVersion = version.split("V")[1];  
-  console.log(dataRespAffco.filter((val) => val.vStepId === stepId && val.version === iVersion))
-  
+  let iVersion = version.split("V")[1];
 
   const handleUploadResponse = (event) => {
     setFileAffco(event.target.files[0]);
@@ -218,7 +238,7 @@ function RemarkDialog(props: IRemarkProps) {
           vAttType: iVersion,
         })
       })
-    }
+    }    
     onClose()
     
   };
@@ -337,8 +357,7 @@ function RemarkDialog(props: IRemarkProps) {
           ).length === 0 ? (
             <FormControl fullWidth sx={{ margin: 1 }}>
               <FormLabel>
-                {tempResp.filter((val) => val.vStepId === stepId).length !==
-                    0 ? tempResp.filter((val) => val.vStepId === stepId)[0].vAttachName : vNameFile !== "" ? vNameFile : "no file selected"}
+                { vNameFile !== "" ? vNameFile : "no file selected"}
               </FormLabel>
             </FormControl>
           ) : null}

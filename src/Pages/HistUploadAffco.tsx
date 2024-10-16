@@ -324,23 +324,14 @@ const HistoryUploadAffco: React.FC = () => {
 
       const responseFiles = response.data.data[0].responseFiles; // Ambil semua responseFiles
 
-      // Cek apakah ada responseFiles dan ambil berdasarkan index
-      if (responseFiles && responseFiles.length > 0) {
-        const indexToDownload = index; // Gunakan index dari parameter
-        const fileData = responseFiles[indexToDownload]; // Ambil file berdasarkan index
+      if (responseFiles.length > 0) { 
+        const fileData = responseFiles[0]; // Ambil file berdasarkan index
 
-        if (fileData) {
-          const iVersion = fileData.iVersion; // Ambil versi dari response
-          const vAttachId = fileData.vAttchId; // Ambil attachment ID
-          const types = fileData.vAttType;
+        const type = row.responseFiles[0].vAttType;
+        const attachId = fileData.vAttchId;
+        
+        fetchDownloadResponse(type, index.toString(), attachId); 
 
-          console.log("atttype : ", types);
-          console.log("filedata : ", fileData);
-
-          fetchDownloadResponse(types, iVersion, vAttachId); // Panggil fungsi untuk download file
-        } else {
-          alert("File tidak ditemukan pada index yang dipilih.");
-        }
       } else {
         alert("File tidak ditemukan, silakan periksa data yang Anda masukkan.");
       }
@@ -403,12 +394,11 @@ const HistoryUploadAffco: React.FC = () => {
       size: 150,
       Cell: ({ row }) => {
         const status = row.original.responseFiles[0]; // Ambil nilai Status dari baris
-        console.log("Statusnya : ", status);
         return (
           <>
             {status !== undefined ? ( // Cek apakah Status adalah "Revised"
               <Button
-                onClick={() => downloadFile(row.original, row.index)}
+                onClick={() => downloadFile(row.original, row.original.responseFiles[0].iVersion)}
                 variant="outlined"
                 color="info"
                 size="small"

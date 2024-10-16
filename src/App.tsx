@@ -63,7 +63,7 @@ import { genSaltSync } from "bcrypt-ts";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CategorySettings from "./Pages/CategorySettings";
-import ChangePassword, {ForgetPassword} from "./Pages/ForgetPassword";
+import ChangePassword, { ForgetPassword } from "./Pages/ForgetPassword";
 
 const drawerWidth: number = 250;
 
@@ -581,12 +581,19 @@ function App() {
               overflow: "auto",
             }}
           >
-            <Toolbar
-              sx={{
-                maxHeight: "50px !important",
-                minHeight: "46px !important",
-              }}
-            />
+            {/* TEST HILANGKAN TOOLBAR DI LOGIN */}
+            {!noToken ? (
+              <>
+                <Toolbar
+                  sx={{
+                    maxHeight: "50px !important",
+                    minHeight: "46px !important",
+                  }}
+                />
+              </>
+            ) : (
+              <></>
+            )}
             <Container
               maxWidth="xl"
               sx={{

@@ -18,22 +18,23 @@ import {
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 import { format, parse } from "date-fns";
 import tblHst_UploadAffco from "../Component/Interface/Hst_UploadAffco";
-import { apiUrl, getToken} from "../Component/TemplateUrl";
+import { apiUrl, getToken } from "../Component/TemplateUrl";
 
 const HistoryUploadAffco: React.FC = () => {
   const [rows, setRows] = React.useState<tblHst_UploadAffco[]>([]);
-  const [columns, setColumns] = React.useState<MRT_ColumnDef<tblHst_UploadAffco>[]>([]);
+  const [columns, setColumns] = React.useState<
+    MRT_ColumnDef<tblHst_UploadAffco>[]
+  >([]);
   const [month, setMonth] = React.useState<string>("");
   const [year, setYear] = React.useState<string>("");
   const [affcoId, setAffcoId] = React.useState<string>("");
   const [stepId, setStepId] = React.useState<string>("");
-  const [dialogData, setDialogData] = React.useState<tblHst_UploadAffco[]>([]); 
+  const [dialogData, setDialogData] = React.useState<tblHst_UploadAffco[]>([]);
   const [revisionHistoryData, setRevisionHistoryData] = React.useState<
     tblHst_UploadAffco[]
-  >([]); 
-  const [selectedRows, setSelectedRows] = React.useState<tblHst_UploadAffco | null>(
-    null
-  );
+  >([]);
+  const [selectedRows, setSelectedRows] =
+    React.useState<tblHst_UploadAffco | null>(null);
   const [viewHistoryOpen, setViewHistoryOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState(0);
@@ -52,6 +53,7 @@ const HistoryUploadAffco: React.FC = () => {
     "October",
     "November",
     "December",
+    "December (Audited)",
   ];
 
   React.useEffect(() => {
@@ -60,7 +62,7 @@ const HistoryUploadAffco: React.FC = () => {
       try {
         const bulan = monthNames.indexOf(month) + 1;
         const resp = await axios.get(
-          apiUrl +`api/Package/GetReport?nYear=${year}&nMonth=${bulan}`,
+          apiUrl + `api/Package/GetReport?nYear=${year}&nMonth=${bulan}`,
           {
             headers: {
               Authorization: `Bearer ` + getToken,
@@ -103,18 +105,18 @@ const HistoryUploadAffco: React.FC = () => {
             // Sticky to the left (fixed column)
             muiTableHeadCellProps: {
               sx: {
-                position: 'sticky',
+                position: "sticky",
                 left: 0,
                 zIndex: 2, // Set zIndex to ensure it's above other columns
-                backgroundColor: 'white', // Give it a background color
+                backgroundColor: "white", // Give it a background color
               },
             },
             muiTableBodyCellProps: {
               sx: {
-                position: 'sticky',
+                position: "sticky",
                 left: 0,
                 zIndex: 1,
-                backgroundColor: 'white',
+                backgroundColor: "white",
               },
             },
           },
@@ -125,18 +127,18 @@ const HistoryUploadAffco: React.FC = () => {
             // Sticky to the left (fixed column)
             muiTableHeadCellProps: {
               sx: {
-                position: 'sticky',
+                position: "sticky",
                 left: 50, // Shift it after the # column
                 zIndex: 2, // Make sure it's above other columns
-                backgroundColor: 'white',
+                backgroundColor: "white",
               },
             },
             muiTableBodyCellProps: {
               sx: {
-                position: 'sticky',
+                position: "sticky",
                 left: 50,
                 zIndex: 1,
-                backgroundColor: 'white',
+                backgroundColor: "white",
               },
             },
           },
@@ -195,7 +197,8 @@ const HistoryUploadAffco: React.FC = () => {
         const bulan = monthNames.indexOf(month) + 1;
         try {
           const response = await axios.get(
-            apiUrl + `api/Package/GetReportFileHistory?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
+            apiUrl +
+              `api/Package/GetReportFileHistory?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
             {
               headers: {
                 Authorization: `Bearer ` + getToken,
@@ -218,7 +221,8 @@ const HistoryUploadAffco: React.FC = () => {
       if (affcoId && stepId && month && year) {
         try {
           const response = await axios.get(
-            apiUrl + `api/Package/GetActivity?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
+            apiUrl +
+              `api/Package/GetActivity?nYear=${year}&nMonth=${bulan}&vAffcoId=${affcoId}&vStepId=${stepId}`,
             {
               headers: {
                 Authorization: `Bearer ` + getToken,
@@ -298,66 +302,41 @@ const HistoryUploadAffco: React.FC = () => {
     { accessorKey: "vCrea", header: "Created By", size: 100 },
     {
       accessorKey: "dCrea",
-      header: "Created Date",
+      header: "Submitted Date",
       size: 100,
-      Cell: ({ cell }) => {
-        const dateStr = cell.getValue<string>();
-        let formattedDate = " ";
-
-        try {
-          const date = parse(dateStr, "dd-MM-yyyy", new Date());
-          if (!isNaN(date.getTime())) {
-            formattedDate = format(date, "dd/MM/yyyy");
-          }
-        } catch (error) {
-          console.error("Error parsing or formatting date:", error);
-        }
-
-        return (
-          <span
-            style={{
-              display: "block",
-              width: "120px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {formattedDate}
-          </span>
-        );
-      },
     },
     { accessorKey: "vStatus", header: "Status", size: 150 },
     { accessorKey: "vRemarks", header: "Remarks", size: 150 },
   ];
 
-  //Bagian Download Responses File : 
+  //Bagian Download Responses File :
   const downloadFile = async (row: any, index: number) => {
     try {
       const response = await axios.get(
-        apiUrl + `api/Package/GetActivity?nYear=${row.iYear}&nMonth=${row.iMonth}&vAffcoId=${row.vAffcoId}&vStepId=${row.vStepId}`,
+        apiUrl +
+          `api/Package/GetActivity?nYear=${row.iYear}&nMonth=${row.iMonth}&vAffcoId=${row.vAffcoId}&vStepId=${row.vStepId}`,
         {
           headers: {
             Authorization: `Bearer ` + getToken,
           },
         }
       );
-  
+
       const responseFiles = response.data.data[0].responseFiles; // Ambil semua responseFiles
-  
+
       // Cek apakah ada responseFiles dan ambil berdasarkan index
       if (responseFiles && responseFiles.length > 0) {
         const indexToDownload = index; // Gunakan index dari parameter
         const fileData = responseFiles[indexToDownload]; // Ambil file berdasarkan index
-  
+
         if (fileData) {
           const iVersion = fileData.iVersion; // Ambil versi dari response
           const vAttachId = fileData.vAttchId; // Ambil attachment ID
           const types = fileData.vAttType;
-  
+
           console.log("atttype : ", types);
           console.log("filedata : ", fileData);
-          
+
           fetchDownloadResponse(types, iVersion, vAttachId); // Panggil fungsi untuk download file
         } else {
           alert("File tidak ditemukan pada index yang dipilih.");
@@ -373,19 +352,22 @@ const HistoryUploadAffco: React.FC = () => {
       }
     }
   };
-  
+
   const fetchDownloadResponse = (
     types: string,
     version: string,
     attachId: string
   ) => {
-    console.log("APInya : ", apiUrl +
-      `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`)
-    window.open(apiUrl +
-      `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`)
-      
+    console.log(
+      "APInya : ",
+      apiUrl +
+        `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`
+    );
+    window.open(
+      apiUrl +
+        `api/Package/DownloadResponseAttachment?types=${types}&iVersion=${version}&vAttachId=${attachId}`
+    );
   };
-  
 
   //Revision History Table :
   const revisionHistoryColumns: MRT_ColumnDef<any>[] = [
@@ -408,7 +390,7 @@ const HistoryUploadAffco: React.FC = () => {
       size: 150,
       Cell: ({ row }) => {
         const status = row.original.responseFiles[0]; // Ambil nilai Status dari baris
-        console.log("Statusnya : ",status);
+        console.log("Statusnya : ", status);
         return (
           <>
             {status !== undefined ? ( // Cek apakah Status adalah "Revised"
@@ -420,7 +402,7 @@ const HistoryUploadAffco: React.FC = () => {
               >
                 Download
               </Button>
-            ): null}
+            ) : null}
           </>
         );
       },
@@ -430,7 +412,8 @@ const HistoryUploadAffco: React.FC = () => {
       accessorKey: "dDateTime",
       header: "Approval Date",
       size: 150,
-      Cell: ({ cell }) => format(new Date(cell.getValue() as string), 'dd/MM/yyyy HH:mm'),
+      Cell: ({ cell }) =>
+        format(new Date(cell.getValue() as string), "dd/MM/yyyy HH:mm"),
     },
   ];
 
@@ -487,16 +470,17 @@ const HistoryUploadAffco: React.FC = () => {
       <MaterialReactTable
         columns={columns}
         data={rows}
+        enableStickyHeader
         initialState={{
           pagination: { pageIndex: 0, pageSize: 10 },
         }}
         enableSorting
         muiTableHeadProps={{
           sx: {
-            position: 'sticky',
+            position: "sticky",
             top: 0,
             zIndex: 3, // Ensure the header is above the rest of the table content
-            backgroundColor: 'white',
+            backgroundColor: "white",
           },
         }}
       />
@@ -514,6 +498,7 @@ const HistoryUploadAffco: React.FC = () => {
               <MaterialReactTable
                 columns={dialogColumns}
                 data={dialogData}
+                enableStickyHeader
                 initialState={{
                   pagination: { pageIndex: 0, pageSize: 5 },
                 }}
@@ -530,6 +515,7 @@ const HistoryUploadAffco: React.FC = () => {
                 <MaterialReactTable
                   columns={revisionHistoryColumns}
                   data={revisionHistoryData}
+                  enableStickyHeader
                   initialState={{
                     pagination: { pageIndex: 0, pageSize: 5 },
                   }}

@@ -56,6 +56,7 @@ import AffcoUpload from "./Pages/AffcoUpload";
 import AcordionWrapper from "./Component/AccordionWrapper";
 import EmailApprovalAspack from "./Pages/MstEmailApproval";
 import EmailAffcoSubmit from "./Pages/MstEmailAffcoSubmit";
+import EmailNews from "./Pages/MstEmailNews";
 import { IProfileProps } from "./Component/Interface/DataTemplate";
 import CloseIcon from "@mui/icons-material/Close";
 import { apiUrl, getRole, getToken, getUserId } from "./Component/TemplateUrl";
@@ -764,6 +765,13 @@ function App() {
                       path="/emailAffcoSubmit"
                       element={
                         <ProtectedRoute element={<EmailAffcoSubmit />} />
+                      }
+                    />
+
+                    <Route
+                      path="/emailNews"
+                      element={
+                        <ProtectedRoute element={<EmailNews />} />
                       }
                     />
                   </>

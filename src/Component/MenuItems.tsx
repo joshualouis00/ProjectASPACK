@@ -291,6 +291,17 @@ const MenuItems = (props: MenuItemsProps) => {
                 </ListItemIcon>
                 <ListItemText primary="Affco Submit" />
               </ListItemButton>
+              <ListItemButton
+                onClick={() => {
+                  navigate("/emailNews");
+                }}
+                sx={{ bgcolor: "#223c49", color: "white", ml: "25px" }}
+              >
+                <ListItemIcon>
+                  <FolderOpenOutlinedIcon color="inherit" sx={{ mb: "5px" }} />
+                </ListItemIcon>
+                <ListItemText primary="Consolidation News" />
+              </ListItemButton>
             </List>
           </Collapse>
         </>

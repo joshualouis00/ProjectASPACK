@@ -348,8 +348,9 @@ export const DataWorkflow: React.FC = () => {
             required
           >
             <MenuItem value="Excel">Excel</MenuItem>
+            <MenuItem value="Word">Word</MenuItem>
             <MenuItem value="PDF">PDF</MenuItem>
-            <MenuItem value="Both">Both</MenuItem>
+            <MenuItem value="All">All</MenuItem>
           </TextField>
           <TextField
             select

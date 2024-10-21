@@ -354,20 +354,28 @@ const TabContent: React.FC<ITabContent> = ({
           "application/vnd.ms-excel",
           "application/vnd.ms-excel.sheet.macroEnabled.12", 
         ],
-        Both: [
+        Word: [
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/msword",
+          "application/vnd.ms-word.document.macroEnabled.12",
+        ],
+        All: [
           "application/pdf",
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "application/vnd.ms-excel",
           "application/vnd.ms-excel.sheet.macroEnabled.12",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/msword",
+          "application/vnd.ms-word.document.macroEnabled.12",
         ],
       };
 
-      if (vFileType === "Both") {
+      if (vFileType === "All") {
         const invalidFiles = acceptedFiles.filter(
-          (file) => !fileTypeMap["Both"].includes(file.type)
+          (file) => !fileTypeMap["All"].includes(file.type)
         );
         if (invalidFiles.length > 0) {
-          setErrorMessage("Uploaded files must be either PDF or Excel.");
+          setErrorMessage("Uploaded files must be either PDF, Excel and Word.");
           setTimeout(() => {
             setErrorMessage(null);
           }, 5000);

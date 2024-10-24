@@ -71,7 +71,9 @@ export default function AspackAprroval() {
   const [dataAffco, setDataAffco] = React.useState<IStepProps[]>([]);
   const [dataHeader, setDataHeader] = React.useState<IHeaderProps>({ iMonth: "", iYear: "", iStatus: "", vAffcoId: "", vPackageId : ""});
   const [open, setOpen] = React.useState(false);
+  const [openApprove, setOpenApprove] = React.useState(false);
   const [index, setIndex] = React.useState<number>(0);  
+  const [indexApprove, setIndexApprove] = React.useState<number>(0); 
   const [dataResponse, setDataResponse] = React.useState<IRespFile[]>([]);
   const [filterCategory, setFilterCategory] = React.useState("")
   const [pMonth, setPMonth] = React.useState("")
@@ -300,7 +302,7 @@ export default function AspackAprroval() {
         setIsOpenPeriod(false)
       }
       setStatus(true)
-      fetchGetPackage()
+      fetchGetPackage()      
       
     } else {
       if (year !== "" && vAffco !== undefined ) {
@@ -365,6 +367,11 @@ export default function AspackAprroval() {
     
   }
 
+  const handleClickReviseApproved = (data: number) => {
+    setOpenApprove(true)
+    setIndexApprove(data)
+  }
+
   const handleClickApprove = (data: number) => {
     const date = dayjs(Date())
     const user = getUserId !== null ? getUserId : ""
@@ -392,7 +399,7 @@ export default function AspackAprroval() {
 
   
 
-  function AddReviseDialog(props: IDialogProps){
+ function AddReviseDialog(props: IDialogProps){
     const { open, onClose, data} = props;
     const [remark, setRemark] = React.useState("");
   const [duedate, setDueDate] = React.useState<Dayjs | null>(null);
@@ -414,6 +421,7 @@ export default function AspackAprroval() {
     const submitRevise = (data: number) => {
       if(remark !== "" && duedate !== null){
         setOpen(false)
+        setOpenApprove(false)
       const updateData = {...dataAffco[data], status:"Revise", dDueDate: duedate ? duedate.format("YYYY-MM-DD HH:mm:ss") : "", apprRemarks: remark, dApprover: "", vApprover: ""}
       const newDataAffco = [...dataAffco];
       newDataAffco[data] = updateData;
@@ -523,13 +531,13 @@ export default function AspackAprroval() {
       return (
         dataForm.append(`Detail[${index}].vAttchId`, val.vAttachId),
         dataForm.append(`Detail[${index}].vStepId`, val.stepid),
-        dataForm.append(`Detail[${index}].vApprover`, val.vApprover),
-        dataForm.append(`Detail[${index}].dApprover`, val.dApprover),
+        dataForm.append(`Detail[${index}].vApprover`, ""),
+        dataForm.append(`Detail[${index}].dApprover`, ""),
         dataForm.append(`Detail[${index}].dDueDate`, val.dDueDate),
         dataForm.append(`Detail[${index}].vApprRemarks`, val.apprRemarks),
         dataForm.append(`Detail[${index}].vUsrRemarks`, val.userRemarks),
         dataForm.append(`Detail[${index}].vTemporalCode`, ""),
-        dataForm.append(`Detail[${index}].vStatus`, val.status === "Revise" ? "R" : "A")
+        dataForm.append(`Detail[${index}].vStatus`, val.status === "Revise"  ? "R" : val.status === "Approve"  ? "A" : val.status === "Revised"  ? "R" : val.status === "Approved"  ? "A" : "S")
       )
     })
 
@@ -823,17 +831,14 @@ export default function AspackAprroval() {
                         )}
                         
                         enableRowActions
-                        renderBottomToolbarCustomActions={({ table }) => {
-                          const countSubmitted = dataAffco.filter(
-                            (v) => v.status === "Submitted" 
-                          ).length; 
-                          const countRevised = dataAffco.filter((v) => v.status === "Revised").length;                                                   
+                        renderBottomToolbarCustomActions={({ table }) => {                          
+                          const countRevApp = dataAffco.filter((v) => v.status === "Revise" || v.status === "Approve").length;                                                  
                           return (
                             <div style={{ display: "flex", gap: "0.5rem" }}>                              
                               <Button
                                 color="success"
                                 variant="contained"
-                                disabled={isOpenPeriod && countSubmitted === 0 && dataHeader?.vPackageId !== "" && dataAffco.length > 0 && dataHeader?.iStatus === "S" ? false : isOpenPeriod && countSubmitted === 0 && countRevised === 0 && dataHeader?.vPackageId !== "" && dataHeader.iStatus === "PA" ? false : true}
+                                disabled={isOpenPeriod && countRevApp !== 0 && dataHeader?.vPackageId !== "" ? false : true}
                                 onClick={submitApprovals}
                               >
                                 Submit Approval
@@ -887,9 +892,30 @@ export default function AspackAprroval() {
                     <Box>
                       <MaterialReactTable
                         columns={columnApproved}
-                        data={dataAffco.filter((v) => v.status === "Approved")}                        
+                        data={dataAffco.filter((v) => v.status === "Approved" )}
+                        enableRowActions
+                        renderRowActions={({ row }) => (
+                          <Stack direction={"row"}>
+                            <Button
+                              size="small"
+                              sx={{ margin: 1 }}
+                              variant="contained"
+                              color="warning"
+                              onClick={() => {
+                                const index = dataAffco.findIndex((val) => val.stepid === row.original.stepid);                               
+
+                                handleClickReviseApproved(index)
+                              }}
+                            >
+                              Revise
+                            </Button>
+                            
+                          </Stack>
+                        )}
                         
+                        positionActionsColumn="last"
                       />
+                      <AddReviseDialog onClose={() => setOpenApprove(false)} open={openApprove} data={indexApprove} />
                     </Box>
                   </CustomTabs>
                 </Box>

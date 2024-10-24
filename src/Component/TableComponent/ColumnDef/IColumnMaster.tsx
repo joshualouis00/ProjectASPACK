@@ -2,6 +2,29 @@ import { MRT_ColumnDef } from "material-react-table";
 import IDataUser from "../../Interface/DataUser";
 import IDataAffco from "../../Interface/DataAffco";
 import { ICategory, IConsNewsProps } from "../../Interface/DataTemplate";
+import { Button } from "@mui/material";
+import { apiUrl, getToken } from "../../TemplateUrl";
+
+const handleSendEmail = (data: string) => {
+  const vAttachId = btoa(data)
+  fetch(apiUrl + `api/Consolidate/SendMailConsolidation?vAttachId=${vAttachId}`,{
+    method: 'POST',
+    headers: {
+      Authorization: `bearer ${getToken}`
+    }
+  }).then((resp) => {
+    resp.json().then((val) => {
+      if(val.success
+      ){
+        alert(val.message)
+        window.location.reload()
+      } else {
+        alert(val.message)
+      }
+    })
+
+  })
+}
 
 export const columnMasterUser: MRT_ColumnDef<IDataUser>[] = [
   { header: "#", 
@@ -78,13 +101,27 @@ export const columnConsNews: MRT_ColumnDef<IConsNewsProps>[] = [
     header: "Description"
   },
   {
-    accessorKey: "vConsolidateCategory",
+    accessorKey: "category",
     header: "Category"
   },
   {
     accessorKey: "bActive",
     header: "Status",
     Cell: ({ row }) => row.original.bActive ? "Active" : "Non Active"
+  },
+  {
+    header: "Send Email",
+    Cell: ({ row }) => {
+      return (
+        <Button variant="contained" color="error" onClick={() => { handleSendEmail(row.original.uUid)}}>Send</Button>
+      )
+    }
+  },
+  {
+
+    header: "Last Send",
+    Cell: ({ row }) => row.original.dLastSend !== null ? row.original.dLastSend.replaceAll('-','/') : "not yet"
+
   }
 ]
 

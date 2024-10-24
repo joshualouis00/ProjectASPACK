@@ -6,6 +6,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  CardMedia,
   Dialog,
   DialogActions,
   DialogContent,
@@ -29,8 +30,8 @@ import {
   getRole,
   getToken,
   generateYears,
-  generateMonths,
-  generateCategory,
+  generateMonths
+ 
 } from "../Component/TemplateUrl";
 import { ICategory, IConsNewsProps, IConsProps } from "../Component/Interface/DataTemplate";
 import { Download } from "@mui/icons-material";
@@ -80,6 +81,9 @@ export default function Kategori() {
     dCrea: "",
     vCrea: "",
     bActive: false,
+    dLastSend: "",
+    category: "",
+    vImage: ""
   });
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -141,6 +145,9 @@ export default function Kategori() {
               dCrea: val.dCrea,
               vCrea: val.vCrea,
               bActive: val.bActive,
+              dLastSend: val.dLastSend,
+              category: val.vConsolidateCategoryName,
+              vImage: val.vImage
             };
           })
         );
@@ -335,23 +342,31 @@ export default function Kategori() {
                   <Card
                         sx={{
                           maxWidth: 300,
-                          maxHeight: 300,
+                          maxHeight: 500,
                           marginBottom: 5,
                           borderRadius: 3,
-                          marginTop: 1,
-                          marginLeft: 1,
-                          marginRight: 1,
+                          marginTop: 1,                          
+                          marginRight: 2,
                         }}
                         key={index}
                       >
+                        <CardMedia 
+                        sx={{
+                          maxWidth: 300,
+                          height: 150
+                        }}
+                        component={'img'}
+                        src={item.vImage}
+                        
+                        />
                         <CardHeader
                           sx={{
                             "& .MuiCardHeader-title": { color: "white" },
                             "& .MuiCardHeader-subheader": { color: "white" },
                             backgroundColor: "seagreen",
                           }}
-                          title={item.vTitle}
-                          subheader={item.vSubTitle}
+                          title={item.vTitle.length < 20 ? item.vTitle : item.vTitle.substring(0,16) + "..."}
+                          subheader={item.vSubTitle.length <= 25 ? item.vSubTitle : item.vSubTitle.substring(0,21) + "..."}
                         />
                         <CardActionArea
                           onClick={() => {

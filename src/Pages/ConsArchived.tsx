@@ -42,6 +42,9 @@ export default function Archived() {
     vDescription: "",
     vConsolidateCategory: "",
     bActive: false,
+    dLastSend: "",
+    category: "",
+    vImage: ""
   });
   const [message, setMessage] = React.useState("");
     const [openSnack, setOpenSnack] = React.useState(false);
@@ -271,6 +274,9 @@ export default function Archived() {
               dCrea: val.dCrea,
               vCrea: val.vCrea,
               bActive: val.bActive,
+              dLastSend: val.dLastSend ,
+              category: val.vConsolidateCategoryName,
+              vImage: val.vImage
             };
           })
         );

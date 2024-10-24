@@ -511,7 +511,7 @@ export const columnApproved: MRT_ColumnDef<IStepProps>[] = [
     header: "Version",
   },
   {
-    header: "Action",
+    header: "Download",
     Cell: ({ cell }) => {
       return (
         <Button
@@ -534,7 +534,7 @@ export const columnApproved: MRT_ColumnDef<IStepProps>[] = [
   {
     accessorKey: "status",
     header: "Status",
-  },
+  }
 ];
 
 export const columnHistoryUpload: MRT_ColumnDef<IStepProps>[] = [

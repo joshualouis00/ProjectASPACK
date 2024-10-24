@@ -47,6 +47,7 @@ export default function ButtonAddNews() {
     const { open, onClose } = props;
     const [category, setCategory] = React.useState("");  
     const [dataFile, setDataFile] = React.useState<File>();
+    const [dataBanner, setDataBanner] = React.useState<File>();
     const [title, setTitle] = React.useState("");
     const [subTitle, setSubTitle] = React.useState("");
     const [desc, setDesc] = React.useState("");
@@ -55,9 +56,11 @@ export default function ButtonAddNews() {
     const [hasErrorSub, setHasErrorSub] = React.useState(false);
     const [hasErrorDesc, setHasErrorDesc] = React.useState(false);
     const [hasErrorFile, setHasErrorFile] = React.useState(false);
+    const [hasErrorBanner, setHasErrorBanner] = React.useState(false);
     const [hasErrorCat, setHasErrorCat] = React.useState(false);  
     const [btnCreate, setBtnCreate] = React.useState(false);  
     const [dataCategory, setDataCategory] = React.useState<ICategory[]>([])
+    const [invalidType, setInvalidType] = React.useState("")
     const navigate = useHandleUnauthorized();
 
     const fetchCategory = () => {
@@ -115,6 +118,26 @@ export default function ButtonAddNews() {
       }
       
     }
+
+    const handleBannerUpload = (event) => {
+      const validExt = ["image/jpeg","image/png"]
+      if(event.target.files[0] === undefined){
+        setHasErrorBanner(true)
+        
+      } else {
+        const validFile = validExt.includes(event.target.files[0].type)
+        if(validFile){
+          setHasErrorBanner(false)
+          setInvalidType("")
+        setDataBanner(event.target.files[0])
+        } else {
+          setHasErrorBanner(true)
+          setInvalidType("Invalid file type. Only .jpg, .jpeg, and .png are allowed.")
+        }
+        
+      }
+
+    }
   
     const handleChangeTitle = (event) => {
       
@@ -153,59 +176,70 @@ export default function ButtonAddNews() {
     const handleCreateNews =  () => {
       
       const dataForm = new FormData();
-      if(title !== "" && subTitle !== "" && desc !== "" && dataFile !== undefined && category !== ""){
-        setBtnCreate(true);
-        setLoading(true);
-        dataForm.append("uUid","");
-      dataForm.append("vTitle", title);
-      dataForm.append("vSubTitle", subTitle);
-      dataForm.append("vDescription", desc);
-      dataForm.append("vConsolidateCategory", category);
-      dataForm.append("vAttachment", attchName);
-      dataFile ? dataForm.append("fAttachment", dataFile) : dataForm.append("fAttachment", "")
-      fetch(apiUrl + "api/Consolidate/SubmitConsolidateNews",{
-        method: "POST",
-        headers: {
-          Authorization: `bearer ${getToken}`,
-            Accept: "*/*",
-        },
-        body: dataForm
-      }).then((resp) => {
-        if(resp.ok){
-          resp.json().then((val) => {
-            if(val.success){  
-              setLoading(false)          
-              setCategory("")
-              setTitle("");
-              setSubTitle("");
-              setDesc("");
-              setDataFile(undefined);
-              setMessage("Consolidate news added successfully.");
-              setError(false);
-              setOpenSnack(true);
-              onClose();
-              setBtnCreate(false)
-              setTimeout(() => {
-                window.location.reload();
-              },2000)
-              
-            } else {   
-              setLoading(false)          
-              setCategory("")
-              setTitle("");
-              setSubTitle("");
-              setDesc("");
-              setDataFile(undefined);
-              setMessage(val.message)
-              setError(true);
-              setOpenSnack(true);
-              onClose();
-              setBtnCreate(false)
-            }
-          })       
-          
+      if(title !== "" && subTitle !== "" && desc !== "" && dataFile !== undefined && category !== "" && dataBanner !== undefined){
+        let readerBanner = new FileReader()
+        let encodeBanner 
+        readerBanner.readAsDataURL(dataBanner)
+        readerBanner.onloadend = () => {
+          encodeBanner = readerBanner.result
+          setBtnCreate(true);
+          setLoading(true);
+          dataForm.append("uUid","");
+        dataForm.append("vTitle", title);
+        dataForm.append("vSubTitle", subTitle);
+        dataForm.append("vDescription", desc);
+        dataForm.append("vConsolidateCategory", category);
+        dataForm.append("vImage", encodeBanner);
+        dataForm.append("vAttachment", attchName);
+        dataFile ? dataForm.append("fAttachment", dataFile) : dataForm.append("fAttachment", "")
+        fetch(apiUrl + "api/Consolidate/SubmitConsolidateNews",{
+          method: "POST",
+          headers: {
+            Authorization: `bearer ${getToken}`,
+              Accept: "*/*",
+          },
+          body: dataForm
+        }).then((resp) => {
+          if(resp.ok){
+            resp.json().then((val) => {
+              if(val.success){  
+                setLoading(false)          
+                setCategory("")
+                setTitle("");
+                setSubTitle("");
+                setDesc("");
+                setDataFile(undefined);
+                setMessage("Consolidate news added successfully.");
+                setError(false);
+                setOpenSnack(true);
+                onClose();
+                setBtnCreate(false)
+                setTimeout(() => {
+                  window.location.reload();
+                },2000)
+                
+              } else {   
+                setLoading(false)          
+                setCategory("")
+                setTitle("");
+                setSubTitle("");
+                setDesc("");
+                setDataFile(undefined);
+                setMessage(val.message)
+                setError(true);
+                setOpenSnack(true);
+                onClose();
+                setBtnCreate(false)
+              }
+            })       
+            
+          }
+        })
+
+
         }
-      })
+        
+        
       } else {
         if(title === ""){
           setHasErrorTitle(true)
@@ -221,6 +255,9 @@ export default function ButtonAddNews() {
         }
         if(category === ""){
           setHasErrorCat(true)
+        }
+        if(dataBanner === undefined){
+          setHasErrorBanner(true)
         }
       }
       
@@ -260,7 +297,7 @@ export default function ButtonAddNews() {
             sx={{ display: "flex", flexDirection: "column", alignItems: "left" }}
           >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <TextField size="small" label="Title News" value={title} onChange={handleChangeTitle} error={hasErrorTitle}/>
+              <TextField size="small" label="Title News *" value={title} onChange={handleChangeTitle} error={hasErrorTitle}/>
               {
                 hasErrorTitle && (<FormHelperText sx={{ color: "red" }}>
                   This is required!
@@ -268,7 +305,7 @@ export default function ButtonAddNews() {
               }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <TextField size="small" label="Sub Title News" name="vSubTitle" value={subTitle} onChange={handleChangeSubtitle} error={hasErrorSub}/>
+              <TextField size="small" label="Sub Title News *" name="vSubTitle" value={subTitle} onChange={handleChangeSubtitle} error={hasErrorSub}/>
               {
                 hasErrorSub && (
                   <FormHelperText sx={{ color: "red" }}>
@@ -280,7 +317,7 @@ export default function ButtonAddNews() {
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <TextField
                 multiline              
-                label="Description"
+                label="Description *"
                 name="vDesc"
                 value={desc}
                 onChange={handleChangeDesc}
@@ -297,7 +334,7 @@ export default function ButtonAddNews() {
               }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel id="categoryId" color={hasErrorCat ? "error" : undefined}>Category News</InputLabel>
+              <InputLabel id="categoryId" color={hasErrorCat ? "error" : undefined}>Category News *</InputLabel>
               <Select
                 labelId="categoryId"
                 name="vCategory"
@@ -323,7 +360,11 @@ export default function ButtonAddNews() {
               }
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <FormLabel id="vAttach" sx={{ marginBottom: 1}}>Attachment File</FormLabel>
+              <Box>
+              <FormLabel id="vAttach" sx={{ marginBottom: 1}}>Attachment File </FormLabel>
+              <FormLabel  sx={{  color: "red"}}>*</FormLabel>
+              </Box>
+            
               <Button
                 component="label"
                 role={undefined}
@@ -335,13 +376,39 @@ export default function ButtonAddNews() {
                 <VisuallyHiddenInput type="file" onChange={handleFileUpload}/>
               </Button>
             </FormControl>
-            <FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
               {
                 hasErrorFile && (<FormHelperText sx={{ color: "red" }}>
                   File is required!
                 </FormHelperText>)
               }
             <FormLabel  sx={{ marginBottom: 1}}>{dataFile ? dataFile?.name : "no file selected"}</FormLabel>
+            </FormControl>
+
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <Box>
+              <FormLabel id="vAttach" sx={{ marginBottom: 1}}>Banner </FormLabel>
+              <FormLabel  sx={{  color: "red"}}>*(File type: *.JPG,*.JPEG,*.PNG)</FormLabel>
+              </Box>
+            
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUploadIcon />}
+              >
+                Upload file
+                <VisuallyHiddenInput type="file" onChange={handleBannerUpload}/>
+              </Button>
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              {
+                hasErrorBanner && (<FormHelperText sx={{ color: "red" }}>
+                  {invalidType !== "" ? invalidType : "Banner is required!"}
+                </FormHelperText>)
+              }
+            <FormLabel  sx={{ marginBottom: 1}}>{dataBanner ? dataBanner?.name : "no file selected"}</FormLabel>
             </FormControl>
             
           </Box>

@@ -24,7 +24,6 @@ import {
   InputLabel,
 } from "@mui/material";
 import ConsArchived from "./Pages/ConsArchived";
-import ConsRecent from "./Pages/ConsRecent";
 import ConsKategori from "./Pages/ConsKategori";
 import CustomTheme from "./Theme/CustomTheme";
 import MenuIcon from "@mui/icons-material/Menu";

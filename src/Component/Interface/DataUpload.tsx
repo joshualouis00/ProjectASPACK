@@ -14,7 +14,13 @@ export interface IStepProps {
     vTempCode: string ,
     vApprover: string ,
     vAttachId: string,
-    stepName?: string
+    stepName?: string,
+    dLastTemplateUpdate? : string
+}
+
+export interface ILastUpdateTemp {
+    stepid: string,
+    dLastTemplateUpdate: string
 }
 
 export interface ITempFile {

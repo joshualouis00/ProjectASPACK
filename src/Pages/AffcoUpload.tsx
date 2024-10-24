@@ -41,6 +41,7 @@ import {
   ITempFile,
   IHeaderProps,
   IRespFile,
+  ILastUpdateTemp,
 } from "../Component/Interface/DataUpload";
 import { getUserId } from "../Component/TemplateUrl";
 import { format } from "date-fns";
@@ -85,6 +86,7 @@ export default function AffcoUpload() {
   const [message, setMessage] = React.useState("");
   const [openSnack, setOpenSnack] = React.useState(false);
   const [error, setError] = React.useState(false);
+  const [lastUpdateTemp, setLastUpdateTemp] = React.useState<ILastUpdateTemp[]>([])
 
   const location = useLocation();
   const parameter = new URLSearchParams(location.search);
@@ -141,11 +143,18 @@ export default function AffcoUpload() {
                 "application/vnd.ms-excel",
                 "application/vnd.ms-excel.sheet.macroEnabled.12"
               ]
-            : [
+            : validFileType[0].fileType === "Word" ?
+            ["application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/msword",
+          "application/vnd.ms-word.document.macroEnabled.12"] :
+            [
                 "application/pdf",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "application/vnd.ms-excel",
-                "application/vnd.ms-excel.sheet.macroEnabled.12"
+                "application/vnd.ms-excel.sheet.macroEnabled.12",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/msword",
+          "application/vnd.ms-word.document.macroEnabled.12"
               ];
 
         let invalidExt = acceptedFiles.filter(
@@ -158,7 +167,9 @@ export default function AffcoUpload() {
               ? "PDF"
               : validFileType[0].fileType === "Excel"
               ? "Excel"
-              : "Pdf & Excel";
+              : validFileType[0].fileType === "Word" ?
+              "Word" 
+              : "Pdf, Excel, Word";
           setMessage(`Invalid file type! allowed file type only : ${msg}`);
           setOpenSnack(true);
           setError(true);
@@ -214,6 +225,9 @@ export default function AffcoUpload() {
               newSubmitData[index] = newData;
               setSubmitData(newSubmitData);
               setAllowUpload(false);
+            } else {
+              setAllowUpload(true)
+              
             }
 
             setDataFile((prev) => [...files, ...prev]);
@@ -354,6 +368,12 @@ export default function AffcoUpload() {
       }
     ).then((resp) => {
       resp.json().then((valData) => {
+        setLastUpdateTemp(valData.detail.map((dtl) => {
+          return {
+            stepid : dtl.vStepId,
+            dLastTemplateUpdate : dtl.dLastTemplateUpdate
+          }
+        }))
         dataRespAffco = valData.responseFile
           .filter((val) => val.vAttType === "RESPAFFCO")
           .map((val) => ({
@@ -429,6 +449,7 @@ export default function AffcoUpload() {
                 vTempCode: dtl.vTemporalCode,
                 vAttachId: dtl.vAttchId,
                 stepName: dtl.vStepName,
+                dLastTemplateUpdate: dtl.dLastTemplateUpdate
               };
             })
           );
@@ -808,7 +829,7 @@ export default function AffcoUpload() {
               </Item>
               {isOpenPeriod &&
               stepData !== "" &&
-              dataHeader?.vPackageId === "" ? (
+              dataHeader?.vPackageId === "" && dataFile.filter((val) => val.stepid === stepData).length === 0 ? (
                 <Box
                   {...getRootProps()}
                   sx={{
@@ -871,7 +892,7 @@ export default function AffcoUpload() {
                     submitData.length ===
                       submitData.filter((x) => x.status === "Approved").length
                       ? "All Aspack Approved"
-                      : stepData !== "" && !allowUpload
+                      : stepData !== "" && (!allowUpload || dataHeader?.vPackageId === "")
                       ? "upload disabled"
                       : !isOpenPeriod
                       ? "Close Period for upload"
@@ -880,6 +901,8 @@ export default function AffcoUpload() {
                 </Box>
               )}
               <Item elevation={0}>
+                <Box>
+                
                 <Button
                   variant="contained"
                   color="primary"
@@ -889,6 +912,11 @@ export default function AffcoUpload() {
                 >
                   Download Template
                 </Button>
+                {
+                  stepData !== "" ? <Typography variant="body1" sx={{ float: "right", marginTop: 1, marginRight: 1 }}> Last Updated: { lastUpdateTemp.filter((val) => val.stepid === stepData)[0].dLastTemplateUpdate?.replaceAll("-","/") }</Typography> : null
+                }
+                </Box>
+                
               </Item>
 
               <Item elevation={0}>

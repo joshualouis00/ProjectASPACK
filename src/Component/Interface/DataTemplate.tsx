@@ -15,7 +15,10 @@ export interface IConsNewsProps {
     vConsolidateCategory: string,
     dCrea: string,
     vCrea: string,
-    bActive: boolean    
+    bActive: boolean,
+    dLastSend: string,
+    category: string,
+    vImage: string    
 }
 
 export interface IConsProps{

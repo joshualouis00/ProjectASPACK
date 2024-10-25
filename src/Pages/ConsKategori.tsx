@@ -365,8 +365,8 @@ export default function Kategori() {
                             "& .MuiCardHeader-subheader": { color: "white" },
                             backgroundColor: "seagreen",
                           }}
-                          title={item.vTitle.length < 20 ? item.vTitle : item.vTitle.substring(0,16) + "..."}
-                          subheader={item.vSubTitle.length <= 25 ? item.vSubTitle : item.vSubTitle.substring(0,21) + "..."}
+                          title={item.vTitle.length < 20 ? item.vTitle : item.vTitle.substring(0,15) + "..."}
+                          subheader={item.vSubTitle.length <= 25 ? item.vSubTitle : item.vSubTitle.substring(0,20) + "..."}
                         />
                         <CardActionArea
                           onClick={() => {

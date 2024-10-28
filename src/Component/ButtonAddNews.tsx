@@ -162,6 +162,7 @@ export default function ButtonAddNews() {
       dataForm.append("vDescription", desc);
       dataForm.append("vConsolidateCategory", category);
       dataForm.append("vAttachment", attchName);
+      dataForm.append("vImage","");
       dataFile ? dataForm.append("fAttachment", dataFile) : dataForm.append("fAttachment", "")
       fetch(apiUrl + "api/Consolidate/SubmitConsolidateNews",{
         method: "POST",

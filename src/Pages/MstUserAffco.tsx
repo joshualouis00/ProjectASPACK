@@ -500,7 +500,7 @@ export default function MstUserAffco() {
       setEmail(data.email);
       setLdapLogin(data.ldapLogin);
       setLdapName(data.vLdap);
-      setRole(data.role === "Console" ? "C" : "A");
+      setRole(data.role === "Consol" ? "C" : "A");
       const picAffco =
         data.vPicAffco.length > 0 ? data.vPicAffco.split(",") : [];
 

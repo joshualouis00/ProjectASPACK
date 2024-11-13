@@ -741,6 +741,7 @@ export default function AspackAprroval() {
             <Item elevation={0}>
               {status === true && vAffco !== undefined ? (
                 <Box sx={{ width: "100%" }}>
+                  <Box sx={{ overflowX: 'auto', overflowY: 'hidden'}}>
                   <Stepper alternativeLabel activeStep={-1}>
                     { dataHeader?.vPackageId !== "" ? dataAffco.map((value,index) => {
                       const iconProps: {
@@ -811,6 +812,7 @@ export default function AspackAprroval() {
                           val.category === vAffco?.category ||
                           val.category === "All").map((value,index) => { return (<Step key={value.name}><StepLabel>{value.name}</StepLabel></Step>)})}
                   </Stepper>
+                  </Box>                  
                   <Divider sx={{ marginTop: 3, marginBottom: 5 }} />
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                     <Tabs value={tab} onChange={handleChangeTab}>

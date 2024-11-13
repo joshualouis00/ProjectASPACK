@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  Container,
   Divider,
   FormControl,
   FormHelperText,
@@ -738,6 +739,7 @@ export default function AffcoUpload() {
           {filter ? (
             <Stack direction={"column"}>
               <Item elevation={0}>
+                <Box sx={{ overflowX: 'auto', overflowY: 'hidden'}}>
                 <Stepper nonLinear activeStep={activeStep} alternativeLabel>
                   {dataHeader.vPackageId !== ""
                     ? dataFile
@@ -826,6 +828,7 @@ export default function AffcoUpload() {
                         </Step>
                       ))}
                 </Stepper>
+                </Box>
               </Item>
               {isOpenPeriod &&
               stepData !== "" &&

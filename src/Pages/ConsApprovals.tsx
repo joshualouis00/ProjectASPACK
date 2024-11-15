@@ -51,6 +51,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AssignmentReturn, AssignmentTurnedIn } from "@mui/icons-material";
 
 
 export let dataRespAffcoCons: IRespFile[] = []
@@ -861,7 +862,7 @@ export default function AspackAprroval() {
                                 handleClickRevise(index)
                               }}
                             >
-                              Revise
+                              <AssignmentReturn />
                             </Button>
                             <Button
                               size="small"
@@ -873,7 +874,7 @@ export default function AspackAprroval() {
                                 handleClickApprove(index)
                               }}
                             >
-                              Approve
+                              <AssignmentTurnedIn />
                             </Button>
                           </Stack>
                         )}
@@ -909,7 +910,7 @@ export default function AspackAprroval() {
                                 handleClickReviseApproved(index)
                               }}
                             >
-                              Revise
+                              <AssignmentReturn />
                             </Button>
                             
                           </Stack>

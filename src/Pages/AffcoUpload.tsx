@@ -204,7 +204,7 @@ export default function AffcoUpload() {
 
             const temFiles: ITempFile[] = acceptedFiles.map((val) => ({
               vAttchName: val.name,
-              vRemarks: "",
+              vRemarks: stepData,
               vAttchId: "",
               vTempCode: tempCode,
               dtlFIle: val,
@@ -224,20 +224,39 @@ export default function AffcoUpload() {
               };
               const newSubmitData = [...submitData];
               newSubmitData[index] = newData;
-              setSubmitData(newSubmitData);
-              setAllowUpload(false);
+              setSubmitData(newSubmitData);              
+              
             } else {
-              setAllowUpload(true)
+              setAllowUpload(!allowUpload)
               
             }
 
-            setDataFile((prev) => [...files, ...prev]);
-            setTempFile((prevFile) => [...prevFile, ...temFiles]);            
+            const indexFiles = dataFile.findIndex((val) => val.status === "Draft" && val.stepid === stepData)
+            const indexTempFiles = tempFile.findIndex((val) => val.vRemarks === stepData)
+
+            if(indexFiles === -1 && indexTempFiles === -1){
+
+              setDataFile((prev) => [...files, ...prev]);
+            setTempFile((prevFile) => [...prevFile, ...temFiles]); 
+           
+
+            } else {
+              
+              dataFile.splice(indexFiles,1)
+              tempFile.splice(indexTempFiles,1)              
+              setDataFile((prev) => [...files, ...prev]);
+            setTempFile((prevFile) => [...prevFile, ...temFiles]); 
+
+
+            }
+            
+
+                       
           }
         }
       }
     },
-    [stepData, dataHeader?.vPackageId, index, submitData, dataStep]
+    [stepData, dataHeader?.vPackageId, index, submitData, dataStep, dataFile, tempFile, allowUpload]
   );
 
   const [month, setMonth] = React.useState((dataMonth + 1).toString());
@@ -295,14 +314,18 @@ export default function AffcoUpload() {
       if (
         dataHeader?.vPackageId !== "" &&
         countRevise.length > 0 &&
-        isDraft.length < 1 &&
+        isDraft.length <= 1 &&
         isApproved.length === 0 &&
         isSubmitted.length === 0
       ) {
         setAllowUpload(true);
+        
       } else {
         setAllowUpload(false);
+        
       }
+
+      
     };
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -832,7 +855,7 @@ export default function AffcoUpload() {
               </Item>
               {isOpenPeriod &&
               stepData !== "" &&
-              dataHeader?.vPackageId === "" && dataFile.filter((val) => val.stepid === stepData).length === 0 ? (
+              dataHeader?.vPackageId === ""  ? (
                 <Box
                   {...getRootProps()}
                   sx={{

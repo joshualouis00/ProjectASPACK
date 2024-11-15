@@ -17,10 +17,11 @@ import {
   FormLabel,
   IconButton,
   TextField,
+  Typography,
 } from "@mui/material";
 import { apiUrl } from "../../TemplateUrl";
 import {  useState } from "react";
-import { Download } from "@mui/icons-material";
+import { Download, DownloadRounded } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { dataRespAffco, dataCountRevise } from "../../../Pages/AffcoUpload";
@@ -451,7 +452,7 @@ export const columnWaiting: MRT_ColumnDef<IStepProps>[] = [
             );
           }}
         >
-          Download
+          <DownloadRounded />
         </Button>
       );
     },
@@ -484,7 +485,7 @@ export const columnRevised: MRT_ColumnDef<IStepProps>[] = [
             );
           }}
         >
-          Download
+          <DownloadRounded />
         </Button>
       );
     },
@@ -526,7 +527,7 @@ export const columnApproved: MRT_ColumnDef<IStepProps>[] = [
             );
           }}
         >
-          Download
+          <DownloadRounded />
         </Button>
       );
     },
@@ -538,7 +539,9 @@ export const columnApproved: MRT_ColumnDef<IStepProps>[] = [
 ];
 
 export const columnHistoryUpload: MRT_ColumnDef<IStepProps>[] = [
-  { header: "#", Cell: ({ row }) => row.index + 1, size: 50 },
+  { header: "#", 
+    Cell: ({ row }) => row.index + 1, 
+    size: 50 },
   {
     accessorKey: "filename",
     header: "File Name",

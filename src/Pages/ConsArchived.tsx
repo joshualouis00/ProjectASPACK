@@ -347,7 +347,7 @@ export default function Archived() {
             <FormLabel sx={{ m: 1 }}>Previous Banner</FormLabel>
             <Card>
               <CardMedia
-                sx={{ maxWidth: "100%", height: 150 }}
+                // sx={{ maxWidth: "100vw", height: '100vh' }}
                 component={"img"}
                 src={vImage}
               />

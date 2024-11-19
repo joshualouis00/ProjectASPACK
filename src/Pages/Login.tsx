@@ -132,7 +132,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.get(
-        apiUrl + `api/Auth/requestForgetPassword?vUserId=${userIdForForget}`
+        apiUrl + `api/Auth/requestForgetPassword?vUserId=${salt + btoa(userIdForForget)}`
       );
 
       if (response.data.success) {
@@ -353,7 +353,7 @@ const Login: React.FC = () => {
               fullWidth
               variant="standard"
               value={userIdForForget}
-              onChange={(e) => setUserIDForForget(btoa(e.target.value))}
+              onChange={(e) => setUserIDForForget(e.target.value)}
             />
             {resetError && <Alert severity="error">{resetError}</Alert>}
           </DialogContent>

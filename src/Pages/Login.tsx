@@ -85,7 +85,9 @@ const Login: React.FC = () => {
   const combine = password + userId;
   const encodeString = btoa(combine);
   const salt = genSaltSync(8);
+  const saltUser = genSaltSync(8);
   const hashedPassword = salt + encodeString;
+  const hashedUsername = saltUser + btoa(userId);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -96,7 +98,7 @@ const Login: React.FC = () => {
 
     try {
       const resp = await axios.post(apiUrl + "api/Auth/Login", {
-        Email: userId,
+        Email: hashedUsername,
         Password: hashedPassword,
         target: value,
       });
@@ -351,7 +353,7 @@ const Login: React.FC = () => {
               fullWidth
               variant="standard"
               value={userIdForForget}
-              onChange={(e) => setUserIDForForget(e.target.value)}
+              onChange={(e) => setUserIDForForget(btoa(e.target.value))}
             />
             {resetError && <Alert severity="error">{resetError}</Alert>}
           </DialogContent>

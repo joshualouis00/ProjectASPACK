@@ -10,6 +10,9 @@ import {
   Alert,
   useTheme,
   Stack,
+  Dialog,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import React, { useEffect, useState, useCallback } from "react";
 import CustomTheme from "../Theme/CustomTheme";
@@ -80,6 +83,8 @@ const MasterTemplate = () => {
   const [data, setData] = useState<any[]>([]);
   const [files, setFiles] = useState<{ [key: string]: FileData[] }>({});
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
   const navigate = useHandleUnauthorized();
 
   useEffect(() => {
@@ -179,6 +184,7 @@ const MasterTemplate = () => {
   };
 
   const handleUploadAll = async () => {
+    setLoading(true);
     const allDraftFiles = gatherAllDraftFiles();
 
     if (allDraftFiles.length === 0) {
@@ -211,11 +217,12 @@ const MasterTemplate = () => {
       );
 
       if (response.status === 200) {
-        setUploadStatus("success");
+        //setUploadStatus("success");
+        // Set upload message for each file uploaded
+        allDraftFiles.forEach(file => {
+          setUploadMessage(`Template [${file.vStepId}] Berhasil terupload`);
+        });
         await getTemplates();
-        setTimeout(() => {
-          setUploadStatus(null);
-        }, 5000);
       }
     } catch (error: any) {
       if (error.response && error.response.status === 401) {
@@ -227,6 +234,8 @@ const MasterTemplate = () => {
           setUploadStatus(null);
         }, 5000);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -292,6 +301,39 @@ const MasterTemplate = () => {
             ? "Submit All"
             : "Submit"}
         </Button>
+
+        {/* Tambah Loading */}
+        {/* Dialog for loading */}
+        <Dialog open={loading}>
+          <DialogTitle>Loading</DialogTitle>
+          <DialogContent>
+            <Typography>Uploading your template, please wait...</Typography>
+          </DialogContent>
+        </Dialog>
+
+        {/* Snackbar for upload message */}
+        <Snackbar open={!!uploadMessage} autoHideDuration={6000} onClose={() => setUploadMessage("")}>
+          <Stack
+            sx={{
+              position: "fixed",
+              top: uploadMessage ? 60 : 0, // Jika ada error, beri jarak dari error message
+              left: 0,
+              right: 0,
+              zIndex: 9999,
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 2,
+            }}
+          >
+            {/* Tambahan Alert Success 29 Nov 2024 */}
+            <Typography color="success" sx={{ mt: 2 }}> 
+              <Alert onClose={() => setUploadMessage("")} severity="success" sx={{ width: "100%" }}>
+                {uploadMessage}
+              </Alert>
+            </Typography>
+          </Stack>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );
@@ -352,7 +394,7 @@ const TabContent: React.FC<ITabContent> = ({
         Excel: [
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "application/vnd.ms-excel",
-          "application/vnd.ms-excel.sheet.macroEnabled.12", 
+          "application/vnd.ms-excel.sheet.macroEnabled.12",
         ],
         Word: [
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -464,17 +506,17 @@ const TabContent: React.FC<ITabContent> = ({
         />
         {errorMessage && (
           <Stack
-          sx={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 9999, // memastikan berada di atas elemen lain
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            mt: 2,
-          }}
+            sx={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              zIndex: 9999, // memastikan berada di atas elemen lain
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 2,
+            }}
           >
             <Typography color="error" sx={{ mt: 2 }}>
               <Alert severity="error">{errorMessage}</Alert>
@@ -482,23 +524,25 @@ const TabContent: React.FC<ITabContent> = ({
           </Stack>
         )}
         {uploadStatus && (
-          <Stack 
-          sx={{
-            position: "fixed",
-            top: errorMessage ? 60 : 0, // Jika ada error, beri jarak dari error message
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            mt: 2,
-          }}
+          <Stack
+            sx={{
+              position: "fixed",
+              top: errorMessage ? 60 : 0, // Jika ada error, beri jarak dari error message
+              left: 0,
+              right: 0,
+              zIndex: 9999,
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 2,
+            }}
           >
-            <Alert
-              severity="success"
-              sx={{ width: "100%" }}
-            >{uploadStatus}</Alert>
+            {/* Tambahan Alert Success 29 Nov 2024 */}
+            <Typography color="success" sx={{ mt: 2 }}> 
+              <Alert severity="success" sx={{ width: "100%" }}>
+                {uploadStatus}
+              </Alert>
+            </Typography>
           </Stack>
         )}
       </Container>

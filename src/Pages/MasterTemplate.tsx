@@ -220,7 +220,7 @@ const MasterTemplate = () => {
         //setUploadStatus("success");
         // Set upload message for each file uploaded
         allDraftFiles.forEach(file => {
-          setUploadMessage(`Template [${file.vStepId}] Berhasil terupload`);
+          setUploadMessage(`Berhasil Upload Template`);
         });
         await getTemplates();
       }

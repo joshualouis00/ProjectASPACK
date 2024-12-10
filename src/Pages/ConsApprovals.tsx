@@ -35,9 +35,21 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
 import IDataAffco from "../Component/Interface/DataAffco";
 import IDataTemplate from "../Component/Interface/DataTemplate";
-import { apiUrl, CustomSnackBar, generateMonths, generateYears, getToken, getUserId} from "../Component/TemplateUrl";
+import {
+  apiUrl,
+  CustomSnackBar,
+  generateMonths,
+  generateYears,
+  getToken,
+  getUserId,
+} from "../Component/TemplateUrl";
 import { CustomTabs, a11yProps } from "../Component/CustomTab";
-import { IDialogProps, IHeaderProps, IRespFile, IStepProps } from "../Component/Interface/DataUpload";
+import {
+  IDialogProps,
+  IHeaderProps,
+  IRespFile,
+  IStepProps,
+} from "../Component/Interface/DataUpload";
 import { MaterialReactTable } from "material-react-table";
 import {
   columnApproved,
@@ -45,16 +57,18 @@ import {
   columnWaiting,
 } from "../Component/TableComponent/ColumnDef/IColumnUpload";
 import dayjs, { Dayjs } from "dayjs";
-import { LocalizationProvider, MobileDateTimePicker } from "@mui/x-date-pickers";
+import {
+  LocalizationProvider,
+  MobileDateTimePicker,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AssignmentReturn, AssignmentTurnedIn } from "@mui/icons-material";
 
-
-export let dataRespAffcoCons: IRespFile[] = []
+export let dataRespAffcoCons: IRespFile[] = [];
 
 export default function AspackAprroval() {
   const dataMonth = new Date().getMonth();
@@ -70,41 +84,45 @@ export default function AspackAprroval() {
   const [status, setStatus] = React.useState(false);
   const [tab, setTab] = React.useState(0);
   const [dataAffco, setDataAffco] = React.useState<IStepProps[]>([]);
-  const [dataHeader, setDataHeader] = React.useState<IHeaderProps>({ iMonth: "", iYear: "", iStatus: "", vAffcoId: "", vPackageId : ""});
+  const [dataHeader, setDataHeader] = React.useState<IHeaderProps>({
+    iMonth: "",
+    iYear: "",
+    iStatus: "",
+    vAffcoId: "",
+    vPackageId: "",
+  });
   const [open, setOpen] = React.useState(false);
   const [openApprove, setOpenApprove] = React.useState(false);
-  const [index, setIndex] = React.useState<number>(0);  
-  const [indexApprove, setIndexApprove] = React.useState<number>(0); 
+  const [index, setIndex] = React.useState<number>(0);
+  const [indexApprove, setIndexApprove] = React.useState<number>(0);
   const [dataResponse, setDataResponse] = React.useState<IRespFile[]>([]);
-  const [filterCategory, setFilterCategory] = React.useState("")
-  const [pMonth, setPMonth] = React.useState("")
-  const [pYear, setPYear] = React.useState("")
-  const [pSdate, setPSdate] = React.useState<Dayjs>(dayjs())
-  const [pEdate, setPEdate] = React.useState<Dayjs>(dayjs())
-  const [isOpenPeriod, setIsOpenPeriod] = React.useState(false)
-  const [message, setMessage] = React.useState("")
-  const [openSnack, setOpenSnack] = React.useState(false)
-  const [error, setError] = React.useState(false)
-  const [loading, setLoading] = React.useState(false)
+  const [filterCategory, setFilterCategory] = React.useState("");
+  const [pMonth, setPMonth] = React.useState("");
+  const [pYear, setPYear] = React.useState("");
+  const [pSdate, setPSdate] = React.useState<Dayjs>(dayjs());
+  const [pEdate, setPEdate] = React.useState<Dayjs>(dayjs());
+  const [isOpenPeriod, setIsOpenPeriod] = React.useState(false);
+  const [message, setMessage] = React.useState("");
+  const [openSnack, setOpenSnack] = React.useState(false);
+  const [error, setError] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
-  const navigate = useHandleUnauthorized()
-  const handleNavigate = useNavigate()
+  const navigate = useHandleUnauthorized();
+  const handleNavigate = useNavigate();
 
-  const location = useLocation()
-  const parameter = new URLSearchParams(location.search)
+  const location = useLocation();
+  const parameter = new URLSearchParams(location.search);
 
-  const [urlAffcoId, setUrlAffcoId] = React.useState("")
-  
+  const [urlAffcoId, setUrlAffcoId] = React.useState("");
 
   const fetchAffcoFilter = async () => {
-   await fetch(apiUrl + "api/Package/GeneratePICAffcoFilter", {
+    await fetch(apiUrl + "api/Package/GeneratePICAffcoFilter", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken}`,
       },
     }).then((resp) => {
-
-      if(resp.ok){
+      if (resp.ok) {
         resp.json().then((valData) => {
           setAffco(
             valData.data.map((val, index) => {
@@ -113,27 +131,25 @@ export default function AspackAprroval() {
                 id: val.vAffcoId,
                 name: val.vAffcoName,
                 category: val.vAffcoCategory,
-                status: "Active" 
+                status: "Active",
               };
             })
           );
         });
       } else {
-        navigate()
+        navigate();
       }
-      
-    })
-  }
+    });
+  };
 
-  const fetchStep = () => {    
+  const fetchStep = () => {
     fetch(apiUrl + "api/WorkflowStep/getStep", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${getToken}`,
       },
     }).then((resp) => {
-
-      if(resp.ok){
+      if (resp.ok) {
         resp.json().then((valData) => {
           const data = valData.data;
           setTemplate(
@@ -149,195 +165,176 @@ export default function AspackAprroval() {
           );
         });
       } else {
-        navigate()
+        navigate();
       }
-      
-    })
-
-  }
+    });
+  };
 
   const fetchOpenPeriode = () => {
     fetch(apiUrl + "api/Setting/GetOpenPeriod", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${getToken}`
-      }
-    }).then((resp) =>{
-      if(resp.ok) {
+        Authorization: `Bearer ${getToken}`,
+      },
+    }).then((resp) => {
+      if (resp.ok) {
         resp.json().then((data) => {
-          setPMonth(data.data.iMonth)
-          setPYear(data.data.iYear)
-          setPSdate(dayjs(data.data.dStartDate))
-          setPEdate(dayjs(data.data.dEndDate))
-        })
+          setPMonth(data.data.iMonth);
+          setPYear(data.data.iYear);
+          setPSdate(dayjs(data.data.dStartDate));
+          setPEdate(dayjs(data.data.dEndDate));
+        });
       }
-    })
-
-  }
-
+    });
+  };
 
   React.useEffect(() => {
-    fetchAffcoFilter()
-    fetchStep()
-    fetchOpenPeriode()
+    fetchAffcoFilter();
+    fetchStep();
+    fetchOpenPeriode();
 
-    if(parameter.get("magnet") !== null){
-      
-    try{
-      const urlParam = (parameter.get("magnet") || '').toString()
-    const decode = atob(urlParam)
-    const newParam = decode.split(",")
+    if (parameter.get("magnet") !== null) {
+      try {
+        const urlParam = (parameter.get("magnet") || "").toString();
+        const decode = atob(urlParam);
+        const newParam = decode.split(",");
 
-    setYear(newParam[0])
-    setMonth(newParam[1])
-    setUrlAffcoId(newParam[2])
-    } catch(error){
-      alert("url not found / invalid!")
-      handleNavigate("/Approval")
-    } 
-
+        setYear(newParam[0]);
+        setMonth(newParam[1]);
+        setUrlAffcoId(newParam[2]);
+      } catch (error) {
+        alert("url not found / invalid!");
+        handleNavigate("/Approval");
+      }
     } else {
-      handleNavigate("/Approval")
+      handleNavigate("/Approval");
     }
-
-    
   }, []);
 
   const fetchGetPackage = () => {
     fetch(
-        apiUrl +
-          `api/Package/getPackage?nYear=${year}&nMonth=${month}&vAffcoId=${vAffco?.id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${getToken}`,
-          },
-        }
-      ).then((resp) => {
-        if(resp.ok){
-          setUrlAffcoId("")
-          resp.json().then((valData) => {
-            setDataHeader({
-              vPackageId: valData.header.vPackageId,
-              iMonth: valData.header.iMonth,
-              iYear: valData.header.iYear,
-              iStatus: valData.header.iStatus,
-              vAffcoId: valData.header.vAffcoId,
-            });
-  
-            if (valData.header.vPackageId !== "") {
-              dataRespAffcoCons = valData.responseFile.filter((val) => val.vAttType === "RESPAFFCO").map((val) => ({
+      apiUrl +
+        `api/Package/getPackage?nYear=${year}&nMonth=${month}&vAffcoId=${vAffco?.id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getToken}`,
+        },
+      }
+    ).then((resp) => {
+      if (resp.ok) {
+        setUrlAffcoId("");
+        resp.json().then((valData) => {
+          setDataHeader({
+            vPackageId: valData.header.vPackageId,
+            iMonth: valData.header.iMonth,
+            iYear: valData.header.iYear,
+            iStatus: valData.header.iStatus,
+            vAffcoId: valData.header.vAffcoId,
+          });
+
+          if (valData.header.vPackageId !== "") {
+            dataRespAffcoCons = valData.responseFile
+              .filter((val) => val.vAttType === "RESPAFFCO")
+              .map((val) => ({
                 vStepId: val.vStepId,
                 vAttchName: val.vAttchName,
                 vAttType: val.vAttType,
                 vRemark: val.vRemarks,
                 fAttchContent: val.fAttchContent,
-                version: val.iVersion
-              }))
-              setDataAffco(
-                valData.detail.map((dtl) => {
-                  return {
-                    filename:
-                      dtl.fPackageFile.length > 0
-                        ? dtl.fPackageFile[0].vAttchName
-                        : "",
-                    createDate:
-                      dtl.fPackageFile.length > 0
-                        ? dtl.fPackageFile[0].dCrea
-                        : "",
-                    createBy:
-                      dtl.fPackageFile.length > 0
-                        ? dtl.fPackageFile[0].vCrea
-                        : "",
-                    docVersion:
-                      dtl.fPackageFile.length > 0
-                        ? "V" + dtl.fPackageFile.length
-                        : "",
-                    status:
-                      dtl.vStatus === "S"
-                        ? "Submitted"
-                        : dtl.vStatus === "A"
-                        ? "Approved"
-                        : dtl.vStatus === "R"
-                        ? "Revised"
-                        : "",
-                    stepid: dtl.vStepId,
-                    dApprover: dtl.dApprover,
-                    dDueDate: dtl.dDueDate,
-                    apprRemarks: dtl.vApprRemarks,
-                    userRemarks: dtl.vUsrRemarks,
-                    vTempCode: dtl.vTemporalCode,
-                    vAttachId: dtl.vAttchId,
-                    stepName: dtl.vStepName
-                  };
-                })
-              );
-            } else {
-              setDataAffco([]);
-            }
-          });
-        } else {
-          navigate()
-        }
-        
-      })
-
-  }
+                version: val.iVersion,
+              }));
+            setDataAffco(
+              valData.detail.map((dtl) => {
+                return {
+                  filename:
+                    dtl.fPackageFile.length > 0
+                      ? dtl.fPackageFile[0].vAttchName
+                      : "",
+                  createDate:
+                    dtl.fPackageFile.length > 0
+                      ? dtl.fPackageFile[0].dCrea
+                      : "",
+                  createBy:
+                    dtl.fPackageFile.length > 0
+                      ? dtl.fPackageFile[0].vCrea
+                      : "",
+                  docVersion:
+                    dtl.fPackageFile.length > 0
+                      ? "V" + dtl.fPackageFile.length
+                      : "",
+                  status:
+                    dtl.vStatus === "S"
+                      ? "Submitted"
+                      : dtl.vStatus === "A"
+                      ? "Approved"
+                      : dtl.vStatus === "R"
+                      ? "Revised"
+                      : "",
+                  stepid: dtl.vStepId,
+                  dApprover: dtl.dApprover,
+                  dDueDate: dtl.dDueDate,
+                  apprRemarks: dtl.vApprRemarks,
+                  userRemarks: dtl.vUsrRemarks,
+                  vTempCode: dtl.vTemporalCode,
+                  vAttachId: dtl.vAttchId,
+                  stepName: dtl.vStepName,
+                };
+              })
+            );
+          } else {
+            setDataAffco([]);
+          }
+        });
+      } else {
+        navigate();
+      }
+    });
+  };
 
   const handleSubmitFilter = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();  
-    if(urlAffcoId !== ""){
-      if(pMonth === month.toString() && pYear === year){
-        const now = dayjs().format('YYYY-MM-DD')
-        const nowDate = dayjs(now)
-        if(nowDate >= pSdate && nowDate <= pEdate){
-          
-          setIsOpenPeriod(true)
+    event.preventDefault();
+    if (urlAffcoId !== "") {
+      if (pMonth === month.toString() && pYear === year) {
+        const now = dayjs().format("YYYY-MM-DD");
+        const nowDate = dayjs(now);
+        if (nowDate >= pSdate && nowDate <= pEdate) {
+          setIsOpenPeriod(true);
         } else {
-          setIsOpenPeriod(false)
-          
+          setIsOpenPeriod(false);
         }
-  
-  
       } else {
-        setIsOpenPeriod(false)
+        setIsOpenPeriod(false);
       }
-      setStatus(true)
-      fetchGetPackage()      
-      
+      setStatus(true);
+      fetchGetPackage();
     } else {
-      if (year !== "" && vAffco !== undefined ) {
-        console.log("masuk ke kondisi ini")
-        if(pMonth === month.toString() && pYear === year){
-          const now = dayjs().format('YYYY-MM-DD')
-          const nowDate = dayjs(now)
-          if(nowDate >= pSdate && nowDate <= pEdate){
-            
-            setIsOpenPeriod(true)
+      if (year !== "" && vAffco !== undefined) {
+        console.log("masuk ke kondisi ini");
+        if (pMonth === month.toString() && pYear === year) {
+          const now = dayjs().format("YYYY-MM-DD");
+          const nowDate = dayjs(now);
+          if (nowDate >= pSdate && nowDate <= pEdate) {
+            setIsOpenPeriod(true);
           } else {
-            setIsOpenPeriod(false)
-            
+            setIsOpenPeriod(false);
           }
-    
-    
         } else {
-          setIsOpenPeriod(false)
+          setIsOpenPeriod(false);
         }
-        setStatus(true)
-        fetchGetPackage()      
+        setStatus(true);
+        fetchGetPackage();
       } else {
         if (year === "") {
           setHasErrorYear(true);
           setStatus(false);
         }
-        if (vAffco === undefined) {        
+        if (vAffco === undefined) {
           setHasErrorAffco(true);
           setStatus(false);
-        } 
+        }
       }
     }
-     
-    
   };
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -360,31 +357,38 @@ export default function AspackAprroval() {
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
-  };  
+  };
 
   const handleClickRevise = (data: number) => {
-    setOpen(true)
-    setIndex(data)
-    
-  }
+    setOpen(true);
+    setIndex(data);
+  };
 
   const handleClickReviseApproved = (data: number) => {
-    setOpenApprove(true)
-    setIndexApprove(data)
-  }
+    setOpenApprove(true);
+    setIndexApprove(data);
+  };
 
   const handleClickApprove = (data: number) => {
-    const date = dayjs(Date())
-    const user = getUserId !== null ? getUserId : ""
-    
-    const updateData = {...dataAffco[data], status:"Approve", dDueDate: "", apprRemarks: "", dApprover: date.format("YYYY-MM-DD"), vApprover: user}
-      const newDataAffco = [...dataAffco];
-      newDataAffco[data] = updateData;      
-      setDataAffco(newDataAffco);
-      const resData = dataResponse.filter((x) => x.vStepId !== dataAffco[data].stepid)
-      setDataResponse(resData)
+    const date = dayjs(Date());
+    const user = getUserId !== null ? getUserId : "";
 
-  }
+    const updateData = {
+      ...dataAffco[data],
+      status: "Approve",
+      dDueDate: "",
+      apprRemarks: "",
+      dApprover: date.format("YYYY-MM-DD"),
+      vApprover: user,
+    };
+    const newDataAffco = [...dataAffco];
+    newDataAffco[data] = updateData;
+    setDataAffco(newDataAffco);
+    const resData = dataResponse.filter(
+      (x) => x.vStepId !== dataAffco[data].stepid
+    );
+    setDataResponse(resData);
+  };
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -398,56 +402,57 @@ export default function AspackAprroval() {
     width: 1,
   });
 
-  
-
- function AddReviseDialog(props: IDialogProps){
-    const { open, onClose, data} = props;
+  function AddReviseDialog(props: IDialogProps) {
+    const { open, onClose, data } = props;
     const [remark, setRemark] = React.useState("");
-  const [duedate, setDueDate] = React.useState<Dayjs | null>(null);
-  const [fRemark, setFRemark] = React.useState<string | File>("");
-  const [vRemark, setVRemark] = React.useState("");
+    const [duedate, setDueDate] = React.useState<Dayjs | null>(null);
+    const [fRemark, setFRemark] = React.useState<string | File>("");
+    const [vRemark, setVRemark] = React.useState("");
 
-  console.log("data response : ",dataResponse)
+    console.log("data response : ", dataResponse);
 
     const handleFRemarkUpload = (event) => {
-      setFRemark(event.target.files[0])
-      setVRemark(event.target.files[0].name)
-    }
+      setFRemark(event.target.files[0]);
+      setVRemark(event.target.files[0].name);
+    };
 
     const handleChangeRemark = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setRemark(event.target.value)
-
-    }    
+      setRemark(event.target.value);
+    };
 
     const submitRevise = (data: number) => {
-      if(remark !== "" && duedate !== null){
-        setOpen(false)
-        setOpenApprove(false)
-      const updateData = {...dataAffco[data], status:"Revise", dDueDate: duedate ? duedate.format("YYYY-MM-DD HH:mm:ss") : "", apprRemarks: remark, dApprover: "", vApprover: ""}
-      const newDataAffco = [...dataAffco];
-      newDataAffco[data] = updateData;
-      setDataAffco(newDataAffco);
-      const resData = {
-        vStepId : dataAffco[data].stepid,
-        vAttchName : vRemark !== "" ? vRemark : "no file attach",
-        vAttType : "",
-        vRemark : remark,
-        vAttchId : dataAffco[data].vAttachId,
-        fAttchContent : fRemark
-      }
-      setDataResponse((resp) => [...resp , resData])
-
+      if (remark !== "" && duedate !== null) {
+        setOpen(false);
+        setOpenApprove(false);
+        const updateData = {
+          ...dataAffco[data],
+          status: "Revise",
+          dDueDate: duedate ? duedate.format("YYYY-MM-DD HH:mm:ss") : "",
+          apprRemarks: remark,
+          dApprover: "",
+          vApprover: "",
+        };
+        const newDataAffco = [...dataAffco];
+        newDataAffco[data] = updateData;
+        setDataAffco(newDataAffco);
+        const resData = {
+          vStepId: dataAffco[data].stepid,
+          vAttchName: vRemark !== "" ? vRemark : "no file attach",
+          vAttType: "",
+          vRemark: remark,
+          vAttchId: dataAffco[data].vAttachId,
+          fAttchContent: fRemark,
+        };
+        setDataResponse((resp) => [...resp, resData]);
       } else {
-        if(remark === ""){
-          alert("remark must be filled!")
+        if (remark === "") {
+          alert("remark must be filled!");
         }
-        if(duedate === null){
-          alert("duedate must be filled!")
+        if (duedate === null) {
+          alert("duedate must be filled!");
         }
-        
       }
-      
-    }
+    };
 
     return (
       <Dialog onClose={onClose} open={open} fullWidth>
@@ -456,7 +461,7 @@ export default function AspackAprroval() {
           aria-label="close"
           onClick={onClose}
           sx={(theme) => ({
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: theme.palette.grey[500],
@@ -465,70 +470,96 @@ export default function AspackAprroval() {
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-          <Box >
-            <FormControl fullWidth sx={{ margin: 1}}>
-              <Box >
-              <FormLabel>What needs to be revised from this document? </FormLabel>
-              <FormLabel sx={{ color: "red"}}>*</FormLabel>
+          <Box>
+            <FormControl fullWidth sx={{ margin: 1 }}>
+              <Box>
+                <FormLabel>
+                  What needs to be revised from this document?{" "}
+                </FormLabel>
+                <FormLabel sx={{ color: "red" }}>*</FormLabel>
               </Box>
-              
-              <TextField multiline rows={5} value={remark} onChange={handleChangeRemark}/>
+
+              <TextField
+                multiline
+                rows={5}
+                value={remark}
+                onChange={handleChangeRemark}
+              />
             </FormControl>
-            <FormControl fullWidth sx={{ margin: 1}}>
-            <Box >
-              <FormLabel>Due Date </FormLabel>
-              <FormLabel sx={{ color: "red"}}>*</FormLabel>
+            <FormControl fullWidth sx={{ margin: 1 }}>
+              <Box>
+                <FormLabel>Due Date </FormLabel>
+                <FormLabel sx={{ color: "red" }}>*</FormLabel>
               </Box>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileDateTimePicker
-                ampm={false}
-                orientation="landscape"
-                disablePast
-                value={duedate}
-                onChange={(newValue) => setDueDate(newValue)}
-                slotProps={{ textField: { fullWidth: true } }}
-                format="DD-MMM-YYYY HH:mm:ss"
+                  ampm={false}
+                  orientation="landscape"
+                  disablePast
+                  value={duedate}
+                  onChange={(newValue) => setDueDate(newValue)}
+                  slotProps={{ textField: { fullWidth: true } }}
+                  format="DD-MMM-YYYY HH:mm:ss"
                 />
               </LocalizationProvider>
             </FormControl>
-            <FormControl fullWidth sx={{ margin: 1}}>
+            <FormControl fullWidth sx={{ margin: 1 }}>
               <FormLabel>Attach Supporting File : </FormLabel>
               <Button
-              component="label"
-              role={undefined}
-              variant="contained"
-              tabIndex={-1}
-              startIcon={<CloudUploadIcon />}
-            >
-              Upload file
-              <VisuallyHiddenInput type="file" onChange={handleFRemarkUpload}/>
-            </Button>
-
-            </FormControl >
-            <FormControl fullWidth sx={{ margin: 1}}>
-              <FormLabel>{vRemark !== "" ? vRemark : "no file selected"}</FormLabel>
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUploadIcon />}
+              >
+                Upload file
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={handleFRemarkUpload}
+                />
+              </Button>
+            </FormControl>
+            <FormControl fullWidth sx={{ margin: 1 }}>
+              <FormLabel>
+                {vRemark !== "" ? vRemark : "no file selected"}
+              </FormLabel>
             </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button size="small" variant="contained" onClick={() => submitRevise(data)} color="success" sx={{ margin: 1}}>Add Revise</Button>
-          <Button size="small" variant="contained" onClick={onClose} color="inherit">Back</Button>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => submitRevise(data)}
+            color="success"
+            sx={{ margin: 1 }}
+          >
+            Add Revise
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={onClose}
+            color="inherit"
+          >
+            Back
+          </Button>
         </DialogActions>
       </Dialog>
-    )
+    );
   }
 
   const submitApprovals = () => {
-    setLoading(true)
-    const dataForm = new FormData();   
+    setLoading(true);
+    const dataForm = new FormData();
 
-    dataForm.append("Header.vPackageId", dataHeader.vPackageId)
-    dataForm.append("Header.iYear", dataHeader.iYear)
-    dataForm.append("Header.iMonth", dataHeader.iMonth)
-    dataForm.append("Header.iStatus", dataHeader.iStatus)
-    dataForm.append("Header.vAffcoId", dataHeader.vAffcoId)
+    dataForm.append("Header.vPackageId", dataHeader.vPackageId);
+    dataForm.append("Header.iYear", dataHeader.iYear);
+    dataForm.append("Header.iMonth", dataHeader.iMonth);
+    dataForm.append("Header.iStatus", dataHeader.iStatus);
+    dataForm.append("Header.vAffcoId", dataHeader.vAffcoId);
 
-    dataAffco.map((val,index) => {
+    dataAffco.map((val, index) => {
       return (
         dataForm.append(`Detail[${index}].vAttchId`, val.vAttachId),
         dataForm.append(`Detail[${index}].vStepId`, val.stepid),
@@ -538,62 +569,70 @@ export default function AspackAprroval() {
         dataForm.append(`Detail[${index}].vApprRemarks`, val.apprRemarks),
         dataForm.append(`Detail[${index}].vUsrRemarks`, val.userRemarks),
         dataForm.append(`Detail[${index}].vTemporalCode`, ""),
-        dataForm.append(`Detail[${index}].vStatus`, val.status === "Revise"  ? "R" : val.status === "Approve"  ? "A" : val.status === "Revised"  ? "R" : val.status === "Approved"  ? "A" : "S")
-      )
-    })
+        dataForm.append(
+          `Detail[${index}].vStatus`,
+          val.status === "Revise"
+            ? "R"
+            : val.status === "Approve"
+            ? "A"
+            : val.status === "Revised"
+            ? "R"
+            : val.status === "Approved"
+            ? "A"
+            : "S"
+        )
+      );
+    });
 
-    if(dataResponse.length > 0){
+    if (dataResponse.length > 0) {
       dataResponse?.map((val, index) => {
         return (
           dataForm.append(`Response[${index}].vStepId`, val.vStepId),
-          dataForm.append(`Response[${index}].vRemarks`, val.vRemark),          
+          dataForm.append(`Response[${index}].vRemarks`, val.vRemark),
           dataForm.append(`Response[${index}].vAttchName`, val.vAttchName),
-          dataForm.append(`Response[${index}].fAttchContent`, val.fAttchContent),
+          dataForm.append(
+            `Response[${index}].fAttchContent`,
+            val.fAttchContent
+          ),
           dataForm.append(`Response[${index}].vAttchId`, val.vAttchId)
-        )
-      })
+        );
+      });
     }
 
-    fetch(apiUrl + "api/Package/SubmitPackage",{
+    fetch(apiUrl + "api/Package/SubmitPackage", {
       method: "POST",
       headers: {
-        
         Authorization: `bearer ${getToken}`,
-          Accept: "*/*",
+        Accept: "*/*",
       },
       body: dataForm,
-
     }).then((resp) => {
-      if(resp.ok){
-        setLoading(false)
-        setMessage("Approvals submitted.")
-        setError(false)
-        setOpenSnack(true)
-        fetchGetPackage()
+      if (resp.ok) {
+        setLoading(false);
+        setMessage("Approvals submitted.");
+        setError(false);
+        setOpenSnack(true);
+        fetchGetPackage();
       } else {
-        if(resp.status === 404){
-          navigate()
-
+        if (resp.status === 404) {
+          navigate();
         } else {
-          setLoading(false)
-        setMessage("Error Server! please contact your IT Administrator")
-        setError(true)
-        setOpenSnack(true)
-        fetchGetPackage()
+          setLoading(false);
+          setMessage("Error Server! please contact your IT Administrator");
+          setError(true);
+          setOpenSnack(true);
+          fetchGetPackage();
         }
-        
       }
-    })
-
-  }
+    });
+  };
   React.useEffect(() => {
-    if(urlAffcoId !== ""){
-      console.log("bisa ke load")
-      setVAffco(affco.filter((val) => val.id === urlAffcoId)[0])
-  
+    if (urlAffcoId !== "") {
+      console.log("bisa ke load");
+      setVAffco(affco.filter((val) => val.id === urlAffcoId)[0]);
     }
-  },[urlAffcoId, affco])
-  
+  }, [urlAffcoId, affco]);
+
   return (
     <Box
       sx={{
@@ -603,17 +642,16 @@ export default function AspackAprroval() {
         alignItems: "left",
       }}
     >
-      
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          Filter Periode          
-        </AccordionSummary>    
-           
+          Filter Periode
+        </AccordionSummary>
+
         <Divider />
         <AccordionDetails>
           <Box component="form" onSubmit={handleSubmitFilter}>
             <Stack direction={"row"}>
-            <Item elevation={0}>
+              <Item elevation={0}>
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <InputLabel id="year">Select Periode Year</InputLabel>
                   <Select
@@ -624,11 +662,13 @@ export default function AspackAprroval() {
                     onChange={handleChangeYear}
                     error={hasErrorYear}
                   >
-                    { generateYears().map((val,index) => {
-                        return (
-                          <MenuItem key={index} value={val}>{val}</MenuItem>
-                        )
-                      })}
+                    {generateYears().map((val, index) => {
+                      return (
+                        <MenuItem key={index} value={val}>
+                          {val}
+                        </MenuItem>
+                      );
+                    })}
                   </Select>
                   {hasErrorYear && (
                     <FormHelperText sx={{ color: "red" }}>
@@ -648,10 +688,12 @@ export default function AspackAprroval() {
                     onChange={handleChangeMonth}
                     error={hasErrorMonth}
                   >
-                    { generateMonths.map((val) => {
+                    {generateMonths.map((val) => {
                       return (
-                        <MenuItem key={val.id} value={val.id}>{val.name}</MenuItem>
-                      )
+                        <MenuItem key={val.id} value={val.id}>
+                          {val.name}
+                        </MenuItem>
+                      );
                     })}
                   </Select>
                   {hasErrorMonth && (
@@ -660,35 +702,37 @@ export default function AspackAprroval() {
                     </FormHelperText>
                   )}
                 </FormControl>
-              </Item>              
+              </Item>
               <Item elevation={0}>
                 <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
                   <Autocomplete
                     id="vAffco-autocomplete"
-                    size="small"                    
+                    size="small"
                     isOptionEqualToValue={(option, value) => true}
-                    value={urlAffcoId === "" ? vAffco : affco.filter((val) => val.id === urlAffcoId)[0]}
+                    value={
+                      urlAffcoId === ""
+                        ? vAffco
+                        : affco.filter((val) => val.id === urlAffcoId)[0]
+                    }
                     onChange={(event, newValue) => {
-                      setUrlAffcoId("")
-                      
-                      if(newValue === null){
-                        console.log("masuk ke null : ", status)
-                        setHasErrorAffco(true); 
-                        setStatus(false)                       
+                      setUrlAffcoId("");
+
+                      if (newValue === null) {
+                        console.log("masuk ke null : ", status);
+                        setHasErrorAffco(true);
+                        setStatus(false);
                         setVAffco(newValue);
-
-                      }else{
-                        fetchGetPackage()
+                      } else {
+                        fetchGetPackage();
                         setHasErrorAffco(false);
-                      setVAffco(newValue);
-
+                        setVAffco(newValue);
                       }
                     }}
                     disablePortal
                     options={affco}
                     getOptionLabel={(option) => option.name}
                     renderOption={(props, option) => {
-                      const { key, ...optionProps } = props;                      
+                      const { key, ...optionProps } = props;
                       return (
                         <Box key={key} component="li" {...optionProps}>
                           {option.name}
@@ -730,90 +774,115 @@ export default function AspackAprroval() {
         </AccordionSummary>
         <Divider />
         <AccordionDetails>
-          {
-            message && (<CustomSnackBar open={openSnack} onClose={() => { setOpenSnack(false)}} error={error} message={message} />)
-          }
-          {
-            loading && (<Backdrop open={loading}>
+          {message && (
+            <CustomSnackBar
+              open={openSnack}
+              onClose={() => {
+                setOpenSnack(false);
+              }}
+              error={error}
+              message={message}
+            />
+          )}
+          {loading && (
+            <Backdrop open={loading}>
               <CircularProgress color="inherit" />
-            </Backdrop>)
-          }
+            </Backdrop>
+          )}
           <Stack direction={"column"}>
             <Item elevation={0}>
               {status === true && vAffco !== undefined ? (
                 <Box sx={{ width: "100%" }}>
-                  <Box sx={{ overflowX: 'auto', overflowY: 'hidden'}}>
-                  <Stepper alternativeLabel activeStep={-1}>
-                    { dataHeader?.vPackageId !== "" ? dataAffco.map((value,index) => {
-                      const iconProps: {
-                          active?: boolean;
-                          completed?: boolean;
-                        } = {};
-                        const labelProps: {
-                          optional?: React.ReactNode;
-                        } = {};
-                        if (dataAffco.length > 0) {
-                          if (dataAffco[index].status === "Submitted") {
-                            iconProps.active = true;
-                            labelProps.optional = (
-                              <Typography variant="caption" color="blue">
-                                Waiting for Approval
-                              </Typography>
+                  <Box sx={{ overflowX: "auto", overflowY: "hidden" }}>
+                    <Stepper alternativeLabel activeStep={-1}>
+                      {dataHeader?.vPackageId !== ""
+                        ? dataAffco.map((value, index) => {
+                            const iconProps: {
+                              active?: boolean;
+                              completed?: boolean;
+                            } = {};
+                            const labelProps: {
+                              optional?: React.ReactNode;
+                            } = {};
+                            if (dataAffco.length > 0) {
+                              if (dataAffco[index].status === "Submitted") {
+                                iconProps.active = true;
+                                labelProps.optional = (
+                                  <Typography variant="caption" color="blue">
+                                    Waiting for Approval
+                                  </Typography>
+                                );
+                              } else {
+                                if (dataAffco[index].status === "Revised") {
+                                  iconProps.completed = true;
+                                  labelProps.optional = (
+                                    <Typography variant="caption" color="red">
+                                      Revised
+                                    </Typography>
+                                  );
+                                } else if (
+                                  dataAffco[index].status === "Approved"
+                                ) {
+                                  iconProps.completed = true;
+                                  labelProps.optional = (
+                                    <Typography variant="caption" color="green">
+                                      Approved
+                                    </Typography>
+                                  );
+                                } else {
+                                  iconProps.active = true;
+                                  labelProps.optional = (
+                                    <Typography variant="caption" color="blue">
+                                      Waiting for Approval
+                                    </Typography>
+                                  );
+                                }
+                              }
+                            }
+                            return (
+                              <Step
+                                key={value.stepid}
+                                {...iconProps}
+                                sx={
+                                  dataAffco.length > 0
+                                    ? dataAffco[index].status === "Approved"
+                                      ? {
+                                          "& .Mui-completed": {
+                                            color: "green",
+                                          },
+                                        }
+                                      : { "& .Mui-completed": { color: "red" } }
+                                    : null
+                                }
+                              >
+                                <StepLabel
+                                  {...labelProps}
+                                  sx={{
+                                    "& .MuiStepLabel-alternativeLabel": {
+                                      color: "black",
+                                    },
+                                  }}
+                                >
+                                  {value.stepName}
+                                </StepLabel>
+                              </Step>
                             );
-                          } else {
-                            if (dataAffco[index].status === "Revised") {
-                              iconProps.completed = true;
-                              labelProps.optional = (
-                                <Typography variant="caption" color="red">
-                                  Revised
-                                </Typography>
+                          })
+                        : template
+                            .filter(
+                              (val) =>
+                                val.category === vAffco?.category ||
+                                val.category === "All"
+                            )
+                            .map((value, index) => {
+                              return (
+                                <Step key={value.name}>
+                                  <StepLabel>{value.name}</StepLabel>
+                                </Step>
                               );
-                            } else if (dataAffco[index].status === "Approved") {
-                              iconProps.completed = true;
-                              labelProps.optional = (
-                                <Typography variant="caption" color="green">
-                                  Approved
-                                </Typography>
-                              );
-                            } else {
-                              iconProps.active = true;
-                              labelProps.optional = (
-                                <Typography variant="caption" color="blue">
-                                  Waiting for Approval
-                                </Typography>
-                              );
-                            }
-                          }
-                        }
-                        return (
-                          <Step
-                            key={value.stepid}
-                            {...iconProps}
-                            sx={
-                              dataAffco.length > 0
-                                ? dataAffco[index].status === "Approved"
-                                  ? { "& .Mui-completed": { color: "green" } }
-                                  : { "& .Mui-completed": { color: "red" } }
-                                : null
-                            }
-                          >
-                            <StepLabel
-                              {...labelProps}
-                              sx={{
-                                "& .MuiStepLabel-alternativeLabel": {
-                                  color: "black",
-                                },
-                              }}
-                            >
-                              {value.stepName}
-                            </StepLabel>
-                          </Step>
-                        )
-                    }) : template.filter((val) =>
-                          val.category === vAffco?.category ||
-                          val.category === "All").map((value,index) => { return (<Step key={value.name}><StepLabel>{value.name}</StepLabel></Step>)})}
-                  </Stepper>
-                  </Box>                  
+                            })}
+                    </Stepper>
+                  </Box>
                   <Divider sx={{ marginTop: 3, marginBottom: 5 }} />
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                     <Tabs value={tab} onChange={handleChangeTab}>
@@ -832,20 +901,68 @@ export default function AspackAprroval() {
                             v.status === "Revise" ||
                             v.status === "Approve"
                         )}
-                        
                         enableRowActions
-                        renderBottomToolbarCustomActions={({ table }) => {                          
-                          const countRevApp = dataAffco.filter((v) => v.status === "Revise" || v.status === "Approve").length;                                                  
+                        enableRowSelection
+                        renderBottomToolbarCustomActions={({ table }) => {
+                          const handleDownloadFile = () => {
+                            const csv =                            table
+                              .getSelectedRowModel()
+                              .flatRows.map((row) => {
+                                return row.original.vAttachId
+
+                              });
+
+                              const vAttachId = btoa(csv.toString())
+                              window.open(
+                                apiUrl +
+                              `api/Package/MultidownloadPackage?vAttachId=${vAttachId}`
+                              )
+                          };
+                          const countRevApp = dataAffco.filter(
+                            (v) =>
+                              v.status === "Revise" || v.status === "Approve"
+                          ).length;
                           return (
-                            <div style={{ display: "flex", gap: "0.5rem" }}>                              
+                            <div style={{ display: "flex", gap: "0.5rem" }}>
                               <Button
                                 color="success"
                                 variant="contained"
-                                disabled={isOpenPeriod && countRevApp !== 0 && dataHeader?.vPackageId !== "" ? false : true}
+                                disabled={
+                                  isOpenPeriod &&
+                                  countRevApp !== 0 &&
+                                  dataHeader?.vPackageId !== ""
+                                    ? false
+                                    : true
+                                }
                                 onClick={submitApprovals}
                               >
                                 Submit Approval
                               </Button>
+                              {table.getIsSomeRowsSelected() ? (
+                                <Button
+                                  variant="contained"
+                                  color="inherit"
+                                  onClick={handleDownloadFile}
+                                >
+                                  Download selected files
+                                </Button>
+                              ) : table.getIsAllRowsSelected() ? (
+                                <Button
+                                  variant="contained"
+                                  color="inherit"
+                                  onClick={handleDownloadFile}
+                                >
+                                  Download all files
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="contained"
+                                  color="inherit"
+                                  disabled
+                                >
+                                  Download selected files
+                                </Button>
+                              )}
                             </div>
                           );
                         }}
@@ -857,9 +974,11 @@ export default function AspackAprroval() {
                               variant="contained"
                               color="warning"
                               onClick={() => {
-                                const index = dataAffco.findIndex((val) => val.stepid === row.original.stepid);                               
+                                const index = dataAffco.findIndex(
+                                  (val) => val.stepid === row.original.stepid
+                                );
 
-                                handleClickRevise(index)
+                                handleClickRevise(index);
                               }}
                             >
                               <AssignmentReturn />
@@ -870,8 +989,10 @@ export default function AspackAprroval() {
                               variant="contained"
                               color="success"
                               onClick={() => {
-                                const index = dataAffco.findIndex((val) => val.stepid === row.original.stepid);
-                                handleClickApprove(index)
+                                const index = dataAffco.findIndex(
+                                  (val) => val.stepid === row.original.stepid
+                                );
+                                handleClickApprove(index);
                               }}
                             >
                               <AssignmentTurnedIn />
@@ -880,14 +1001,18 @@ export default function AspackAprroval() {
                         )}
                         positionActionsColumn="last"
                       />
-                      <AddReviseDialog onClose={() => setOpen(false)} open={open} data={index} />
+                      <AddReviseDialog
+                        onClose={() => setOpen(false)}
+                        open={open}
+                        data={index}
+                      />
                     </Box>
                   </CustomTabs>
                   <CustomTabs value={tab} index={1}>
                     <Box>
                       <MaterialReactTable
                         columns={columnRevised}
-                        data={dataAffco.filter((v) => v.status === "Revised")}                        
+                        data={dataAffco.filter((v) => v.status === "Revised")}
                       />
                     </Box>
                   </CustomTabs>
@@ -895,8 +1020,46 @@ export default function AspackAprroval() {
                     <Box>
                       <MaterialReactTable
                         columns={columnApproved}
-                        data={dataAffco.filter((v) => v.status === "Approved" )}
+                        data={dataAffco.filter((v) => v.status === "Approved")}
                         enableRowActions
+                        enableRowSelection
+                        renderBottomToolbarCustomActions={({ table }) => {
+                          const handleDownloadFile = () => {
+                            const csv =                            table
+                              .getSelectedRowModel()
+                              .flatRows.map((row) => {
+                                return row.original.vAttachId
+
+                              });
+
+                              const vAttachId = btoa(csv.toString())
+                              window.open(
+                                apiUrl +
+                              `api/Package/MultidownloadPackage?vAttachId=${vAttachId}`
+                              )
+                          }
+                          return (
+                            <div style={{ display: "flex", gap: "0.5rem" }}>
+                              {table.getIsSomeRowsSelected() ? (
+                                <Button variant="contained" color="inherit" onClick={handleDownloadFile}>
+                                  download selected files
+                                </Button>
+                              ) : table.getIsAllRowsSelected() ? (
+                                <Button variant="contained" color="inherit" onClick={handleDownloadFile}>
+                                  download all files
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="contained"
+                                  color="inherit"
+                                  disabled
+                                >
+                                  download selected files
+                                </Button>
+                              )}
+                            </div>
+                          );
+                        }}
                         renderRowActions={({ row }) => (
                           <Stack direction={"row"}>
                             <Button
@@ -905,25 +1068,34 @@ export default function AspackAprroval() {
                               variant="contained"
                               color="warning"
                               onClick={() => {
-                                const index = dataAffco.findIndex((val) => val.stepid === row.original.stepid);                               
+                                const index = dataAffco.findIndex(
+                                  (val) => val.stepid === row.original.stepid
+                                );
 
-                                handleClickReviseApproved(index)
+                                handleClickReviseApproved(index);
                               }}
                             >
                               <AssignmentReturn />
                             </Button>
-                            
                           </Stack>
                         )}
-                        
                         positionActionsColumn="last"
                       />
-                      <AddReviseDialog onClose={() => setOpenApprove(false)} open={openApprove} data={indexApprove} />
+                      <AddReviseDialog
+                        onClose={() => setOpenApprove(false)}
+                        open={openApprove}
+                        data={indexApprove}
+                      />
                     </Box>
                   </CustomTabs>
                 </Box>
               ) : (
-                <h1>{ (status === true && vAffco === null) || (status === false && vAffco === null) ? "Select Affiliate Company to show data" : "Click filter to show data"}</h1>
+                <h1>
+                  {(status === true && vAffco === null) ||
+                  (status === false && vAffco === null)
+                    ? "Select Affiliate Company to show data"
+                    : "Click filter to show data"}
+                </h1>
               )}
             </Item>
           </Stack>

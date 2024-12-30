@@ -866,19 +866,30 @@ export default function MstUserAffco() {
     const [affcoName, setAffcoName] = React.useState("");
     const [hasErrorName, setHasErrorName] = React.useState(false)
     const [duplicate, setDuplicate] = React.useState(false)
+    const [maxLength, setMaxLength] = React.useState(false)
 
     const handleChangeAffcoId = (
       event: React.ChangeEvent<HTMLInputElement>
     ) => {
       if(event.target.value !== ""){
-        setAffcoID(event.target.value);
+        if(event.target.value.length <= 5){
+          setAffcoID(event.target.value);
         setHasErrorId(false)
         setDuplicate(false)
+        setMaxLength(false)
+
+        } else {
+          setAffcoID(event.target.value);
+          setHasErrorId(true)
+          setMaxLength(true)
+        }
+        
 
       } else {
         setAffcoID(event.target.value);
         setHasErrorId(true)
         setDuplicate(false)
+        setMaxLength(false)
       }
       
     };
@@ -909,12 +920,13 @@ export default function MstUserAffco() {
       
     };
     const submitAddAffco = () => {
-      if (affcoID !== "" && affcoName !== "" && catAffco !== "") {
+      if (affcoID !== "" && affcoName !== "" && catAffco !== "" && affcoID.length <= 5) {
         let validAffcoId = dataAffco.filter((val) => val.id.toLowerCase() === affcoID.toLowerCase())
         if(validAffcoId.length > 0){
           setDuplicate(true)
           setHasErrorId(true)
         } else {
+          
           setDuplicate(false)
           setHasErrorId(false)
           fetch(apiUrl + "api/Master/addAffco", {
@@ -993,7 +1005,7 @@ export default function MstUserAffco() {
             }}
           >
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <TextField
+              <TextField            
                 error={hasErrorId}
                 size="small"
                 label="Affco ID"
@@ -1003,7 +1015,7 @@ export default function MstUserAffco() {
               />
               {
                 hasErrorId && (<FormHelperText sx={{ color: "red" }}>
-                  { duplicate ? "Affco ID already registered." : "This is required!"} 
+                  { duplicate ? "Affco ID already registered." : maxLength ? "Affco ID cannot be more than 5 characters" :"This is required!"} 
                 </FormHelperText>)
               }
             </FormControl>

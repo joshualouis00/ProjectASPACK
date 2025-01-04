@@ -48,6 +48,7 @@ import { getUserId } from "../Component/TemplateUrl";
 import { format } from "date-fns";
 import dayjs, { Dayjs } from "dayjs";
 import { useLocation, useNavigate } from "react-router-dom";
+import useHandleUnauthorized from "../Component/handleUnauthorized";
 
 export let dataRespAffco: IRespFile[] = [];
 export let dataCountRevise: IStepProps[] = [];
@@ -93,6 +94,7 @@ export default function AffcoUpload() {
   const parameter = new URLSearchParams(location.search);
 
   const handleNavigate = useNavigate();
+  const navigate = useHandleUnauthorized();
 
   const fetchOpenPeriode = () => {
     fetch(apiUrl + "api/Setting/GetOpenPeriod", {
@@ -639,7 +641,18 @@ export default function AffcoUpload() {
         alert("success submit approvals");
         window.location.reload();
       } else {
-        alert("something wrong : " + resp.status);
+        if(resp.status === 401){
+          alert("Your session has expired. Please login again.");
+          navigate()
+        } 
+        else if(resp.status === 500){
+          alert("Internal server error, please contact your IT Administrator");
+          
+        } else {
+          alert("something wrong, error code : " + resp.status + " , please contact your IT Administrator");
+          
+        }
+        
       }
     });
   };

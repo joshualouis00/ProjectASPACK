@@ -153,7 +153,8 @@ export default function AspackAprroval() {
         resp.json().then((valData) => {
           const data = valData.data;
           setTemplate(
-            data.map((val, index) => {
+            data.filter((x) => x.bActive === true)
+            .map((val, index) => {
               return {
                 id: val.vStepId,
                 name: val.vStepDesc,

@@ -615,11 +615,12 @@ export default function AspackAprroval() {
         setOpenSnack(true);
         fetchGetPackage();
       } else {
-        if (resp.status === 404) {
+        if (resp.status === 401) {
+          alert("Your session has expired. Please login again.")
           navigate();
         } else {
           setLoading(false);
-          setMessage("Error Server! please contact your IT Administrator");
+          setMessage("Error Code : "+ resp.status + " please contact your IT Administrator");
           setError(true);
           setOpenSnack(true);
           fetchGetPackage();

@@ -234,7 +234,7 @@ export default function Kategori() {
                     onChange={handleChangeCategory}
                   >
                     <MenuItem value="ALL">All</MenuItem>
-                    {dataCategory.map((val, index) => {
+                    {dataCategory.filter((x) => x.bActive === true).map((val, index) => {
                       return (
                         <MenuItem key={index} value={val.vCode}>
                           {val.vValue1}

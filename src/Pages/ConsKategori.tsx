@@ -30,10 +30,13 @@ import {
   getRole,
   getToken,
   generateYears,
-  generateMonths
- 
+  generateMonths,
 } from "../Component/TemplateUrl";
-import { ICategory, IConsNewsProps, IConsProps } from "../Component/Interface/DataTemplate";
+import {
+  ICategory,
+  IConsNewsProps,
+  IConsProps,
+} from "../Component/Interface/DataTemplate";
 import { Download } from "@mui/icons-material";
 import useHandleUnauthorized from "../Component/handleUnauthorized";
 export default function Kategori() {
@@ -68,7 +71,7 @@ export default function Kategori() {
   const [year, setYear] = React.useState("");
   const [category, setCategory] = React.useState("ALL");
   const [dataNews, setDataNews] = React.useState<IConsNewsProps[]>([]);
-  const [dataCategory, setDataCategory] = React.useState<ICategory[]>([])
+  const [dataCategory, setDataCategory] = React.useState<ICategory[]>([]);
   const navigate = useHandleUnauthorized();
   const [openFull, setOpenFull] = React.useState(false);
   const [detailNews, setDetailNews] = React.useState<IConsNewsProps>({
@@ -83,7 +86,7 @@ export default function Kategori() {
     bActive: false,
     dLastSend: "",
     category: "",
-    vImage: ""
+    vImage: "",
   });
 
   const handleChangeMonth = (event: SelectChangeEvent) => {
@@ -98,70 +101,144 @@ export default function Kategori() {
     setCategory(event.target.value as string);
   };
 
-  const fetchCategory = () => {
-    fetch(apiUrl + "api/Setting/GetSettingValue?types=CATEGORY", {
-      method: "GET",
-      headers: {
-        Authorization: `bearer ${getToken}`,
-      },
-    }).then((resp) => {
-      if (resp.ok) {
-        resp.json().then((valData) => {
-          setDataCategory(
-            valData.data.map((val) => {
-              return {
-                vCode: val.vCode,
-                vType: val.vType,
-                vValue1: val.vValue1,
-                vValue2: val.vValue2,
-                bActive: val.bActive,
-              };
-            })
+  // const fetchCategory = () => {
+  //   fetch(apiUrl + "api/Setting/GetSettingValue?types=CATEGORY", {
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `bearer ${getToken}`,
+  //     },
+  //   }).then((resp) => {
+  //     if (resp.ok) {
+  //       resp.json().then((valData) => {
+  //         setDataCategory(
+  //           valData.data.map((val) => {
+  //             return {
+  //               vCode: val.vCode,
+  //               vType: val.vType,
+  //               vValue1: val.vValue1,
+  //               vValue2: val.vValue2,
+  //               bActive: val.bActive,
+  //             };
+  //           })
+  //         );
+  //       });
+  //     } else {
+  //       navigate();
+  //     }
+  //   });
+  // }
+
+  // React.useEffect(() => {
+  //   fetch(apiUrl + "api/Consolidate/GetConsolidateNews", {
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `Bearer ${getToken}`,
+  //     },
+  //   }).then((resp) => {
+  //     resp.json().then((news) => {
+  //       //Update 1 Juli 2025 by Joshua
+  //       const matchedData = news.data.map((val) => {
+  //         // cek kategori berdasarkan kode kategori
+  //         const matchedCategory = dataCategory.find(cat => cat.vCode === val.vConsolidateCategory);
+  //         return {
+  //           ...val,
+  //           bActive: matchedCategory ? matchedCategory.bActive : false,
+  //           category: val.vConsolidateCategoryName,
+  //           vImage: val.vImage,
+  //         };
+  //       });
+  //       setDataNews(matchedData);
+  //       console.log("Check Data News : " + JSON.stringify(matchedData, null, 2));
+  //       // setDataNews(
+  //       //   news.data.map((val) => {
+  //       //     return {
+  //       //       uUid: val.uUid,
+  //       //       vTitle: val.vTitle,
+  //       //       vDescription: val.vDescription,
+  //       //       vSubTitle: val.vSubTitle,
+  //       //       vAttachment: val.vAttachment,
+  //       //       vConsolidateCategory: val.vConsolidateCategory,
+  //       //       dCrea: val.dCrea,
+  //       //       vCrea: val.vCrea,
+  //       //       bActive: val.bActive,
+  //       //       dLastSend: val.dLastSend,
+  //       //       category: val.vConsolidateCategoryName,
+  //       //       vImage: val.vImage
+  //       //     };
+  //       //   })
+  //       // );
+  //     });
+  //   });
+  //   fetchCategory()
+  // }, []);
+
+  // Update 1 Juli 2025 by Joshua
+  // Combine useEffect Category dan News
+  React.useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const categoryResp = await fetch(
+          apiUrl + "api/Setting/GetSettingValue?types=CATEGORY",
+          {
+            method: "GET",
+            headers: { Authorization: `bearer ${getToken}` },
+          }
+        );
+        const categoryData = await categoryResp.json();
+        const categories = categoryData.data.map((val) => ({
+          vCode: val.vCode,
+          vType: val.vType,
+          vValue1: val.vValue1,
+          vValue2: val.vValue2,
+          bActive: val.bActive,
+        }));
+        console.log("Check Categories : ", categories);
+        setDataCategory(categories);
+
+        const newsResp = await fetch(
+          apiUrl + "api/Consolidate/GetConsolidateNews",
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${getToken}` },
+          }
+        );
+        const newsData = await newsResp.json();
+        const mappedNews = newsData.data.map((val) => {
+          const matchedCategory = categories.find(
+            (cat) => cat.vCode === val.vConsolidateCategory && cat.bActive === val.bActive
           );
+          return {
+            uUid: val.uUid,
+            vTitle: val.vTitle,
+            vDescription: val.vDescription,
+            vSubTitle: val.vSubTitle,
+            vAttachment: val.vAttachment,
+            vConsolidateCategory: val.vConsolidateCategory,
+            dCrea: val.dCrea,
+            vCrea: val.vCrea,
+            bActive: matchedCategory ? matchedCategory.bActive : false,
+            dLastSend: val.dLastSend,
+            category: val.vConsolidateCategoryName,
+            vImage: val.vImage,
+          };
         });
-      } else {
+        console.log("Check Data News : ", mappedNews);
+        setDataNews(mappedNews);
+      } catch (error) {
+        console.error("Check Error nich : ", error);
         navigate();
       }
-    });
-  }
-
-  React.useEffect(() => {
-    fetch(apiUrl + "api/Consolidate/GetConsolidateNews", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${getToken}`,
-      },
-    }).then((resp) => {
-      resp.json().then((news) => {
-        setDataNews(
-          news.data.map((val) => {
-            return {
-              uUid: val.uUid,
-              vTitle: val.vTitle,
-              vDescription: val.vDescription,
-              vSubTitle: val.vSubTitle,
-              vAttachment: val.vAttachment,
-              vConsolidateCategory: val.vConsolidateCategory,
-              dCrea: val.dCrea,
-              vCrea: val.vCrea,
-              bActive: val.bActive,
-              dLastSend: val.dLastSend,
-              category: val.vConsolidateCategoryName,
-              vImage: val.vImage
-            };
-          })
-        );
-      });
-    });
-    fetchCategory()
+    };
+    fetchAll();
   }, []);
 
   const handleClickDownload = (data: string) => {
-    const encode = btoa(data)
+    const encode = btoa(data);
 
-    window.open(apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + encode)
-
-  }
+    window.open(
+      apiUrl + "api/Consolidate/DownloadAttachment?vAttachId=" + encode
+    );
+  };
 
   const handleClickFull = (data: IConsNewsProps) => {
     setOpenFull(true);
@@ -228,19 +305,21 @@ export default function Kategori() {
                   <Select
                     labelId="category"
                     name="vCategory"
-                    defaultValue={category}
+                    //defaultValue={category}
                     value={category}
                     label="Select Category"
                     onChange={handleChangeCategory}
                   >
                     <MenuItem value="ALL">All</MenuItem>
-                    {dataCategory.filter((x) => x.bActive === true).map((val, index) => {
-                      return (
-                        <MenuItem key={index} value={val.vCode}>
-                          {val.vValue1}
-                        </MenuItem>
-                      );
-                    })}
+                    {dataCategory
+                      .filter((x) => x.bActive === true)
+                      .map((val, index) => {
+                        return (
+                          <MenuItem key={index} value={val.vCode}>
+                            {val.vValue1}
+                          </MenuItem>
+                        );
+                      })}
                   </Select>
                 </FormControl>
               </Item>
@@ -276,129 +355,166 @@ export default function Kategori() {
                     onChange={handleChangeMonth}
                   >
                     <MenuItem value="">Select Periode Month</MenuItem>
-                    {generateMonths.filter((val) => val.id !== 13).map((val) => {
-                      return (
-                        <MenuItem key={val.id} value={val.id}>
-                          {val.name}
-                        </MenuItem>
-                      );
-                    })}
+                    {generateMonths
+                      .filter((val) => val.id !== 13)
+                      .map((val) => {
+                        return (
+                          <MenuItem key={val.id} value={val.id}>
+                            {val.name}
+                          </MenuItem>
+                        );
+                      })}
                   </Select>
                 </FormControl>
               </Item>
             </Stack>
           </Item>
           <Item elevation={0}>
-          <ExpandNews
+            <ExpandNews
               open={openFull}
               onClose={() => {
                 setOpenFull(false);
               }}
               data={detailNews}
             />
-          <Carousel
-                swipeable={true}
-                draggable={true}
-                showDots={true}
-                responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
-                infinite={true}
-                autoPlay={true}
-                autoPlaySpeed={2000}
-                keyBoardControl={true}
-                customTransition="all .5"
-                transitionDuration={500}
-                containerClass="carousel-container"
-                removeArrowOnDeviceType={["tablet", "mobile"]}
-                dotListClass="custom-dot-list-style"
-                itemClass="carousel-item-padding-40-px"
-              >
-                {dataNews?.filter((val) =>  {
-                  if(category === "ALL" && year === "" && month === "" ){
-                    return val.bActive === true
+            <Carousel
+              swipeable={true}
+              draggable={true}
+              showDots={true}
+              responsive={responsive}
+              ssr={true} // means to render carousel on server-side.
+              infinite={true}
+              autoPlay={true}
+              autoPlaySpeed={2000}
+              keyBoardControl={true}
+              customTransition="all .5"
+              transitionDuration={500}
+              containerClass="carousel-container"
+              removeArrowOnDeviceType={["tablet", "mobile"]}
+              dotListClass="custom-dot-list-style"
+              itemClass="carousel-item-padding-40-px"
+            >
+              {dataNews
+                ?.filter((val) => {
+                  if (category === "ALL" && year === "" && month === "") {
+                    return val.bActive === true;
                   }
-                  if(category === "ALL" && year !== "" && month !== ""){
-                    return parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  if (category === "ALL" && year !== "" && month !== "") {
+                    return (
+                      parseInt(val.dCrea.split("-")[2]) === parseInt(year) &&
+                      parseInt(val.dCrea.split("-")[1]) === parseInt(month) &&
+                      val.bActive === true
+                    );
                   }
-                  if(category === "ALL" && year !== "" && month === ""){
-                    return parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true
+                  if (category === "ALL" && year !== "" && month === "") {
+                    return (
+                      parseInt(val.dCrea.split("-")[2]) === parseInt(year) &&
+                      val.bActive === true
+                    );
                   }
-                  if(category === "ALL" && year === "" && month !== ""){
-                    return parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  if (category === "ALL" && year === "" && month !== "") {
+                    return (
+                      parseInt(val.dCrea.split("-")[1]) === parseInt(month) &&
+                      val.bActive === true
+                    );
                   }
-                  if(category !== "ALL" && year === "" && month === ""){
-                    return val.vConsolidateCategory === category && val.bActive === true
+                  if (category !== "ALL" && year === "" && month === "") {
+                    return (
+                      val.vConsolidateCategory === category &&
+                      val.bActive === true
+                    );
                   }
-                  if(category !== "ALL" && year !== "" && month !== ""){
-                    return val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  if (category !== "ALL" && year !== "" && month !== "") {
+                    return (
+                      val.vConsolidateCategory === category &&
+                      parseInt(val.dCrea.split("-")[2]) === parseInt(year) &&
+                      parseInt(val.dCrea.split("-")[1]) === parseInt(month) &&
+                      val.bActive === true
+                    );
                   }
-                  if(category !== "ALL" && year !== "" && month === ""){
-                    return val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[2]) === parseInt(year) && val.bActive === true
+                  if (category !== "ALL" && year !== "" && month === "") {
+                    return (
+                      val.vConsolidateCategory === category &&
+                      parseInt(val.dCrea.split("-")[2]) === parseInt(year) &&
+                      val.bActive === true
+                    );
                   }
-                  if(category !== "ALL" && year === "" && month !== ""){
-                    return val.vConsolidateCategory === category && parseInt(val.dCrea.split("-")[1]) === parseInt(month) && val.bActive === true
+                  if (category !== "ALL" && year === "" && month !== "") {
+                    return (
+                      val.vConsolidateCategory === category &&
+                      parseInt(val.dCrea.split("-")[1]) === parseInt(month) &&
+                      val.bActive === true
+                    );
                   }
-                }).map((item, index) => (
+                })
+                .map((item, index) => (
                   <Card
-                        sx={{
-                          maxWidth: 300,
-                          maxHeight: 500,
-                          marginBottom: 5,
-                          borderRadius: 3,
-                          marginTop: 1,                          
-                          marginRight: 2,
-                        }}
-                        key={index}
-                      >
-                        <CardMedia 
-                        sx={{
-                          maxWidth: 300,
-                          height: 150
-                        }}
-                        component={'img'}
-                        src={item.vImage}
-                        
-                        />
-                        <CardHeader
-                          sx={{
-                            "& .MuiCardHeader-title": { color: "white" },
-                            "& .MuiCardHeader-subheader": { color: "white" },
-                            backgroundColor: "seagreen",
-                          }}
-                          title={item.vTitle.length < 20 ? item.vTitle : item.vTitle.substring(0,15) + "..."}
-                          subheader={item.vSubTitle.length <= 25 ? item.vSubTitle : item.vSubTitle.substring(0,20) + "..."}
-                        />
-                        <CardActionArea
-                          onClick={() => {
-                            handleClickFull(item);
-                          }}
+                    sx={{
+                      maxWidth: 300,
+                      maxHeight: 500,
+                      marginBottom: 5,
+                      borderRadius: 3,
+                      marginTop: 1,
+                      marginRight: 2,
+                    }}
+                    key={index}
+                  >
+                    <CardMedia
+                      sx={{
+                        maxWidth: 300,
+                        height: 150,
+                      }}
+                      component={"img"}
+                      src={item.vImage}
+                    />
+                    <CardHeader
+                      sx={{
+                        "& .MuiCardHeader-title": { color: "white" },
+                        "& .MuiCardHeader-subheader": { color: "white" },
+                        backgroundColor: "seagreen",
+                      }}
+                      title={
+                        item.vTitle.length < 20
+                          ? item.vTitle
+                          : item.vTitle.substring(0, 15) + "..."
+                      }
+                      subheader={
+                        item.vSubTitle.length <= 25
+                          ? item.vSubTitle
+                          : item.vSubTitle.substring(0, 20) + "..."
+                      }
+                    />
+                    <CardActionArea
+                      onClick={() => {
+                        handleClickFull(item);
+                      }}
+                    >
+                      <CardContent sx={{ minHeight: 100 }}>
+                        <Typography
+                          variant="body1"
+                          color="text.secondary"
+                          noWrap
                         >
-                          <CardContent sx={{ minHeight: 100 }}>
-                            <Typography
-                              variant="body1"
-                              color="text.secondary"
-                              noWrap
-                            >
-                              {item.vDescription}
-                            </Typography>
-                          </CardContent>
-                        </CardActionArea>
-                        <CardActions sx={{ backgroundColor: "seagreen" }}>                          
-                          <IconButton
-                            id="menu-button"
-                            onClick={() => {
-                              handleClickDownload(item.uUid);
-                            }}
-                          >
-                            <Download color="inherit" />
-                            <Typography variant="body2" color="white">
-                              Download
-                            </Typography>
-                          </IconButton>
-                        </CardActions>
-                      </Card>
+                          {item.vDescription}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                    <CardActions sx={{ backgroundColor: "seagreen" }}>
+                      <IconButton
+                        id="menu-button"
+                        onClick={() => {
+                          handleClickDownload(item.uUid);
+                        }}
+                      >
+                        <Download color="inherit" />
+                        <Typography variant="body2" color="white">
+                          Download
+                        </Typography>
+                      </IconButton>
+                    </CardActions>
+                  </Card>
                 ))}
-              </Carousel>
+            </Carousel>
           </Item>
         </Stack>
       </Box>

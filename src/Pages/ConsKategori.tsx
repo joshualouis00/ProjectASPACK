@@ -101,79 +101,6 @@ export default function Kategori() {
     setCategory(event.target.value as string);
   };
 
-  // const fetchCategory = () => {
-  //   fetch(apiUrl + "api/Setting/GetSettingValue?types=CATEGORY", {
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `bearer ${getToken}`,
-  //     },
-  //   }).then((resp) => {
-  //     if (resp.ok) {
-  //       resp.json().then((valData) => {
-  //         setDataCategory(
-  //           valData.data.map((val) => {
-  //             return {
-  //               vCode: val.vCode,
-  //               vType: val.vType,
-  //               vValue1: val.vValue1,
-  //               vValue2: val.vValue2,
-  //               bActive: val.bActive,
-  //             };
-  //           })
-  //         );
-  //       });
-  //     } else {
-  //       navigate();
-  //     }
-  //   });
-  // }
-
-  // React.useEffect(() => {
-  //   fetch(apiUrl + "api/Consolidate/GetConsolidateNews", {
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `Bearer ${getToken}`,
-  //     },
-  //   }).then((resp) => {
-  //     resp.json().then((news) => {
-  //       //Update 1 Juli 2025 by Joshua
-  //       const matchedData = news.data.map((val) => {
-  //         // cek kategori berdasarkan kode kategori
-  //         const matchedCategory = dataCategory.find(cat => cat.vCode === val.vConsolidateCategory);
-  //         return {
-  //           ...val,
-  //           bActive: matchedCategory ? matchedCategory.bActive : false,
-  //           category: val.vConsolidateCategoryName,
-  //           vImage: val.vImage,
-  //         };
-  //       });
-  //       setDataNews(matchedData);
-  //       console.log("Check Data News : " + JSON.stringify(matchedData, null, 2));
-  //       // setDataNews(
-  //       //   news.data.map((val) => {
-  //       //     return {
-  //       //       uUid: val.uUid,
-  //       //       vTitle: val.vTitle,
-  //       //       vDescription: val.vDescription,
-  //       //       vSubTitle: val.vSubTitle,
-  //       //       vAttachment: val.vAttachment,
-  //       //       vConsolidateCategory: val.vConsolidateCategory,
-  //       //       dCrea: val.dCrea,
-  //       //       vCrea: val.vCrea,
-  //       //       bActive: val.bActive,
-  //       //       dLastSend: val.dLastSend,
-  //       //       category: val.vConsolidateCategoryName,
-  //       //       vImage: val.vImage
-  //       //     };
-  //       //   })
-  //       // );
-  //     });
-  //   });
-  //   fetchCategory()
-  // }, []);
-
-  // Update 1 Juli 2025 by Joshua
-  // Combine useEffect Category dan News
   React.useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -192,7 +119,7 @@ export default function Kategori() {
           vValue2: val.vValue2,
           bActive: val.bActive,
         }));
-        console.log("Check Categories : ", categories);
+
         setDataCategory(categories);
 
         const newsResp = await fetch(
@@ -205,7 +132,9 @@ export default function Kategori() {
         const newsData = await newsResp.json();
         const mappedNews = newsData.data.map((val) => {
           const matchedCategory = categories.find(
-            (cat) => cat.vCode === val.vConsolidateCategory && cat.bActive === val.bActive
+            (cat) =>
+              cat.vCode === val.vConsolidateCategory &&
+              cat.bActive === val.bActive
           );
           return {
             uUid: val.uUid,
@@ -222,10 +151,9 @@ export default function Kategori() {
             vImage: val.vImage,
           };
         });
-        console.log("Check Data News : ", mappedNews);
+
         setDataNews(mappedNews);
       } catch (error) {
-        console.error("Check Error nich : ", error);
         navigate();
       }
     };

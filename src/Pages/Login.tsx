@@ -91,6 +91,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     if (!userId || !password) {
       setError("Username and password are required");
       return;
@@ -103,10 +104,17 @@ const Login: React.FC = () => {
         target: value,
       });
 
-      const { token } = resp.data;
-      const decode = jwtDecode<CustomJwtPayload>(token);
+      // ✅ Cek apakah portal FPA, dan API memberi URL redirect
+      if (value === "FPA" && resp.data?.url) {
+        window.location.replace(resp.data.url);
+        return; // stop eksekusi lanjut
+      }
 
-      if (token) {
+      // 🔹 Kalau bukan FPA (mis. ASP) tetap lanjut ke login biasa
+      const { token } = resp.data;
+      if (value === "ASP" && token) {
+        const decode = jwtDecode<CustomJwtPayload>(token);
+
         localStorage.setItem("token", token);
         localStorage.setItem("UserID", decode.UserID);
         localStorage.setItem("UserName", decode.UserName);
@@ -116,9 +124,8 @@ const Login: React.FC = () => {
 
         navigate("/welcome");
         window.location.reload();
-      } else {
-        setError("Token not found in response");
       }
+      
     } catch (error) {
       setError("Invalid username or password");
     }
@@ -132,7 +139,10 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.get(
-        apiUrl + `api/Auth/requestForgetPassword?vUserId=${salt + btoa(userIdForForget)}`
+        apiUrl +
+          `api/Auth/requestForgetPassword?vUserId=${
+            salt + btoa(userIdForForget)
+          }`
       );
 
       if (response.data.success) {
@@ -184,7 +194,7 @@ const Login: React.FC = () => {
         alignItems: "center", // Tambahkan ini
       }}
     >
-      <Container component="main" maxWidth="xs" sx={{mb: 1}}>
+      <Container component="main" maxWidth="xs" sx={{ mb: 1 }}>
         {/* <LoginPage /> */}
         <CssBaseline />
         <Paper elevation={15} style={paperStyle}>

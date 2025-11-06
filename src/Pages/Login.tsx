@@ -20,17 +20,12 @@ import {
   DialogTitle,
 } from "@mui/material";
 import UseToggleSidebar from "../CommonHandler/UseToggleSidebar";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import { genSaltSync } from "bcrypt-ts";
 import { apiUrl } from "../Component/TemplateUrl";
 import { ForgetPassword, forgetToken } from "./ForgetPassword";
-import LoginPage from "../Component/BgLogin";
-import BackGroundLogin from "../assets/BgLogin.png";
-
-const theme = createTheme();
 
 interface CustomJwtPayload extends JwtPayload {
   UserID: string;
@@ -42,30 +37,23 @@ interface CustomJwtPayload extends JwtPayload {
 }
 
 const Login: React.FC = () => {
+  const params = new URLSearchParams(window.location.search);
   const [userId, setUserID] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const [value, setValue] = React.useState("ASP");
   const [openForgetDialog, setOpenForgetDialog] = useState(false);
   const [openChangePassDialog, setOpenChangePassDialog] = useState(false);
   const [userIdForForget, setUserIDForForget] = useState("");
   const [resetError, setResetError] = useState<string>("");
 
+  console.log("ErrorMessage : ", params.get("ErrorMessage"));
+
   React.useEffect(() => {
     if (forgetToken !== "") {
       setOpenChangePassDialog(true);
     } else {
       setOpenChangePassDialog(false);
-    }
-
-    console.log("Token Forget", forgetToken);
-
-    if (error) {
-      const timer = setTimeout(() => {
-        setError("");
-      }, 5000); // 5000ms = 5 detik
-
-      return () => clearTimeout(timer);
     }
 
     if (resetError) {
@@ -105,9 +93,13 @@ const Login: React.FC = () => {
       });
 
       // ✅ Cek apakah portal FPA, dan API memberi URL redirect
-      if (value === "FPA" && resp.data?.url) {
-        window.location.replace(resp.data.url);
-        return; // stop eksekusi lanjut
+      if (value === "FPA") {
+        if (resp.data?.url) {
+          window.location.replace(resp.data.url);
+        } else {
+          setError(params.get("ErrorMessage"));
+          console.log("ErrorMessage : ", params.get("ErrorMessage"));
+        }
       }
 
       // 🔹 Kalau bukan FPA (mis. ASP) tetap lanjut ke login biasa
@@ -125,7 +117,6 @@ const Login: React.FC = () => {
         navigate("/welcome");
         window.location.reload();
       }
-      
     } catch (error) {
       setError("Invalid username or password");
     }
@@ -179,7 +170,6 @@ const Login: React.FC = () => {
   const btnstyle = { margin: "8px 0" };
 
   return (
-    // <ThemeProvider theme={theme}>
     <Box
       sx={{
         backgroundImage: `url(${require("../assets/Login.png")})`,
